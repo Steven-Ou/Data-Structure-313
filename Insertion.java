@@ -10,4 +10,12 @@ public class Insertion {
             a[j+1] = k; 
         }
     }
+    public static int linear_search(int arr[], int target){
+        for(int i=0;i<target;i++){
+            if(arr[i]==target){
+                return i;
+            }
+        }
+        return -1;
+    }
 }
