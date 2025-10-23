@@ -1,4 +1,4 @@
-public class Insertion {
+public class Sort {
     public static void insertion_sort(int[] a) {
         for (int i = 2; i < a.length; i++) {
             int k = a[i];
