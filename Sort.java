@@ -35,6 +35,21 @@ public class Sort {
         int j=0;
         int k=p;
 
-        
+        while(i<n1&&j<n2){
+            if(L[i]<=R[i]){
+                arr[k]=L[i];
+                i++;
+            }else{
+                arr[k]=R[j];
+                j++;
+            }
+            k++;
+        }
+
+        while(i<n1){
+            arr[k]=L[i];
+            i++;
+            k++;
+        }
     }
 }
