@@ -58,4 +58,7 @@ public class Sort {
             k++;
         }
     }
+    public static int binary_Search(int arr[], int n, int target ){
+
+    }
 }
