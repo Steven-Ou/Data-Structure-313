@@ -60,6 +60,14 @@ public class Sort {
     }
     public static int binary_Search(int arr[], int n, int target ){
         int low =0;
-        int hight = n-1;
+        int high = n-1;
+
+        while(low<=high){
+            int mid = low+(high-low)/2;
+
+            if(arr[mid]==target){
+                
+            }
+        }
     }
 }
