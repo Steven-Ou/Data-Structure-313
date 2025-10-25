@@ -59,6 +59,7 @@ public class Sort {
         }
     }
     public static int binary_Search(int arr[], int n, int target ){
-
+        int low =0;
+        int hight = n-1;
     }
 }
