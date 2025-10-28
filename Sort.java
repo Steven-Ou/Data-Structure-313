@@ -83,6 +83,7 @@ public class Sort {
     }
 
     public static int partition(int arr[], int p, int r){
-
+        int x = arr[r];
+        int i = p-1;
     }
 }
