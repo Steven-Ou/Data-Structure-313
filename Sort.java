@@ -81,4 +81,8 @@ public class Sort {
         a = b;
         b =temp;
     }
+
+    int partition(int arr[], int p, int r){
+        
+    }
 }
