@@ -76,13 +76,13 @@ public class Sort {
         return -1;
     }
 
-    void swap(int a, int b){
+    public static void swap(int a, int b){
         int temp = a;
         a = b;
         b =temp;
     }
 
-    int partition(int arr[], int p, int r){
-        
+    public static int partition(int arr[], int p, int r){
+
     }
 }
