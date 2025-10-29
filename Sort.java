@@ -95,4 +95,7 @@ public class Sort {
         swap(arr[i+1],arr[r]);
         return i+1; 
     }
+    public static int randomized_partition(){
+        
+    }
 }
