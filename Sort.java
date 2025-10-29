@@ -92,5 +92,7 @@ public class Sort {
                 swap(arr[i],arr[j]);
             }
         }
+        swap(arr[i+1],arr[r]);
+        return i+1; 
     }
 }
