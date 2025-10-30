@@ -9,6 +9,8 @@ public class rbt {
         Node left;
         Node right; 
 
-        
+        Node(int key){
+            this.key =key;
+        }
     }
 }
