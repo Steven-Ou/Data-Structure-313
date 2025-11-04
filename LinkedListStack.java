@@ -25,5 +25,6 @@ public class LinkedListStack<T> {
 
         newNode.next=top;
         top = newNode;
+        System.out.println("Pushed:" + value);
     }
 }
