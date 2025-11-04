@@ -11,5 +11,6 @@ class Node<T>{
     }
 }
 public class LinkedListStack {
+    private Node<T> top;
     
 }
