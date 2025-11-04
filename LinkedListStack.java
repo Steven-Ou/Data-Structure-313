@@ -22,6 +22,8 @@ public class LinkedListStack<T> {
 
     public void push(T value){
         Node<T> newNode = new Node<>(value);
-        
+
+        newNode.next=top;
+        top = newNode;
     }
 }
