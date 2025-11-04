@@ -19,4 +19,9 @@ public class LinkedListStack<T> {
     public boolean isEmpty(){
         return top ==null;
     }
+
+    public void push(T value){
+        Node<T> newNode = new Node<>(value);
+        
+    }
 }
