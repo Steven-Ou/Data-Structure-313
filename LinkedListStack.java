@@ -1,4 +1,3 @@
-import java.lang.classfile.components.ClassPrinter.Node;
 import java.util.EmptyStackException;
 
 class Node<T>{
@@ -10,7 +9,14 @@ class Node<T>{
         this.next =null;
     }
 }
-public class LinkedListStack {
+public class LinkedListStack<T> {
     private Node<T> top;
-    
+
+    public LinkedListStack(){
+        this.top =null;
+    }
+
+    public boolean isEmpty(){
+        return top ==null;
+    }
 }
