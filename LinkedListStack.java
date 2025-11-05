@@ -27,4 +27,11 @@ public class LinkedListStack<T> {
         top = newNode;
         System.out.println("Pushed:" + value);
     }
+
+    public T pop(){
+        if(isEmpty()){
+            throw new EmptyStackException();
+        }
+    }
 }
+
