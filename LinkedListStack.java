@@ -32,6 +32,10 @@ public class LinkedListStack<T> {
         if(isEmpty()){
             throw new EmptyStackException();
         }
+
+        T dataToReturn = top.data; //storing the data to return
+        top = top.next; // Update top to point to the next node
     }
+
 }
 
