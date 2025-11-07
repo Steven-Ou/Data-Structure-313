@@ -39,6 +39,10 @@ public class LinkedListStack<T> {
         System.out.println("Popped: "+ dataToReturn);
         return dataToReturn;
     }
-
+    public T peek(){
+        is (isEmpty()){
+            throw new EmptyStackException();
+        }
+    }
 }
 
