@@ -35,6 +35,8 @@ public class LinkedListStack<T> {
 
         T dataToReturn = top.data; //storing the data to return
         top = top.next; // Update top to point to the next node
+
+        System.out.println("Pushed: "+value);
     }
 
 }
