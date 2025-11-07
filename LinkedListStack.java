@@ -40,9 +40,10 @@ public class LinkedListStack<T> {
         return dataToReturn;
     }
     public T peek(){
-        is (isEmpty()){
+        if (isEmpty()){
             throw new EmptyStackException();
         }
+        return top.data;
     }
 }
 
