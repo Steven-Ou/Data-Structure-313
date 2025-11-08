@@ -45,5 +45,10 @@ public class LinkedListStack<T> {
         }
         return top.data;
     }
+
+    public static void main(Stirng[] args){
+        LinkedListStack<Integer> stack = new LinkedListStack<>();
+
+    }
 }
 
