@@ -54,6 +54,12 @@ public class LinkedListStack<T> {
         stack.push(30);
 
         System.out.println("Current top (peek): "+ stack.peek());
+
+        try{
+            stack.pop();
+            stack.pop();
+            System.out.println("Current top (peek): "+ stack.peek());
+        }
     }
 }
 
