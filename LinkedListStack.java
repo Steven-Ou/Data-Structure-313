@@ -49,6 +49,9 @@ public class LinkedListStack<T> {
     public static void main(Stirng[] args){
         LinkedListStack<Integer> stack = new LinkedListStack<>();
 
+        stack.push(10);
+        stack.push(20);
+        stack.push(30);
     }
 }
 
