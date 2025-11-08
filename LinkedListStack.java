@@ -59,6 +59,10 @@ public class LinkedListStack<T> {
             stack.pop();
             stack.pop();
             System.out.println("Current top (peek): "+ stack.peek());
+            stack.pop();
+            stack.pop();
+        }catch(EmptyStackException e){
+            System.out.println("Error: Stack is empty!");
         }
     }
 }
