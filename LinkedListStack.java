@@ -50,7 +50,7 @@ public class LinkedListStack<T> {
         newNode.next = this.head;
         this.head= newNode;
     }
-    public T delete(){
+    public T deleteHead(){
         if(isEmpty()){
             return null;
         }
