@@ -54,7 +54,10 @@ public class LinkedListStack<T> {
         if(isEmpty()){
             return null;
         }
-        
+        T data = head.data;
+        head = head.next;
+
+        return data;
     }
     public static void main(String[] args){
         LinkedListStack<Integer> stack = new LinkedListStack<>();
