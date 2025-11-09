@@ -50,6 +50,12 @@ public class LinkedListStack<T> {
         newNode.next = this.head;
         this.head= newNode;
     }
+    public T delete(){
+        if(isEmpty()){
+            return null;
+        }
+        
+    }
     public static void main(String[] args){
         LinkedListStack<Integer> stack = new LinkedListStack<>();
 
