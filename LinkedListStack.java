@@ -11,7 +11,7 @@ class Node<T>{
 }
 public class LinkedListStack<T> {
     private Node<T> top;
-
+    private Node<T> head;
     public LinkedListStack(){
         this.top =null;
     }
@@ -45,7 +45,11 @@ public class LinkedListStack<T> {
         }
         return top.data;
     }
-
+    public void insertAtHead(T value){
+        Node<T> newNode = new Node<>(value);
+        newNode.next = this.head;
+        this.head= newNode;
+    }
     public static void main(String[] args){
         LinkedListStack<Integer> stack = new LinkedListStack<>();
 
