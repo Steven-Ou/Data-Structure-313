@@ -59,6 +59,9 @@ public class LinkedListStack<T> {
 
         return data;
     }
+    public T deleteTail(){
+        
+    }
     public static void main(String[] args){
         LinkedListStack<Integer> stack = new LinkedListStack<>();
 
