@@ -60,7 +60,9 @@ public class LinkedListStack<T> {
         return data;
     }
     public T deleteTail(){
-        
+        if(isEmpty()){
+            return null;
+        }
     }
     public static void main(String[] args){
         LinkedListStack<Integer> stack = new LinkedListStack<>();
