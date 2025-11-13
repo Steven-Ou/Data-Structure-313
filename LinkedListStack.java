@@ -63,6 +63,11 @@ public class LinkedListStack<T> {
         if(isEmpty()){
             return null;
         }
+        if(head.next == null){
+            T data = head.data;
+            head = null;
+            return data; 
+        }
     }
     public static void main(String[] args){
         LinkedListStack<Integer> stack = new LinkedListStack<>();
