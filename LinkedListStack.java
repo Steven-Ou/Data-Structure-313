@@ -76,6 +76,8 @@ public class LinkedListStack<T> {
             previous = current ;
             current = current.next;
         }
+
+        T data = current.data;
     }
     public static void main(String[] args){
         LinkedListStack<Integer> stack = new LinkedListStack<>();
