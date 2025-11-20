@@ -71,6 +71,11 @@ public class LinkedListStack<T> {
 
         Node<T> current =head;
         Node<T> previous =null;
+
+        while(current.next != null){
+            previous = current ;
+            current = current.next;
+        }
     }
     public static void main(String[] args){
         LinkedListStack<Integer> stack = new LinkedListStack<>();
