@@ -116,6 +116,11 @@ public class LinkedListStack<T> {
         previous.next = current.next;
         return true;
     }
+    public static B treeMinimumRecursive(B x){
+        if(x ==null){
+            return null;
+        }
+    }
     public static void main(String[] args){
         LinkedListStack<Integer> stack = new LinkedListStack<>();
 
