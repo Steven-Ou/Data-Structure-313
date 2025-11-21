@@ -123,6 +123,7 @@ public class LinkedListStack<T> {
         if(x.left ==null){
             return x;
         }
+        return treeMinimumRecursive(x.left);
     }
     public static void main(String[] args){
         LinkedListStack<Integer> stack = new LinkedListStack<>();
