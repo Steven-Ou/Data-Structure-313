@@ -100,8 +100,10 @@ public class LinkedListStack<T> {
         }
         
         if(current ==null){
-
+            return false;
         }
+        previous.next = current.next;
+        return true;
     }
     public static void main(String[] args){
         LinkedListStack<Integer> stack = new LinkedListStack<>();
