@@ -10,6 +10,17 @@ class Node<T>{
     }
 }
 public class LinkedListStack<T> {
+    private static class B{
+        int key;
+        B left;
+        B right;
+
+        public B(int key){
+            this.key=key;
+            this.left = null;
+            this.right = null;
+        }
+    }
     private Node<T> top;
     private Node<T> head;
     public LinkedListStack(){
