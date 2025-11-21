@@ -120,6 +120,9 @@ public class LinkedListStack<T> {
         if(x ==null){
             return null;
         }
+        if(x.left ==null){
+            return x;
+        }
     }
     public static void main(String[] args){
         LinkedListStack<Integer> stack = new LinkedListStack<>();
