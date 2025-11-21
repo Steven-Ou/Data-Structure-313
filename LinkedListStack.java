@@ -90,6 +90,18 @@ public class LinkedListStack<T> {
             head = head.next;
             return true;
         }
+
+        Node<T> current= head;
+        Node<T> previous = null;
+
+        while((current !=null && !current.data.equals(value))){
+            previous =current;
+            current = current.next;
+        }
+        
+        if(current ==null){
+
+        }
     }
     public static void main(String[] args){
         LinkedListStack<Integer> stack = new LinkedListStack<>();
