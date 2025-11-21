@@ -82,6 +82,15 @@ public class LinkedListStack<T> {
 
         return data;
     }
+    public boolean deleteByValue(T value){
+        if(isEmpty()){
+            return false;
+        }
+        if (head.data.equals(value)){
+            head = head.next;
+            return true;
+        }
+    }
     public static void main(String[] args){
         LinkedListStack<Integer> stack = new LinkedListStack<>();
 
