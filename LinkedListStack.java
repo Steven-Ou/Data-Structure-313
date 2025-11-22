@@ -132,7 +132,7 @@ public class LinkedListStack<T> {
         if(x.right==null){
             return x;
         }
-        return treeMaximumRecursive(.right);
+        return treeMaximumRecursive(x.right);
     }
     public static void main(String[] args){
         LinkedListStack<Integer> stack = new LinkedListStack<>();
