@@ -135,11 +135,13 @@ public class LinkedListStack<T> {
         }
         return treeMaximumRecursive(x.right);
     }
-    public static Node treePredecessor(B x){
+    public static B treePredecessor(B x){
         if(x==null){
             return null;
         }
-        
+        if(x.left !=null){
+            return treeMaximumRecursive(x.left);
+        }
     }
     public static void main(String[] args){
         LinkedListStack<Integer> stack = new LinkedListStack<>();
