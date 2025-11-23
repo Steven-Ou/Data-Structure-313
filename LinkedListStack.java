@@ -14,11 +14,12 @@ public class LinkedListStack<T> {
         int key;
         B left;
         B right;
-
+        B parent;
         public B(int key){
             this.key=key;
             this.left = null;
             this.right = null;
+            this.parent = null;
         }
     }
     private Node<T> top;
