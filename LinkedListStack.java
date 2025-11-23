@@ -142,6 +142,15 @@ public class LinkedListStack<T> {
         if(x.left !=null){
             return treeMaximumRecursive(x.left);
         }
+
+        B y = x.parent;
+        B current =x;
+
+        while(y!= null &&current ==y.left){
+            current =y;
+            y=y.parent;
+        }
+        return y;
     }
     public static void main(String[] args){
         LinkedListStack<Integer> stack = new LinkedListStack<>();
