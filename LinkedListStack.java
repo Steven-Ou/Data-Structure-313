@@ -152,6 +152,9 @@ public class LinkedListStack<T> {
         }
         return y;
     }
+    public static B insertRecursive(B root, int key){
+        return insertRecHelper(root,null,key);
+    }
     public static void main(String[] args){
         LinkedListStack<Integer> stack = new LinkedListStack<>();
 
