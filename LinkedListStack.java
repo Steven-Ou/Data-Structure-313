@@ -155,6 +155,19 @@ public class LinkedListStack<T> {
     public static B insertRecursive(B root, int key){
         return insertRecHelper(root,null,key);
     }
+    private static B insertRecHelper(B current, B p, int key) {
+        if (current == null) {
+            B newNode = new B(key);
+            newNode.parent = p;
+            return newNode;
+        }
+        if (key < current.key) {
+            current.left = insertRecHelper(current.left, current, key);
+        } else {
+            current.right = insertRecHelper(current.right, current, key);
+        }
+        return current;
+    }
     public static void main(String[] args){
         LinkedListStack<Integer> stack = new LinkedListStack<>();
 
