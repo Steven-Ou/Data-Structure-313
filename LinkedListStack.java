@@ -168,6 +168,13 @@ public class LinkedListStack<T> {
         }
         return current;
     }
+    public static void inorder(B root){
+        if( root!=null){
+            inorder(root.left);
+            System.out.print(root.key+" ");
+            inorder(root.right);
+        }
+    }
     public static void main(String[] args){
         LinkedListStack<Integer> stack = new LinkedListStack<>();
 
