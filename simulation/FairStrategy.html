@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BST Deletion: Biased vs Fair</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f4f8; }
+        canvas { border: 1px solid #cbd5e0; background-color: white; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); border-radius: 8px; }
+        .btn { transition: all 0.2s; }
+        .btn:active { transform: scale(0.95); }
+    </style>
+</head>
+<body class="flex flex-col items-center p-4 min-h-screen">
+
+    <div class="max-w-4xl w-full text-center space-y-4">
+        <h1 class="text-3xl font-bold text-slate-800">BST Fair Strategy Visualization</h1>
+        <p class="text-slate-600">
+            Current Root: <span id="rootVal" class="font-mono font-bold text-blue-600">--</span> | 
+            Tree Height: <span id="treeHeight" class="font-mono font-bold text-red-600">--</span>
+        </p>
+
+        <div class="flex justify-center gap-4 flex-wrap">
+            <button onclick="resetTree()" class="btn bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded shadow">
+                Reset Tree (Random)
+            </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+            <!-- Biased Controls -->
+            <div class="bg-white p-4 rounded-lg shadow border-l-4 border-red-500">
+                <h2 class="font-bold text-lg mb-2">Strategy 1: Biased (Default)</h2>
+                <p class="text-xs text-gray-500 mb-4 h-10">Always replaces the deleted node with the <b>Successor</b> (Min of Right Subtree).</p>
+                <button onclick="deleteRoot('biased')" class="btn bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded shadow w-full font-bold">
+                    Delete Root (Biased)
+                </button>
+            </div>
+
+            <!-- Fair Controls -->
+            <div class="bg-white p-4 rounded-lg shadow border-l-4 border-green-500">
+                <h2 class="font-bold text-lg mb-2">Strategy 2: Fair (Randomized)</h2>
+                <p class="text-xs text-gray-500 mb-4 h-10">Flips a coin: 50% <b>Successor</b>, 50% <b>Predecessor</b> (Max of Left Subtree).</p>
+                <button onclick="deleteRoot('fair')" class="btn bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded shadow w-full font-bold">
+                    Delete Root (Fair)
+                </button>
+            </div>
+        </div>
+
+        <div class="relative w-full overflow-auto mt-6">
+            <canvas id="treeCanvas" width="800" height="500"></canvas>
+        </div>
+        
+        <div class="text-left bg-blue-50 p-4 rounded text-sm text-blue-800 border border-blue-200">
+            <strong>How to use:</strong>
+            <ul class="list-disc ml-5 mt-1">
+                <li>Click <b>Reset Tree</b> to generate 30 random nodes.</li>
+                <li>Repeatedly click <b>Delete Root (Biased)</b>. Notice how the tree eventually looks "stringy" or heavy on the left side (height decreases slowly).</li>
+                <li>Reset, then repeatedly click <b>Delete Root (Fair)</b>. Notice how the tree stays bushier/shorter for longer.</li>
+            </ul>
+        </div>
+    </div>
+
+<script>
+    // --- BST Implementation ---
+    class Node {
+        constructor(key) {
+            this.key = key;
+            this.left = null;
+            this.right = null;
+        }
+    }
+
+    class BST {
+        constructor() {
+            this.root = null;
+        }
+
+        insert(key) {
+            const newNode = new Node(key);
+            if (!this.root) {
+                this.root = newNode;
+                return;
+            }
+            let current = this.root;
+            while (true) {
+                if (key === current.key) return; // No duplicates for visual simplicity
+                if (key < current.key) {
+                    if (!current.left) {
+                        current.left = newNode;
+                        return;
+                    }
+                    current = current.left;
+                } else {
+                    if (!current.right) {
+                        current.right = newNode;
+                        return;
+                    }
+                    current = current.right;
+                }
+            }
+        }
+
+        // Helper: Find Minimum (for Successor)
+        getMin(node) {
+            while (node.left) node = node.left;
+            return node;
+        }
+
+        // Helper: Find Maximum (for Predecessor)
+        getMax(node) {
+            while (node.right) node = node.right;
+            return node;
+        }
+
+        // Helper: Calculate Height
+        getHeight(node) {
+            if (!node) return 0;
+            return 1 + Math.max(this.getHeight(node.left), this.getHeight(node.right));
+        }
+
+        deleteRoot(strategy) {
+            if (!this.root) return;
+            this.root = this.deleteNode(this.root, this.root.key, strategy);
+        }
+
+        deleteNode(root, key, strategy) {
+            if (!root) return root;
+
+            // Standard BST Delete Search
+            if (key < root.key) {
+                root.left = this.deleteNode(root.left, key, strategy);
+            } else if (key > root.key) {
+                root.right = this.deleteNode(root.right, key, strategy);
+            } else {
+                // Node found
+
+                // Case 1 & 2: One child or no child
+                if (!root.left) return root.right;
+                if (!root.right) return root.left;
+
+                // Case 3: Two children - The interesting part!
+                
+                let replaceWithSuccessor = true;
+
+                if (strategy === 'fair') {
+                    // FAIR STRATEGY: Flip a coin
+                    replaceWithSuccessor = Math.random() > 0.5;
+                }
+
+                if (replaceWithSuccessor) {
+                    // Standard (Successor)
+                    const temp = this.getMin(root.right);
+                    root.key = temp.key;
+                    root.right = this.deleteNode(root.right, temp.key, strategy);
+                } else {
+                    // Predecessor
+                    const temp = this.getMax(root.left);
+                    root.key = temp.key;
+                    root.left = this.deleteNode(root.left, temp.key, strategy); // Recursive delete on left
+                }
+            }
+            return root;
+        }
+    }
+
+    // --- Visualization Logic ---
+    const canvas = document.getElementById('treeCanvas');
+    const ctx = canvas.getContext('2d');
+    let tree = new BST();
+
+    function drawTree() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        if (!tree.root) {
+            ctx.font = "20px Arial";
+            ctx.fillStyle = "#888";
+            ctx.fillText("Tree is empty", canvas.width/2 - 50, canvas.height/2);
+            document.getElementById('rootVal').innerText = "N/A";
+            document.getElementById('treeHeight').innerText = "0";
+            return;
+        }
+
+        document.getElementById('rootVal').innerText = tree.root.key;
+        document.getElementById('treeHeight').innerText = tree.getHeight(tree.root);
+
+        const nodeRadius = 15;
+        const levelHeight = 60;
+
+        // Recursive draw function
+        function drawNode(node, x, y, level, xRange) {
+            if (!node) return;
+
+            // Draw connections first (so lines are behind circles)
+            if (node.left) {
+                const nextX = x - xRange / 2;
+                const nextY = y + levelHeight;
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+                ctx.lineTo(nextX, nextY);
+                ctx.strokeStyle = "#cbd5e0";
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                drawNode(node.left, nextX, nextY, level + 1, xRange / 2);
+            }
+            if (node.right) {
+                const nextX = x + xRange / 2;
+                const nextY = y + levelHeight;
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+                ctx.lineTo(nextX, nextY);
+                ctx.strokeStyle = "#cbd5e0";
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                drawNode(node.right, nextX, nextY, level + 1, xRange / 2);
+            }
+
+            // Draw Node Circle
+            ctx.beginPath();
+            ctx.arc(x, y, nodeRadius, 0, 2 * Math.PI);
+            ctx.fillStyle = "#3b82f6";
+            ctx.fill();
+            ctx.strokeStyle = "#1e40af";
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Draw Text
+            ctx.fillStyle = "white";
+            ctx.font = "bold 12px Arial";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText(node.key, x, y);
+        }
+
+        // Start drawing from root
+        drawNode(tree.root, canvas.width / 2, 40, 1, canvas.width / 2.5);
+    }
+
+    function resetTree() {
+        tree = new BST();
+        const keys = [];
+        // Insert random keys
+        for(let i=0; i<30; i++) {
+            keys.push(Math.floor(Math.random() * 100));
+        }
+        // Basic balancing heuristic just so it looks nice initially (sort then insert middles)
+        // Actually, let's just insert random to show the messiness, it's more educational.
+        keys.forEach(k => tree.insert(k));
+        drawTree();
+    }
+
+    function deleteRoot(strategy) {
+        tree.deleteRoot(strategy);
+        drawTree();
+    }
+
+    // Initialize
+    resetTree();
+
+</script>
+</body>
+</html>
