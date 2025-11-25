@@ -223,6 +223,29 @@ public class LinkedListStack<T> {
             this.key = key;
         }
     }
+    static class SuccessorBST {
+        SuccNode root;
+        
+        private SuccNode getPredecessor(SuccNode target) {
+            if (target.left != null) {
+                SuccNode curr = target.left;
+                while (curr.right != null) curr = curr.right;
+                return curr;
+            }
+            SuccNode pred = null;
+            SuccNode curr = root;
+            while (curr != null && curr != target) {
+                if (target.key > curr.key) {
+                    pred = curr;
+                    curr = curr.right;
+                } else {
+                    curr = curr.left;
+                }
+            }
+            return pred;
+        }
+
+    }
     public static void main(String[] args) {
         LinkedListStack<Integer> stack = new LinkedListStack<>();
 
