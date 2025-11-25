@@ -214,7 +214,15 @@ public class LinkedListStack<T> {
         int isFull = (t.left != null && t.right != null) ? 1 : 0;
         return isFull + countFullNodes(t.left) + countFullNodes(t.right);
     }
+    static class SuccNode {
+        int key;
+        SuccNode left, right;
+        SuccNode succ; 
 
+        public SuccNode(int key) {
+            this.key = key;
+        }
+    }
     public static void main(String[] args) {
         LinkedListStack<Integer> stack = new LinkedListStack<>();
 
