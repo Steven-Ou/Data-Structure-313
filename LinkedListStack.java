@@ -253,6 +253,31 @@ public class LinkedListStack<T> {
             }
             return x;
         }
+        public void insert(int key) {
+            SuccNode z = new SuccNode(key);
+            SuccNode y = null;
+            SuccNode x = root;
+            while (x != null) {
+                y = x;
+                if (z.key < x.key) x = x.left;
+                else x = x.right;
+            }
+            if (y == null) {
+                root = z;
+                z.succ = null;
+            } else {
+                if (z.key < y.key) {
+                    y.left = z;
+                    SuccNode pred = getPredecessor(y);
+                    if (pred != null) pred.succ = z;
+                    z.succ = y;
+                } else {
+                    y.right = z;
+                    z.succ = y.succ;
+                    y.succ = z;
+                }
+            }
+        }
     }
     public static void main(String[] args) {
         LinkedListStack<Integer> stack = new LinkedListStack<>();
