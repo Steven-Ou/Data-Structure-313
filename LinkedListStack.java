@@ -180,6 +180,12 @@ public class LinkedListStack<T> {
         if (t == null) return 0;
         return 1 + countNodes(t.left) + countNodes(t.right);
     }
+    //Counting the leaves
+    public static int countLeaves(B t) {
+        if (t == null) return 0;
+        if (t.left == null && t.right == null) return 1;
+        return countLeaves(t.left) + countLeaves(t.right);
+    }
     public static void main(String[] args){
         LinkedListStack<Integer> stack = new LinkedListStack<>();
 
