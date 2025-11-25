@@ -186,6 +186,13 @@ public class LinkedListStack<T> {
         if (t.left == null && t.right == null) return 1;
         return countLeaves(t.left) + countLeaves(t.right);
     }
+    //Count full nodes
+    public static int countFullNodes(B t) {
+        if (t == null) return 0;
+        int isFull = (t.left != null && t.right != null) ? 1 : 0;
+        return isFull + countFullNodes(t.left) + countFullNodes(t.right);
+    }
+
     public static void main(String[] args){
         LinkedListStack<Integer> stack = new LinkedListStack<>();
 
