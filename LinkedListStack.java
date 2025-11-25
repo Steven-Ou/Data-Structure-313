@@ -245,6 +245,14 @@ public class LinkedListStack<T> {
             return pred;
         }
 
+        public SuccNode search(int key) {
+            SuccNode x = root;
+            while (x != null && key != x.key) {
+                if (key < x.key) x = x.left;
+                else x = x.right;
+            }
+            return x;
+        }
     }
     public static void main(String[] args) {
         LinkedListStack<Integer> stack = new LinkedListStack<>();
