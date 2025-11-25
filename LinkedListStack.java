@@ -312,7 +312,16 @@ public class LinkedListStack<T> {
                 z.succ = y.succ;
             }
         }
-
+         public void printSuccChain() {
+            SuccNode current = root;
+            while(current != null && current.left != null) current = current.left;
+            System.out.print("Succ Chain: ");
+            while(current != null) {
+                System.out.print(current.key + " -> ");
+                current = current.succ;
+            }
+            System.out.println("null");
+        }
     }
     public static void main(String[] args) {
         LinkedListStack<Integer> stack = new LinkedListStack<>();
