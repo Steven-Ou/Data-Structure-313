@@ -278,6 +278,41 @@ public class LinkedListStack<T> {
                 }
             }
         }
+         public void delete(int key) {
+            SuccNode z = search(key);
+            if (z == null) return;
+            SuccNode pred = getPredecessor(z);
+            SuccNode y = (z.left == null || z.right == null) ? z : z.succ;
+            SuccNode x = (y.left != null) ? y.left : y.right;
+            
+            // Parent pointer logic simulated for O(h)
+            SuccNode yParent = null; 
+            SuccNode curr = root;
+            if (curr != y) {
+                while(curr != null) {
+                    if (y.key < curr.key) {
+                        if (curr.left == y) { yParent = curr; break; }
+                        curr = curr.left;
+                    } else {
+                        if (curr.right == y) { yParent = curr; break; }
+                        curr = curr.right;
+                    }
+                }
+            }
+
+            if (yParent == null) root = x;
+            else if (y == yParent.left) yParent.left = x;
+            else yParent.right = x;
+
+            if (y != z) z.key = y.key;
+
+            if (y == z) {
+                if (pred != null) pred.succ = y.succ;
+            } else {
+                z.succ = y.succ;
+            }
+        }
+
     }
     public static void main(String[] args) {
         LinkedListStack<Integer> stack = new LinkedListStack<>();
