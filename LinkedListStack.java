@@ -175,6 +175,11 @@ public class LinkedListStack<T> {
             inorder(root.right);
         }
     }
+    // a. Count total nodes
+    public static int countNodes(B t) {
+        if (t == null) return 0;
+        return 1 + countNodes(t.left) + countNodes(t.right);
+    }
     public static void main(String[] args){
         LinkedListStack<Integer> stack = new LinkedListStack<>();
 
