@@ -342,5 +342,7 @@ public class LinkedListStack<T> {
             System.out.println("Error: Stack is empty!");
         }
          System.out.println("\n--- RECURSIVE BST & COUNTING TESTS ---");
+         B root = null;
+         int[] values = {12,5,18,2,9,15,19,17};
     }
 }
