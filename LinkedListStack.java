@@ -341,5 +341,6 @@ public class LinkedListStack<T> {
         } catch (EmptyStackException e) {
             System.out.println("Error: Stack is empty!");
         }
+         System.out.println("\n--- RECURSIVE BST & COUNTING TESTS ---");
     }
 }
