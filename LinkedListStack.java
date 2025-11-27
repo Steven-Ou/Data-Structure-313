@@ -344,5 +344,13 @@ public class LinkedListStack<T> {
          System.out.println("\n--- RECURSIVE BST & COUNTING TESTS ---");
          B root = null;
          int[] values = {12,5,18,2,9,15,19,17};
+         // Tree Structure: What we expected to get
+        //      12
+        //     /  \
+        //    5    18
+        //   / \   / \
+        //  2   9 15 19
+        //          \
+        //          17
     }
 }
