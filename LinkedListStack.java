@@ -352,5 +352,7 @@ public class LinkedListStack<T> {
         //  2   9 15 19
         //          \
         //          17
+        for(int v : values) root = insertRecursive(root, v);
+
     }
 }
