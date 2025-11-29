@@ -355,5 +355,7 @@ public class LinkedListStack<T> {
         for(int v : values) root = insertRecursive(root, v);
 
         System.out.print("Inorder: ");
+        inorder(root);
+        
     }
 }
