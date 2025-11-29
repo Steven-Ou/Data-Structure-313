@@ -356,6 +356,6 @@ public class LinkedListStack<T> {
 
         System.out.print("Inorder: ");
         inorder(root);
-        
+        System.out.println();
     }
 }
