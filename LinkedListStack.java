@@ -357,5 +357,7 @@ public class LinkedListStack<T> {
         System.out.print("Inorder: ");
         inorder(root);
         System.out.println();
+
+        System.out.println("Total Nodes (Ex 4.31a): " + countNodes(root));
     }
 }
