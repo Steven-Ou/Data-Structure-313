@@ -214,22 +214,25 @@ public class LinkedListStack<T> {
         int isFull = (t.left != null && t.right != null) ? 1 : 0;
         return isFull + countFullNodes(t.left) + countFullNodes(t.right);
     }
+
     static class SuccNode {
         int key;
         SuccNode left, right;
-        SuccNode succ; 
+        SuccNode succ;
 
         public SuccNode(int key) {
             this.key = key;
         }
     }
+
     static class SuccessorBST {
         SuccNode root;
-        
+
         private SuccNode getPredecessor(SuccNode target) {
             if (target.left != null) {
                 SuccNode curr = target.left;
-                while (curr.right != null) curr = curr.right;
+                while (curr.right != null)
+                    curr = curr.right;
                 return curr;
             }
             SuccNode pred = null;
@@ -248,19 +251,24 @@ public class LinkedListStack<T> {
         public SuccNode search(int key) {
             SuccNode x = root;
             while (x != null && key != x.key) {
-                if (key < x.key) x = x.left;
-                else x = x.right;
+                if (key < x.key)
+                    x = x.left;
+                else
+                    x = x.right;
             }
             return x;
         }
+
         public void insert(int key) {
             SuccNode z = new SuccNode(key);
             SuccNode y = null;
             SuccNode x = root;
             while (x != null) {
                 y = x;
-                if (z.key < x.key) x = x.left;
-                else x = x.right;
+                if (z.key < x.key)
+                    x = x.left;
+                else
+                    x = x.right;
             }
             if (y == null) {
                 root = z;
@@ -269,7 +277,8 @@ public class LinkedListStack<T> {
                 if (z.key < y.key) {
                     y.left = z;
                     SuccNode pred = getPredecessor(y);
-                    if (pred != null) pred.succ = z;
+                    if (pred != null)
+                        pred.succ = z;
                     z.succ = y;
                 } else {
                     y.right = z;
@@ -278,51 +287,67 @@ public class LinkedListStack<T> {
                 }
             }
         }
-         public void delete(int key) {
+
+        public void delete(int key) {
             SuccNode z = search(key);
-            if (z == null) return;
+            if (z == null)
+                return;
             SuccNode pred = getPredecessor(z);
             SuccNode y = (z.left == null || z.right == null) ? z : z.succ;
             SuccNode x = (y.left != null) ? y.left : y.right;
-            
+
             // Parent pointer logic simulated for O(h)
-            SuccNode yParent = null; 
+            SuccNode yParent = null;
             SuccNode curr = root;
             if (curr != y) {
-                while(curr != null) {
+                while (curr != null) {
                     if (y.key < curr.key) {
-                        if (curr.left == y) { yParent = curr; break; }
+                        if (curr.left == y) {
+                            yParent = curr;
+                            break;
+                        }
                         curr = curr.left;
                     } else {
-                        if (curr.right == y) { yParent = curr; break; }
+                        if (curr.right == y) {
+                            yParent = curr;
+                            break;
+                        }
                         curr = curr.right;
                     }
                 }
             }
 
-            if (yParent == null) root = x;
-            else if (y == yParent.left) yParent.left = x;
-            else yParent.right = x;
+            if (yParent == null)
+                root = x;
+            else if (y == yParent.left)
+                yParent.left = x;
+            else
+                yParent.right = x;
 
-            if (y != z) z.key = y.key;
+            if (y != z)
+                z.key = y.key;
 
             if (y == z) {
-                if (pred != null) pred.succ = y.succ;
+                if (pred != null)
+                    pred.succ = y.succ;
             } else {
                 z.succ = y.succ;
             }
         }
-         public void printSuccChain() {
+
+        public void printSuccChain() {
             SuccNode current = root;
-            while(current != null && current.left != null) current = current.left;
+            while (current != null && current.left != null)
+                current = current.left;
             System.out.print("Succ Chain: ");
-            while(current != null) {
+            while (current != null) {
                 System.out.print(current.key + " -> ");
                 current = current.succ;
             }
             System.out.println("null");
         }
     }
+
     public static void main(String[] args) {
         LinkedListStack<Integer> stack = new LinkedListStack<>();
 
@@ -341,23 +366,26 @@ public class LinkedListStack<T> {
         } catch (EmptyStackException e) {
             System.out.println("Error: Stack is empty!");
         }
-         System.out.println("\n--- RECURSIVE BST & COUNTING TESTS ---");
-         B root = null;
-         int[] values = {12,5,18,2,9,15,19,17};
-         // Tree Structure: What we expected to get
-        //      12
-        //     /  \
-        //    5    18
-        //   / \   / \
-        //  2   9 15 19
-        //          \
-        //          17
-        for(int v : values) root = insertRecursive(root, v);
+        System.out.println("\n--- RECURSIVE BST & COUNTING TESTS ---");
+        B root = null;
+        int[] values = { 12, 5, 18, 2, 9, 15, 19, 17 };
+        // Tree Structure: What we expected to get
+        // 12
+        // / \
+        // 5 18
+        // / \ / \
+        // 2 9 15 19
+        // \
+        // 17
+        for (int v : values)
+            root = insertRecursive(root, v);
 
         System.out.print("Inorder: ");
         inorder(root);
         System.out.println();
 
         System.out.println("Total Nodes (Ex 4.31a): " + countNodes(root));
+        System.out.println("Total Leaves (Ex 4.31b): " + countLeaves(root)); // Expect 4 (2, 9, 17, 19)
+
     }
 }
