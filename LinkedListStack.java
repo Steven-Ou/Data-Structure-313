@@ -386,6 +386,7 @@ public class LinkedListStack<T> {
 
         System.out.println("Total Nodes (Ex 4.31a): " + countNodes(root));
         System.out.println("Total Leaves (Ex 4.31b): " + countLeaves(root)); // Expect 4 (2, 9, 17, 19)
+        System.out.println("Full Nodes   (Ex 4.31c): " + countFullNodes(root));   // Expect 3 (12, 5, 18)
 
     }
 }
