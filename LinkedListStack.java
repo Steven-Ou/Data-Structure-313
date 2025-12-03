@@ -387,6 +387,15 @@ public class LinkedListStack<T> {
         System.out.println("Total Nodes (Ex 4.31a): " + countNodes(root));
         System.out.println("Total Leaves (Ex 4.31b): " + countLeaves(root)); // Expect 4 (2, 9, 17, 19)
         System.out.println("Full Nodes   (Ex 4.31c): " + countFullNodes(root));   // Expect 3 (12, 5, 18)
-
+        
+        System.out.println("\n--- SUCCESSOR BST TESTS ---");
+        SuccessorBST succTree = new SuccessorBST();
+        int[] succValues = {15, 6, 18, 3, 7, 17, 20};
+        for(int v : succValues) succTree.insert(v);
+        succTree.printSuccChain(); // Expect sorted chain
+        
+        System.out.println("Deleting 15 (Root)...");
+        succTree.delete(15);
+        succTree.printSuccChain();
     }
 }
