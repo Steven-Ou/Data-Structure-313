@@ -11,3 +11,27 @@ class TreeNode {
     this.id = Math.random().toString(36).substr(2, 9);
   }
 }
+
+const generateGraph = (numNodes = 5, directed = false, weighted = true) => {
+  const nodes = Array.from({ length: numNodes }, (_, i) => ({ id: i, label: String.fromCharCode(65 + i) }));
+  const edges = [];
+  const matrix = Array(numNodes).fill(null).map(() => Array(numNodes).fill(0));
+  
+  // Create a spanning tree first to ensure connectivity
+  const connected = new Set([0]);
+  const pool = Array.from({length: numNodes - 1}, (_, i) => i + 1);
+  
+  while(pool.length > 0) {
+    const targetIdx = Math.floor(Math.random() * pool.length);
+    const target = pool.splice(targetIdx, 1)[0];
+    const source = Array.from(connected)[Math.floor(Math.random() * connected.size)];
+    
+    const weight = weighted ? Math.floor(Math.random() * 9) + 1 : 1;
+    edges.push({ source, target, weight });
+    matrix[source][target] = weight;
+    if (!directed) matrix[target][source] = weight;
+    connected.add(target);
+  }
+
+  
+}
