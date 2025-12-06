@@ -33,5 +33,16 @@ const generateGraph = (numNodes = 5, directed = false, weighted = true) => {
     connected.add(target);
   }
 
-  
+  for (let i = 0; i < numNodes; i++) {
+    if (Math.random() > 0.7) {
+      const target = Math.floor(Math.random() * numNodes);
+      if (target !== i && matrix[i][target] === 0) {
+         const weight = weighted ? Math.floor(Math.random() * 9) + 1 : 1;
+         edges.push({ source: i, target, weight });
+         matrix[i][target] = weight;
+         if (!directed) matrix[target][i] = weight;
+      }
+    }
+  }
+  return { nodes, edges, matrix };
 }
