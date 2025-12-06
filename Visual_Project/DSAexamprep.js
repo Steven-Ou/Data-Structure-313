@@ -70,3 +70,18 @@ const generateBSTData = (count = 10) => {
   }
   return { root, values };
 };
+
+const generateRBTData = () => {
+  // Hardcoded valid RBT scenarios for stability in quizzing
+  const root = new TreeNode(50, "black");
+  root.left = new TreeNode(25, "red");
+  root.right = new TreeNode(75, "red");
+  
+  root.left.left = new TreeNode(10, "black");
+  root.left.right = new TreeNode(33, "black");
+  
+  root.right.left = new TreeNode(60, "black");
+  root.right.right = new TreeNode(89, "black");
+  
+  return { root };
+}
