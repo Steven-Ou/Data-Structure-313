@@ -85,3 +85,7 @@ const generateRBTData = () => {
   
   return { root };
 }
+
+const algorithms =/*turing machine*/{
+    
+}
