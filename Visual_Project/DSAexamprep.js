@@ -45,4 +45,28 @@ const generateGraph = (numNodes = 5, directed = false, weighted = true) => {
     }
   }
   return { nodes, edges, matrix };
-}
+};
+
+const generateBSTData = (count = 10) => {
+  const rootVal = Math.floor(Math.random() * 40) + 30;
+  const root = new TreeNode(rootVal);
+  const values = [rootVal];
+  
+  for(let i=0; i<count; i++) {
+    const val = Math.floor(Math.random() * 100);
+    if(values.includes(val)) continue;
+    values.push(val);
+    
+    let curr = root;
+    while(true) {
+      if(val < curr.val) {
+        if(!curr.left) { curr.left = new TreeNode(val); break; }
+        curr = curr.left;
+      } else {
+        if(!curr.right) { curr.right = new TreeNode(val); break; }
+        curr = curr.right;
+      }
+    }
+  }
+  return { root, values };
+};
