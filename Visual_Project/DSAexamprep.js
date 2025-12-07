@@ -514,3 +514,55 @@ void startDFS(Graph* G) {
 }`
   }
 };
+
+const TreeVisualizer = ({ root, highlight }) => {
+  if (!root) return null;
+  const levels = [];
+  const traverse = (node, depth, x, spread) => {
+    if (!node) return;
+    if (!levels[depth]) levels[depth] = [];
+    const pos = { x, y: 40 + depth * 60, val: node.val, color: node.color, id: node.id };
+    levels[depth].push(pos);
+    node.pos = pos;
+    traverse(node.left, depth + 1, x - spread, spread / 2);
+    traverse(node.right, depth + 1, x + spread, spread / 2);
+  };
+  traverse(root, 0, 200, 100);
+  const renderLines = (node) => {
+    if (!node) return [];
+    const lines = [];
+    if (node.left) {
+      lines.push(<line key={`${node.id}-L`} x1={node.pos.x} y1={node.pos.y} x2={node.left.pos.x} y2={node.left.pos.y} stroke="#cbd5e1" strokeWidth="2" />);
+      lines.push(...renderLines(node.left));
+    }
+    if (node.right) {
+      lines.push(<line key={`${node.id}-R`} x1={node.pos.x} y1={node.pos.y} x2={node.right.pos.x} y2={node.right.pos.y} stroke="#cbd5e1" strokeWidth="2" />);
+      lines.push(...renderLines(node.right));
+    }
+    return lines;
+  };
+  const renderNodes = (node) => {
+    if (!node) return [];
+    const nodesArr = [];
+    const isTarget = node.val === highlight;
+    const isRed = node.color === "red";
+    const fill = isTarget ? "#fef3c7" : (isRed ? "#fee2e2" : (node.color === "black" ? "#334155" : "white"));
+    const stroke = isTarget ? "#d97706" : (isRed ? "#ef4444" : (node.color === "black" ? "#0f172a" : "#3b82f6"));
+    const textFill = node.color === "black" ? "white" : "#1e293b";
+    nodesArr.push(
+      <g key={node.id}>
+        <circle cx={node.pos.x} cy={node.pos.y} r="16" fill={fill} stroke={stroke} strokeWidth={isTarget ? 3 : 2} />
+        <text x={node.pos.x} y={node.pos.y} dy="5" textAnchor="middle" fontSize="12" fontWeight="bold" fill={textFill}>{node.val}</text>
+      </g>
+    );
+    nodesArr.push(...renderNodes(node.left));
+    nodesArr.push(...renderNodes(node.right));
+    return nodesArr;
+  };
+  return (
+    <svg width="400" height="350" className="mx-auto">
+      {renderLines(root)}
+      {renderNodes(root)}
+    </svg>
+  );
+};
