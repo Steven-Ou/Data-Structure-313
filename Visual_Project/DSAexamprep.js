@@ -25,6 +25,48 @@ class TreeNode {
   }
 }
 
+
+const analyzeCode = (code, algoType) => {
+  if (!code) return { detectedLang: "None", percentage: 0, feedback: [] };
+
+  // AGGRESSIVE SANITIZATION:
+  // 1. Keep only ASCII printable characters (codes 32-126) and newlines/tabs
+  // 2. Collapse whitespace
+  // 3. Lowercase
+  const codeLower = code
+    .replace(/[^\x20-\x7E\s]/g, ' ') // Replace non-ASCII with space
+    .replace(/\s+/g, ' ')            // Collapse multiple spaces
+    .toLowerCase();
+
+  const feedback = [];
+  let score = 0;
+  let maxScore = 0;
+  let detectedLang = "Pseudo-code";
+
+  // 1. Language Detection
+  if (codeLower.includes('->') || codeLower.includes('::') || codeLower.includes('cout') || codeLower.includes('#include') || codeLower.includes('<vector>')) {
+    detectedLang = "C++";
+  } else if (codeLower.includes('system.out') || codeLower.includes('public void') || codeLower.includes('arraylist')) {
+    detectedLang = "Java";
+  } else if (codeLower.includes('def ') || codeLower.includes('print(') || codeLower.includes('self.')) {
+    detectedLang = "Python";
+  }
+
+  // Helper to check requirements
+  const check = (keywords, message, weight = 1) => {
+    maxScore += weight;
+    // Check if ANY of the keywords exist in the sanitized string
+    // We trim keywords to ensure no accidental spaces in definitions match
+    const match = keywords.some(k => codeLower.includes(k.toLowerCase().trim()));
+    
+    if (match) {
+      score += weight;
+      feedback.push({ success: true, text: message });
+    } else {
+      feedback.push({ success: false, text: `Missing logic: ${message}` });
+    }
+  };
+  
 const generateGraph = (numNodes = 5, directed = false, weighted = true) => {
   const nodes = Array.from({ length: numNodes }, (_, i) => ({
     id: i,
