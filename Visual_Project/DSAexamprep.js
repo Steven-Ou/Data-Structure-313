@@ -214,53 +214,303 @@ const generateRBTData = () => {
   return { root };
 };
 
-const algorithms = /*turing machine*/ {
+const algorithms = {
   bfs: {
     name: "BFS (Breadth-First Search)",
     category: "Graphs",
-    signature: "void bfs(Graph* G, Node* start) {",
-    hint: "Use a Queue<Node*>. Enqueue start, mark visited. While queue not empty, dequeue u, visit neighbors. (Tie-break: alphabetical)",
+    signature: "void bfs(Graph* G, int startNode) {",
+    hint: "Use a Queue<int>. Push start, mark visited. While !q.empty(), front(), pop(), then visit neighbors.",
     solve: (data) => {
       const { matrix } = data;
-      const start = 0; // 'A'
+      const start = 0; 
       const queue = [start];
       const visited = new Set([start]);
       const result = [];
-      while (queue.length > 0) {
+      while(queue.length > 0) {
         const u = queue.shift();
         result.push(String.fromCharCode(65 + u));
         const neighbors = [];
-        for (let v = 0; v < matrix.length; v++) {
-          if (matrix[u][v] > 0 && !visited.has(v)) {
+        for(let v=0; v<matrix.length; v++) {
+          if(matrix[u][v] > 0 && !visited.has(v)) {
             neighbors.push(v);
             visited.add(v);
           }
         }
-        queue.push(...neighbors);
+        queue.push(...neighbors); 
       }
-      return result.join(",");
+      return result.join(", ");
     },
-    question:
-      "Perform BFS starting from Node A. List visited nodes. (Tie-breaker: Visit lower letter neighbors first).",
+    question: "Perform BFS starting from Node A. List visited nodes. (Tie-breaker: Visit lower letter neighbors first).",
     code: `void bfs(Graph* G, int startNode) {
-    Queue<int> q;
-    bool visited[G->V] = {false};
+    queue<int> q;
+    vector<bool> visited(G->V, false);
     
-    q.enqueue(startNode);
+    q.push(startNode);          // Enqueue
     visited[startNode] = true;
     
-    while (!q.isEmpty()) {
-        int u = q.dequeue();
-        print(u);
+    while (!q.empty()) {
+        int u = q.front();      // Peek
+        q.pop();                // Dequeue
+        cout << u << " ";
         
-        // Weiss: Adjacency Lists usually
-        for (Node* v : G->adj[u]) {
-            if (!visited[v->id]) {
-                visited[v->id] = true;
-                q.enqueue(v->id);
+        // Iterate neighbors
+        for (auto v : G->adj[u]) {
+            if (!visited[v]) {
+                visited[v] = true;
+                q.push(v);
             }
         }
     }
-}`,
+}`
   },
+  dfs: {
+    name: "DFS (Depth-First Search)",
+    category: "Graphs",
+    signature: "void dfs(Graph* G, int u, vector<bool>& visited) {",
+    hint: "Use Recursion. Mark u as visited, print u. Loop through unvisited neighbors and recurse.",
+    solve: (data) => {
+      const { matrix } = data;
+      const visited = new Set();
+      const result = [];
+      const recurse = (u) => {
+        visited.add(u);
+        result.push(String.fromCharCode(65 + u));
+        for(let v=0; v<matrix.length; v++) {
+          if(matrix[u][v] > 0 && !visited.has(v)) recurse(v);
+        }
+      };
+      recurse(0);
+      return result.join(", ");
+    },
+    question: "Perform Pre-Order DFS starting from Node A. List visited nodes. (Tie-breaker: lower letter first).",
+    code: `// Recursive DFS
+void dfs(Graph* G, int u, vector<bool>& visited) {
+    visited[u] = true;
+    cout << u << " ";
+    
+    for (auto v : G->adj[u]) {
+        if (!visited[v]) {
+            dfs(G, v, visited);
+        }
+    }
+}
+
+// Driver
+void startDFS(Graph* G) {
+    vector<bool> visited(G->V, false);
+    dfs(G, 0, visited);
+}`
+  },
+  dijkstra: {
+    name: "Dijkstra's Algorithm",
+    category: "Graphs",
+    signature: "void dijkstra(Graph* G, int s) {",
+    hint: "Use priority_queue<pair<int, int>> (dist, u). Relax edges: if (dist[u] + w < dist[v]) update.",
+    solve: (data) => {
+      const { matrix, nodes } = data;
+      const dist = Array(nodes.length).fill(Infinity);
+      dist[0] = 0;
+      const visited = new Array(nodes.length).fill(false);
+      for(let i=0; i<nodes.length; i++) {
+        let u = -1;
+        let minVal = Infinity;
+        for(let k=0; k<nodes.length; k++) {
+          if(!visited[k] && dist[k] < minVal) {
+            minVal = dist[k];
+            u = k;
+          }
+        }
+        if(u === -1) break;
+        visited[u] = true;
+        for(let v=0; v<nodes.length; v++) {
+          if(matrix[u][v] > 0 && !visited[v]) {
+            if(dist[u] + matrix[u][v] < dist[v]) {
+              dist[v] = dist[u] + matrix[u][v];
+            }
+          }
+        }
+      }
+      return dist[nodes.length-1] === Infinity ? "INF" : dist[nodes.length-1];
+    },
+    question: "What is the shortest path distance from Node A to the last Node (highest letter)?",
+    code: `void dijkstra(Graph* G, int s) {
+    // Min-heap via greater comparator
+    priority_queue<pair<int,int>, vector<pair<int,int>>, greater<>> pq;
+    vector<int> dist(G->V, INF);
+    
+    dist[s] = 0;
+    pq.push({0, s});
+    
+    while (!pq.empty()) {
+        int u = pq.top().second;
+        pq.pop();
+        
+        for (auto edge : G->adj[u]) {
+            int v = edge.dest;
+            int weight = edge.weight;
+            
+            // Relaxation
+            if (dist[u] + weight < dist[v]) {
+                dist[v] = dist[u] + weight;
+                pq.push({dist[v], v});
+            }
+        }
+    }
+}`
+  },
+  bst_inorder: {
+    name: "In-Order Traversal",
+    category: "Trees",
+    signature: "void inorder(Node* root) {",
+    hint: "Left -> Print(Root) -> Right. Produces sorted output for BST.",
+    solve: (data) => {
+      const res = [];
+      const t = (n) => { if(!n) return; t(n.left); res.push(n.val); t(n.right); };
+      t(data.root);
+      return res.join(", ");
+    },
+    question: "List the values of the tree in In-Order sequence (comma separated).",
+    code: `void inorder(Node* root) {
+    if (root == nullptr) return;
+    
+    inorder(root->left);
+    cout << root->val << " ";
+    inorder(root->right);
+}`
+  },
+  bst_preorder: {
+    name: "Pre-Order Traversal",
+    category: "Trees",
+    signature: "void preorder(Node* root) {",
+    hint: "Print(Root) -> Left -> Right.",
+    solve: (data) => {
+      const res = [];
+      const t = (n) => { if(!n) return; res.push(n.val); t(n.left); t(n.right); };
+      t(data.root);
+      return res.join(", ");
+    },
+    question: "List the values of the tree in Pre-Order sequence (comma separated).",
+    code: `void preorder(Node* root) {
+    if (root == nullptr) return;
+    
+    cout << root->val << " ";
+    preorder(root->left);
+    preorder(root->right);
+}`
+  },
+  bst_postorder: {
+    name: "Post-Order Traversal",
+    category: "Trees",
+    signature: "void postorder(Node* root) {",
+    hint: "Left -> Right -> Print(Root).",
+    solve: (data) => {
+      const res = [];
+      const t = (n) => { if(!n) return; t(n.left); t(n.right); res.push(n.val); };
+      t(data.root);
+      return res.join(", ");
+    },
+    question: "List the values of the tree in Post-Order sequence (comma separated).",
+    code: `void postorder(Node* root) {
+    if (root == nullptr) return;
+    
+    postorder(root->left);
+    postorder(root->right);
+    cout << root->val << " ";
+}`
+  },
+  bst_successor: {
+    name: "In-Order Successor",
+    category: "Trees",
+    signature: "Node* successor(Node* root, int val) {",
+    hint: "Smallest node > val. Go right then left-most, OR traverse from root.",
+    solve: (data) => {
+      const { root, target } = data;
+      const sorted = [];
+      const t = (n) => { if(!n) return; t(n.left); sorted.push(n.val); t(n.right); };
+      t(root);
+      const idx = sorted.indexOf(target);
+      return idx < sorted.length - 1 ? sorted[idx + 1] : "None";
+    },
+    question: (data) => `Find the In-Order Successor of node ${data.target}.`,
+    code: `Node* successor(Node* root, int val) {
+    Node* succ = nullptr;
+    while (root) {
+        if (val < root->val) {
+            succ = root;
+            root = root->left;
+        } else {
+            root = root->right;
+        }
+    }
+    return succ;
+}`
+  },
+  bst_predecessor: {
+    name: "In-Order Predecessor",
+    category: "Trees",
+    signature: "Node* predecessor(Node* root, int val) {",
+    hint: "Largest node < val.",
+    solve: (data) => {
+      const { root, target } = data;
+      const sorted = [];
+      const t = (n) => { if(!n) return; t(n.left); sorted.push(n.val); t(n.right); };
+      t(root);
+      const idx = sorted.indexOf(target);
+      return idx > 0 ? sorted[idx - 1] : "None";
+    },
+    question: (data) => `Find the In-Order Predecessor of node ${data.target}.`,
+    code: `Node* predecessor(Node* root, int val) {
+    Node* pred = nullptr;
+    while (root) {
+        if (val > root->val) {
+            pred = root;
+            root = root->right;
+        } else {
+            root = root->left;
+        }
+    }
+    return pred;
+}`
+  },
+  bst_parent: {
+    name: "Find Parent Node",
+    category: "Trees",
+    signature: "Node* findParent(Node* root, int val) {",
+    hint: "Traverse. If root->left == val OR root->right == val, root is parent.",
+    solve: (data) => {
+      const { root, target } = data;
+      let parent = null;
+      let curr = root;
+      while(curr) {
+        if(curr.val === target) break;
+        parent = curr.val;
+        if(target < curr.val) curr = curr.left;
+        else curr = curr.right;
+      }
+      return parent === null ? "None" : parent;
+    },
+    question: (data) => `Find the Parent of node ${data.target}. (Return None if it's the root)`,
+    code: `Node* findParent(Node* root, int val) {
+    if (!root || root->val == val) return nullptr;
+    while(root) {
+        if((root->left && root->left->val == val) || 
+           (root->right && root->right->val == val)) return root;
+        if(val < root->val) root = root->left;
+        else root = root->right;
+    }
+    return nullptr;
+}`
+  },
+  rbt_props: {
+    name: "Red-Black Tree Properties",
+    category: "Trees",
+    signature: "int blackHeight(Node* root) {",
+    hint: "Black Height: Number of black nodes on any path from root to NIL.",
+    solve: (data) => "2",
+    question: "What is the 'Black Height' of the root (50)? (Count black nodes on path to any null leaf).",
+    code: `int blackHeight(Node* root) {
+    if (!root) return 0;
+    return blackHeight(root->left) + (root->color == BLACK ? 1 : 0);
+}`
+  }
 };
