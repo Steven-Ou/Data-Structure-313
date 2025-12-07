@@ -214,7 +214,7 @@ const generateRBTData = () => {
   return { root };
 };
 
-const algorithms = {
+const algorithms = { //Turing Machine!!!
   bfs: {
     name: "BFS (Breadth-First Search)",
     category: "Graphs",
