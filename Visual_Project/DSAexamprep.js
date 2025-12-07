@@ -25,7 +25,6 @@ class TreeNode {
   }
 }
 
-
 const analyzeCode = (code, algoType) => {
   if (!code) return { detectedLang: "None", percentage: 0, feedback: [] };
 
@@ -66,7 +65,53 @@ const analyzeCode = (code, algoType) => {
       feedback.push({ success: false, text: `Missing logic: ${message}` });
     }
   };
-  
+
+  // 2. Algorithm Specific Logic Fingerprinting
+  if (algoType === 'bfs') {
+    check(['queue', 'deque', 'list'], "Queue Declaration", 2);
+    check(['push', 'add', 'enqueue', 'offer'], "Enqueue (push/add)", 2);
+    check(['front', 'pop', 'poll', 'dequeue', 'remove'], "Dequeue (front/pop)", 2);
+    check(['while', 'empty', 'isempty'], "Main Loop", 2);
+    check(['visited', 'seen', 'vector<bool>', 'set<'], "Visited Tracking", 2);
+    check(['for', 'adj', 'neighbors'], "Neighbor Iteration", 1);
+  } 
+  else if (algoType === 'dfs') {
+    if (codeLower.includes('stack')) {
+      check(['stack', 'push', 'pop'], "Stack Data Structure", 2);
+      check(['while', 'empty'], "Main Loop", 2);
+    } else {
+      check(['dfs', 'recurse', 'solve'], "Recursive Function Call", 3);
+    }
+    check(['visited', 'seen'], "Visited Mechanism", 2);
+  }
+  else if (algoType === 'dijkstra') {
+    check(['priority_queue', 'priorityqueue', 'minheap', 'heap'], "Priority Queue", 3);
+    check(['dist', 'distance'], "Distance Array", 1);
+    check(['inf', 'infinity', 'max_value'], "Infinity Init", 1);
+    check(['<', '>', 'if'], "Relaxation Logic", 3);
+  }
+  else if (algoType.includes('bst_')) {
+    if (algoType.includes('order')) {
+      check(['left', 'right'], "Child Access", 2);
+      check(['print', 'cout', 'val', 'data'], "Node Processing", 2);
+    } 
+    else if (algoType.includes('successor') || algoType.includes('predecessor')) {
+      check(['if', '<', '>'], "Comparison Logic", 2);
+      check(['left', 'right'], "Traversal", 1);
+      check(['parent', 'succ', 'pred', 'temp', 'return'], "Result Tracking", 1);
+    }
+    else if (algoType.includes('parent')) {
+      check(['left', 'right'], "Child Access", 2);
+      check(['==', 'val'], "Equality Check", 2);
+    }
+  }
+
+  // 3. Generic Checks
+  check(['return', 'void'], "Function Structure", 1);
+
+  const percentage = maxScore > 0 ? Math.round((score / maxScore) * 100) : 0;
+  return { detectedLang, percentage, feedback };
+};
 const generateGraph = (numNodes = 5, directed = false, weighted = true) => {
   const nodes = Array.from({ length: numNodes }, (_, i) => ({
     id: i,
