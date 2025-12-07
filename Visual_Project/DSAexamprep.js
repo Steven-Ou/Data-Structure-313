@@ -566,3 +566,56 @@ const TreeVisualizer = ({ root, highlight }) => {
     </svg>
   );
 };
+
+const GraphVisualizer = ({ data, directed }) => {
+  if (!data) return null;
+  const { nodes, edges } = data;
+  const radius = 100;
+  const centerX = 200;
+  const centerY = 150;
+  const getNodePos = (index, total) => {
+    const angle = (index / total) * 2 * Math.PI - Math.PI / 2;
+    return {
+      x: centerX + radius * Math.cos(angle),
+      y: centerY + radius * Math.sin(angle)
+    };
+  };
+  return (
+    <svg width="400" height="300" className="mx-auto">
+      <defs>
+        <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="26" refY="3.5" orient="auto">
+          <polygon points="0 0, 10 3.5, 0 7" fill="#94a3b8" />
+        </marker>
+      </defs>
+      {edges.map((e, i) => {
+        const start = getNodePos(e.source, nodes.length);
+        const end = getNodePos(e.target, nodes.length);
+        return (
+          <g key={i}>
+            <line 
+              x1={start.x} y1={start.y} 
+              x2={end.x} y2={end.y} 
+              stroke="#94a3b8" 
+              strokeWidth="2"
+              markerEnd={directed ? "url(#arrowhead)" : ""}
+            />
+            {e.weight > 1 && (
+              <text x={(start.x+end.x)/2} y={(start.y+end.y)/2} fill="#ef4444" fontSize="12" fontWeight="bold" dy="4" textAnchor="middle">
+                {e.weight}
+              </text>
+            )}
+          </g>
+        );
+      })}
+      {nodes.map((n, i) => {
+        const pos = getNodePos(i, nodes.length);
+        return (
+          <g key={n.id}>
+            <circle cx={pos.x} cy={pos.y} r="18" fill="white" stroke="#3b82f6" strokeWidth="2" />
+            <text x={pos.x} y={pos.y} dy="5" textAnchor="middle" fontWeight="bold" fill="#1e293b">{n.label}</text>
+          </g>
+        );
+      })}
+    </svg>
+  );
+};
