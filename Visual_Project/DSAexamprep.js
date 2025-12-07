@@ -214,7 +214,8 @@ const generateRBTData = () => {
   return { root };
 };
 
-const algorithms = { //Turing Machine!!!
+const algorithms = {
+  //Turing Machine!!!
   bfs: {
     name: "BFS (Breadth-First Search)",
     category: "Graphs",
@@ -222,25 +223,26 @@ const algorithms = { //Turing Machine!!!
     hint: "Use a Queue<int>. Push start, mark visited. While !q.empty(), front(), pop(), then visit neighbors.",
     solve: (data) => {
       const { matrix } = data;
-      const start = 0; 
+      const start = 0;
       const queue = [start];
       const visited = new Set([start]);
       const result = [];
-      while(queue.length > 0) {
+      while (queue.length > 0) {
         const u = queue.shift();
         result.push(String.fromCharCode(65 + u));
         const neighbors = [];
-        for(let v=0; v<matrix.length; v++) {
-          if(matrix[u][v] > 0 && !visited.has(v)) {
+        for (let v = 0; v < matrix.length; v++) {
+          if (matrix[u][v] > 0 && !visited.has(v)) {
             neighbors.push(v);
             visited.add(v);
           }
         }
-        queue.push(...neighbors); 
+        queue.push(...neighbors);
       }
       return result.join(", ");
     },
-    question: "Perform BFS starting from Node A. List visited nodes. (Tie-breaker: Visit lower letter neighbors first).",
+    question:
+      "Perform BFS starting from Node A. List visited nodes. (Tie-breaker: Visit lower letter neighbors first).",
     code: `void bfs(Graph* G, int startNode) {
     queue<int> q;
     vector<bool> visited(G->V, false);
@@ -261,7 +263,7 @@ const algorithms = { //Turing Machine!!!
             }
         }
     }
-}`
+}`,
   },
   dfs: {
     name: "DFS (Depth-First Search)",
@@ -275,14 +277,15 @@ const algorithms = { //Turing Machine!!!
       const recurse = (u) => {
         visited.add(u);
         result.push(String.fromCharCode(65 + u));
-        for(let v=0; v<matrix.length; v++) {
-          if(matrix[u][v] > 0 && !visited.has(v)) recurse(v);
+        for (let v = 0; v < matrix.length; v++) {
+          if (matrix[u][v] > 0 && !visited.has(v)) recurse(v);
         }
       };
       recurse(0);
       return result.join(", ");
     },
-    question: "Perform Pre-Order DFS starting from Node A. List visited nodes. (Tie-breaker: lower letter first).",
+    question:
+      "Perform Pre-Order DFS starting from Node A. List visited nodes. (Tie-breaker: lower letter first).",
     code: `// Recursive DFS
 void dfs(Graph* G, int u, vector<bool>& visited) {
     visited[u] = true;
@@ -299,7 +302,7 @@ void dfs(Graph* G, int u, vector<bool>& visited) {
 void startDFS(Graph* G) {
     vector<bool> visited(G->V, false);
     dfs(G, 0, visited);
-}`
+}`,
   },
   dijkstra: {
     name: "Dijkstra's Algorithm",
@@ -311,28 +314,31 @@ void startDFS(Graph* G) {
       const dist = Array(nodes.length).fill(Infinity);
       dist[0] = 0;
       const visited = new Array(nodes.length).fill(false);
-      for(let i=0; i<nodes.length; i++) {
+      for (let i = 0; i < nodes.length; i++) {
         let u = -1;
         let minVal = Infinity;
-        for(let k=0; k<nodes.length; k++) {
-          if(!visited[k] && dist[k] < minVal) {
+        for (let k = 0; k < nodes.length; k++) {
+          if (!visited[k] && dist[k] < minVal) {
             minVal = dist[k];
             u = k;
           }
         }
-        if(u === -1) break;
+        if (u === -1) break;
         visited[u] = true;
-        for(let v=0; v<nodes.length; v++) {
-          if(matrix[u][v] > 0 && !visited[v]) {
-            if(dist[u] + matrix[u][v] < dist[v]) {
+        for (let v = 0; v < nodes.length; v++) {
+          if (matrix[u][v] > 0 && !visited[v]) {
+            if (dist[u] + matrix[u][v] < dist[v]) {
               dist[v] = dist[u] + matrix[u][v];
             }
           }
         }
       }
-      return dist[nodes.length-1] === Infinity ? "INF" : dist[nodes.length-1];
+      return dist[nodes.length - 1] === Infinity
+        ? "INF"
+        : dist[nodes.length - 1];
     },
-    question: "What is the shortest path distance from Node A to the last Node (highest letter)?",
+    question:
+      "What is the shortest path distance from Node A to the last Node (highest letter)?",
     code: `void dijkstra(Graph* G, int s) {
     // Min-heap via greater comparator
     priority_queue<pair<int,int>, vector<pair<int,int>>, greater<>> pq;
@@ -356,7 +362,7 @@ void startDFS(Graph* G) {
             }
         }
     }
-}`
+}`,
   },
   bst_inorder: {
     name: "In-Order Traversal",
@@ -365,18 +371,24 @@ void startDFS(Graph* G) {
     hint: "Left -> Print(Root) -> Right. Produces sorted output for BST.",
     solve: (data) => {
       const res = [];
-      const t = (n) => { if(!n) return; t(n.left); res.push(n.val); t(n.right); };
+      const t = (n) => {
+        if (!n) return;
+        t(n.left);
+        res.push(n.val);
+        t(n.right);
+      };
       t(data.root);
       return res.join(", ");
     },
-    question: "List the values of the tree in In-Order sequence (comma separated).",
+    question:
+      "List the values of the tree in In-Order sequence (comma separated).",
     code: `void inorder(Node* root) {
     if (root == nullptr) return;
     
     inorder(root->left);
     cout << root->val << " ";
     inorder(root->right);
-}`
+}`,
   },
   bst_preorder: {
     name: "Pre-Order Traversal",
@@ -385,18 +397,24 @@ void startDFS(Graph* G) {
     hint: "Print(Root) -> Left -> Right.",
     solve: (data) => {
       const res = [];
-      const t = (n) => { if(!n) return; res.push(n.val); t(n.left); t(n.right); };
+      const t = (n) => {
+        if (!n) return;
+        res.push(n.val);
+        t(n.left);
+        t(n.right);
+      };
       t(data.root);
       return res.join(", ");
     },
-    question: "List the values of the tree in Pre-Order sequence (comma separated).",
+    question:
+      "List the values of the tree in Pre-Order sequence (comma separated).",
     code: `void preorder(Node* root) {
     if (root == nullptr) return;
     
     cout << root->val << " ";
     preorder(root->left);
     preorder(root->right);
-}`
+}`,
   },
   bst_postorder: {
     name: "Post-Order Traversal",
@@ -405,18 +423,24 @@ void startDFS(Graph* G) {
     hint: "Left -> Right -> Print(Root).",
     solve: (data) => {
       const res = [];
-      const t = (n) => { if(!n) return; t(n.left); t(n.right); res.push(n.val); };
+      const t = (n) => {
+        if (!n) return;
+        t(n.left);
+        t(n.right);
+        res.push(n.val);
+      };
       t(data.root);
       return res.join(", ");
     },
-    question: "List the values of the tree in Post-Order sequence (comma separated).",
+    question:
+      "List the values of the tree in Post-Order sequence (comma separated).",
     code: `void postorder(Node* root) {
     if (root == nullptr) return;
     
     postorder(root->left);
     postorder(root->right);
     cout << root->val << " ";
-}`
+}`,
   },
   bst_successor: {
     name: "In-Order Successor",
@@ -426,7 +450,12 @@ void startDFS(Graph* G) {
     solve: (data) => {
       const { root, target } = data;
       const sorted = [];
-      const t = (n) => { if(!n) return; t(n.left); sorted.push(n.val); t(n.right); };
+      const t = (n) => {
+        if (!n) return;
+        t(n.left);
+        sorted.push(n.val);
+        t(n.right);
+      };
       t(root);
       const idx = sorted.indexOf(target);
       return idx < sorted.length - 1 ? sorted[idx + 1] : "None";
@@ -443,7 +472,7 @@ void startDFS(Graph* G) {
         }
     }
     return succ;
-}`
+}`,
   },
   bst_predecessor: {
     name: "In-Order Predecessor",
@@ -453,7 +482,12 @@ void startDFS(Graph* G) {
     solve: (data) => {
       const { root, target } = data;
       const sorted = [];
-      const t = (n) => { if(!n) return; t(n.left); sorted.push(n.val); t(n.right); };
+      const t = (n) => {
+        if (!n) return;
+        t(n.left);
+        sorted.push(n.val);
+        t(n.right);
+      };
       t(root);
       const idx = sorted.indexOf(target);
       return idx > 0 ? sorted[idx - 1] : "None";
@@ -470,7 +504,7 @@ void startDFS(Graph* G) {
         }
     }
     return pred;
-}`
+}`,
   },
   bst_parent: {
     name: "Find Parent Node",
@@ -481,15 +515,16 @@ void startDFS(Graph* G) {
       const { root, target } = data;
       let parent = null;
       let curr = root;
-      while(curr) {
-        if(curr.val === target) break;
+      while (curr) {
+        if (curr.val === target) break;
         parent = curr.val;
-        if(target < curr.val) curr = curr.left;
+        if (target < curr.val) curr = curr.left;
         else curr = curr.right;
       }
       return parent === null ? "None" : parent;
     },
-    question: (data) => `Find the Parent of node ${data.target}. (Return None if it's the root)`,
+    question: (data) =>
+      `Find the Parent of node ${data.target}. (Return None if it's the root)`,
     code: `Node* findParent(Node* root, int val) {
     if (!root || root->val == val) return nullptr;
     while(root) {
@@ -499,7 +534,7 @@ void startDFS(Graph* G) {
         else root = root->right;
     }
     return nullptr;
-}`
+}`,
   },
   rbt_props: {
     name: "Red-Black Tree Properties",
@@ -507,12 +542,13 @@ void startDFS(Graph* G) {
     signature: "int blackHeight(Node* root) {",
     hint: "Black Height: Number of black nodes on any path from root to NIL.",
     solve: (data) => "2",
-    question: "What is the 'Black Height' of the root (50)? (Count black nodes on path to any null leaf).",
+    question:
+      "What is the 'Black Height' of the root (50)? (Count black nodes on path to any null leaf).",
     code: `int blackHeight(Node* root) {
     if (!root) return 0;
     return blackHeight(root->left) + (root->color == BLACK ? 1 : 0);
-}`
-  }
+}`,
+  },
 };
 
 const TreeVisualizer = ({ root, highlight }) => {
@@ -521,7 +557,13 @@ const TreeVisualizer = ({ root, highlight }) => {
   const traverse = (node, depth, x, spread) => {
     if (!node) return;
     if (!levels[depth]) levels[depth] = [];
-    const pos = { x, y: 40 + depth * 60, val: node.val, color: node.color, id: node.id };
+    const pos = {
+      x,
+      y: 40 + depth * 60,
+      val: node.val,
+      color: node.color,
+      id: node.id,
+    };
     levels[depth].push(pos);
     node.pos = pos;
     traverse(node.left, depth + 1, x - spread, spread / 2);
@@ -532,11 +574,31 @@ const TreeVisualizer = ({ root, highlight }) => {
     if (!node) return [];
     const lines = [];
     if (node.left) {
-      lines.push(<line key={`${node.id}-L`} x1={node.pos.x} y1={node.pos.y} x2={node.left.pos.x} y2={node.left.pos.y} stroke="#cbd5e1" strokeWidth="2" />);
+      lines.push(
+        <line
+          key={`${node.id}-L`}
+          x1={node.pos.x}
+          y1={node.pos.y}
+          x2={node.left.pos.x}
+          y2={node.left.pos.y}
+          stroke="#cbd5e1"
+          strokeWidth="2"
+        />
+      );
       lines.push(...renderLines(node.left));
     }
     if (node.right) {
-      lines.push(<line key={`${node.id}-R`} x1={node.pos.x} y1={node.pos.y} x2={node.right.pos.x} y2={node.right.pos.y} stroke="#cbd5e1" strokeWidth="2" />);
+      lines.push(
+        <line
+          key={`${node.id}-R`}
+          x1={node.pos.x}
+          y1={node.pos.y}
+          x2={node.right.pos.x}
+          y2={node.right.pos.y}
+          stroke="#cbd5e1"
+          strokeWidth="2"
+        />
+      );
       lines.push(...renderLines(node.right));
     }
     return lines;
@@ -546,13 +608,42 @@ const TreeVisualizer = ({ root, highlight }) => {
     const nodesArr = [];
     const isTarget = node.val === highlight;
     const isRed = node.color === "red";
-    const fill = isTarget ? "#fef3c7" : (isRed ? "#fee2e2" : (node.color === "black" ? "#334155" : "white"));
-    const stroke = isTarget ? "#d97706" : (isRed ? "#ef4444" : (node.color === "black" ? "#0f172a" : "#3b82f6"));
+    const fill = isTarget
+      ? "#fef3c7"
+      : isRed
+      ? "#fee2e2"
+      : node.color === "black"
+      ? "#334155"
+      : "white";
+    const stroke = isTarget
+      ? "#d97706"
+      : isRed
+      ? "#ef4444"
+      : node.color === "black"
+      ? "#0f172a"
+      : "#3b82f6";
     const textFill = node.color === "black" ? "white" : "#1e293b";
     nodesArr.push(
       <g key={node.id}>
-        <circle cx={node.pos.x} cy={node.pos.y} r="16" fill={fill} stroke={stroke} strokeWidth={isTarget ? 3 : 2} />
-        <text x={node.pos.x} y={node.pos.y} dy="5" textAnchor="middle" fontSize="12" fontWeight="bold" fill={textFill}>{node.val}</text>
+        <circle
+          cx={node.pos.x}
+          cy={node.pos.y}
+          r="16"
+          fill={fill}
+          stroke={stroke}
+          strokeWidth={isTarget ? 3 : 2}
+        />
+        <text
+          x={node.pos.x}
+          y={node.pos.y}
+          dy="5"
+          textAnchor="middle"
+          fontSize="12"
+          fontWeight="bold"
+          fill={textFill}
+        >
+          {node.val}
+        </text>
       </g>
     );
     nodesArr.push(...renderNodes(node.left));
@@ -577,13 +668,20 @@ const GraphVisualizer = ({ data, directed }) => {
     const angle = (index / total) * 2 * Math.PI - Math.PI / 2;
     return {
       x: centerX + radius * Math.cos(angle),
-      y: centerY + radius * Math.sin(angle)
+      y: centerY + radius * Math.sin(angle),
     };
   };
   return (
     <svg width="400" height="300" className="mx-auto">
       <defs>
-        <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="26" refY="3.5" orient="auto">
+        <marker
+          id="arrowhead"
+          markerWidth="10"
+          markerHeight="7"
+          refX="26"
+          refY="3.5"
+          orient="auto"
+        >
           <polygon points="0 0, 10 3.5, 0 7" fill="#94a3b8" />
         </marker>
       </defs>
@@ -592,15 +690,25 @@ const GraphVisualizer = ({ data, directed }) => {
         const end = getNodePos(e.target, nodes.length);
         return (
           <g key={i}>
-            <line 
-              x1={start.x} y1={start.y} 
-              x2={end.x} y2={end.y} 
-              stroke="#94a3b8" 
+            <line
+              x1={start.x}
+              y1={start.y}
+              x2={end.x}
+              y2={end.y}
+              stroke="#94a3b8"
               strokeWidth="2"
               markerEnd={directed ? "url(#arrowhead)" : ""}
             />
             {e.weight > 1 && (
-              <text x={(start.x+end.x)/2} y={(start.y+end.y)/2} fill="#ef4444" fontSize="12" fontWeight="bold" dy="4" textAnchor="middle">
+              <text
+                x={(start.x + end.x) / 2}
+                y={(start.y + end.y) / 2}
+                fill="#ef4444"
+                fontSize="12"
+                fontWeight="bold"
+                dy="4"
+                textAnchor="middle"
+              >
                 {e.weight}
               </text>
             )}
@@ -611,8 +719,24 @@ const GraphVisualizer = ({ data, directed }) => {
         const pos = getNodePos(i, nodes.length);
         return (
           <g key={n.id}>
-            <circle cx={pos.x} cy={pos.y} r="18" fill="white" stroke="#3b82f6" strokeWidth="2" />
-            <text x={pos.x} y={pos.y} dy="5" textAnchor="middle" fontWeight="bold" fill="#1e293b">{n.label}</text>
+            <circle
+              cx={pos.x}
+              cy={pos.y}
+              r="18"
+              fill="white"
+              stroke="#3b82f6"
+              strokeWidth="2"
+            />
+            <text
+              x={pos.x}
+              y={pos.y}
+              dy="5"
+              textAnchor="middle"
+              fontWeight="bold"
+              fill="#1e293b"
+            >
+              {n.label}
+            </text>
           </g>
         );
       })}
@@ -624,11 +748,12 @@ export default function DSAExamPrep() {
   const [activeAlgo, setActiveAlgo] = useState("bfs");
   const [problemData, setProblemData] = useState(null);
   const [userAnswer, setUserAnswer] = useState("");
-  const [feedback, setFeedback] = useState(null); 
+  const [feedback, setFeedback] = useState(null);
   const [showSolution, setShowSolution] = useState(false);
   const [showTrace, setShowTrace] = useState(false);
   const [showHint, setShowHint] = useState(false);
   const [userCode, setUserCode] = useState("");
   const [codeReport, setCodeReport] = useState(null);
 
+  const currentAlgo = algorithms[activeAlgo];
 }
