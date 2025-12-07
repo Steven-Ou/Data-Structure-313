@@ -621,5 +621,14 @@ const GraphVisualizer = ({ data, directed }) => {
 };
 
 export default function DSAExamPrep() {
+  const [activeAlgo, setActiveAlgo] = useState("bfs");
+  const [problemData, setProblemData] = useState(null);
+  const [userAnswer, setUserAnswer] = useState("");
+  const [feedback, setFeedback] = useState(null); 
+  const [showSolution, setShowSolution] = useState(false);
+  const [showTrace, setShowTrace] = useState(false);
+  const [showHint, setShowHint] = useState(false);
+  const [userCode, setUserCode] = useState("");
+  const [codeReport, setCodeReport] = useState(null);
 
 }
