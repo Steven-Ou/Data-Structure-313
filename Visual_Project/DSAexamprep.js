@@ -756,4 +756,8 @@ export default function DSAExamPrep() {
   const [codeReport, setCodeReport] = useState(null);
 
   const currentAlgo = algorithms[activeAlgo];
+
+  const generateNewProblem = () => {
+    
+  };
 }
