@@ -758,6 +758,12 @@ export default function DSAExamPrep() {
   const currentAlgo = algorithms[activeAlgo];
 
   const generateNewProblem = () => {
-    
+    setFeedback(null);
+    setShowSolution(false);
+    setShowTrace(false);
+    setShowHint(false);
+    setUserAnswer("");
+    setCodeReport(null);
+    setUserCode(currentAlgo.signature + "\n    // Write your implementation here...\n    // Use standard C++ STL (e.g., q.push, q.front)\n    \n");
   };
 }
