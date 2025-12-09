@@ -800,5 +800,22 @@ export default function DSAExamPrep() {
     generateNewProblem();
   }, [activeAlgo]);
 
-  
+  const checkAnswer = () => {
+    if(!problemData) return;
+    const correctAnswer = String(currentAlgo.solve(problemData));
+    const userClean = String(userAnswer).replace(/[^a-zA-Z0-9,]/g, '').toLowerCase();
+    const correctClean = correctAnswer.replace(/[^a-zA-Z0-9,]/g, '').toLowerCase();
+    
+    // Check Result
+    if (userClean === correctClean) {
+      setFeedback("correct");
+    } else {
+      setFeedback("incorrect");
+    }
+
+    // Check Code
+    const analysis = analyzeCode(userCode, activeAlgo);
+    setCodeReport(analysis);
+  };
+
 }
