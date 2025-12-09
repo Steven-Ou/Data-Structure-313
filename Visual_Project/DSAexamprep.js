@@ -764,28 +764,35 @@ export default function DSAExamPrep() {
     setShowHint(false);
     setUserAnswer("");
     setCodeReport(null);
-    setUserCode(currentAlgo.signature + "\n    // Write your implementation here...\n    // Use standard C++ STL (e.g., q.push, q.front)\n    \n");
-  };
+    setUserCode(
+      currentAlgo.signature +
+        "\n    // Write your implementation here...\n    // Use standard C++ STL (e.g., q.push, q.front)\n    \n"
+    );
 
-  if (currentAlgo.category === "Graphs") {
-      setProblemData(generateGraph(5, activeAlgo === "dfs", activeAlgo === 'dijkstra'));
+    if (currentAlgo.category === "Graphs") {
+      setProblemData(
+        generateGraph(5, activeAlgo === "dfs", activeAlgo === "dijkstra")
+      );
     } else if (currentAlgo.category === "Trees") {
       if (activeAlgo === "rbt_props") {
         setProblemData(generateRBTData());
       } else {
         const data = generateBSTData(7);
         if (activeAlgo === "bst_successor") {
-          const valid = data.values.sort((a,b)=>a-b).slice(0, -1);
-          data.target = valid[Math.floor(Math.random()*valid.length)];
+          const valid = data.values.sort((a, b) => a - b).slice(0, -1);
+          data.target = valid[Math.floor(Math.random() * valid.length)];
         } else if (activeAlgo === "bst_predecessor") {
-          const valid = data.values.sort((a,b)=>a-b).slice(1);
-          data.target = valid[Math.floor(Math.random()*valid.length)];
+          const valid = data.values.sort((a, b) => a - b).slice(1);
+          data.target = valid[Math.floor(Math.random() * valid.length)];
         } else if (activeAlgo === "bst_parent") {
-          data.target = data.values.filter(v => v !== data.root.val)[Math.floor(Math.random()*(data.values.length-1))];
+          data.target = data.values.filter((v) => v !== data.root.val)[
+            Math.floor(Math.random() * (data.values.length - 1))
+          ];
         } else {
-          data.target = data.values[0]; 
+          data.target = data.values[0];
         }
         setProblemData(data);
       }
     }
+  };
 }
