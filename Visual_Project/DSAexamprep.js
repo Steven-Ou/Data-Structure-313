@@ -795,4 +795,10 @@ export default function DSAExamPrep() {
       }
     }
   };
+
+  useEffect(() => {
+    generateNewProblem();
+  }, [activeAlgo]);
+
+  
 }
