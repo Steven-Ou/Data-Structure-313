@@ -818,4 +818,10 @@ export default function DSAExamPrep() {
     setCodeReport(analysis);
   };
 
+  const getQuestionText = () => {
+    if (typeof currentAlgo.question === 'function') {
+      return currentAlgo.question(problemData);
+    }
+    return currentAlgo.question;
+  };
 }
