@@ -827,7 +827,9 @@ export default function DSAExamPrep() {
 
   return(
     <div className="flex h-screen bg-slate-50 font-sans text-slate-800">
-        
+      <div className="w-64 bg-white border-r border-slate-200 flex flex-col">
+            
+        </div>
     </div>
   );
 }
