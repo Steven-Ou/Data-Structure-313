@@ -935,6 +935,11 @@ export default function DSAExamPrep() {
             </div>
           </div>
         </div>
+
+      </div>
+
+      <div className="flex-1 flex flex-col overflow-hidden">
+        
       </div>
     </div>
   );
