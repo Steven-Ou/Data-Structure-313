@@ -839,6 +839,36 @@ export default function DSAExamPrep() {
           </div>
           <p className="text-xs text-slate-400 mt-1">Weiss-style Exam Cooker</p>
         </div>
+
+        <div className="flex-1 overflow-y-auto p-4 space-y-6">
+          <div>
+            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2 px-2">Graphs</h3>
+            <div className="space-y-1">
+              <SidebarItem id="bfs" label="BFS" icon={<GitBranch size={16}/>} active={activeAlgo} set={setActiveAlgo} />
+              <SidebarItem id="dfs" label="DFS" icon={<GitBranch size={16}/>} active={activeAlgo} set={setActiveAlgo} />
+              <SidebarItem id="dijkstra" label="Dijkstra" icon={<GitBranch size={16}/>} active={activeAlgo} set={setActiveAlgo} />
+            </div>
+          </div>
+          
+          <div>
+            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2 px-2">Traversals</h3>
+            <div className="space-y-1">
+              <SidebarItem id="bst_preorder" label="Pre-Order" icon={<Database size={16}/>} active={activeAlgo} set={setActiveAlgo} />
+              <SidebarItem id="bst_inorder" label="In-Order" icon={<Database size={16}/>} active={activeAlgo} set={setActiveAlgo} />
+              <SidebarItem id="bst_postorder" label="Post-Order" icon={<Database size={16}/>} active={activeAlgo} set={setActiveAlgo} />
+            </div>
+          </div>
+
+          <div>
+            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2 px-2">Tree Ops</h3>
+            <div className="space-y-1">
+              <SidebarItem id="bst_successor" label="Find Successor" icon={<Layers size={16}/>} active={activeAlgo} set={setActiveAlgo} />
+              <SidebarItem id="bst_predecessor" label="Find Predecessor" icon={<Layers size={16}/>} active={activeAlgo} set={setActiveAlgo} />
+              <SidebarItem id="bst_parent" label="Find Parent" icon={<Layers size={16}/>} active={activeAlgo} set={setActiveAlgo} />
+              <SidebarItem id="rbt_props" label="Red-Black Props" icon={<Layers size={16}/>} active={activeAlgo} set={setActiveAlgo} />
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
