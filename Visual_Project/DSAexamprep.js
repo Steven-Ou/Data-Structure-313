@@ -935,15 +935,16 @@ export default function DSAExamPrep() {
             </div>
           </div>
         </div>
-
       </div>
 
       <div className="flex-1 flex flex-col overflow-hidden">
         <header className="bg-white border-b px-6 py-4 flex justify-between items-center">
           <div>
-            <h1 className="text-2xl font-bold text-slate-800">{currentAlgo.name}</h1>
+            <h1 className="text-2xl font-bold text-slate-800">
+              {currentAlgo.name}
+            </h1>
           </div>
-          <button 
+          <button
             onClick={generateNewProblem}
             className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition shadow-sm font-medium text-sm"
           >
@@ -954,38 +955,42 @@ export default function DSAExamPrep() {
 
         <div className="flex-1 overflow-auto p-6 bg-slate-50">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full">
-            
             <div className="flex flex-col gap-6">
-              
               <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col min-h-[300px]">
-                 <div className="bg-slate-50 border-b border-slate-100 p-3 text-xs font-medium text-slate-500 uppercase tracking-wide text-center">
-                   Visualization
-                 </div>
-                 <div className="flex-1 flex items-center justify-center p-4">
-                   {currentAlgo.category === "Graphs" && problemData && (
-                     <GraphVisualizer data={problemData} directed={activeAlgo === 'dfs'} />
-                   )}
-                   {currentAlgo.category === "Trees" && problemData && (
-                     <TreeVisualizer root={problemData.root} highlight={problemData.target} />
-                   )}
-                 </div>
+                <div className="bg-slate-50 border-b border-slate-100 p-3 text-xs font-medium text-slate-500 uppercase tracking-wide text-center">
+                  Visualization
+                </div>
+                <div className="flex-1 flex items-center justify-center p-4">
+                  {currentAlgo.category === "Graphs" && problemData && (
+                    <GraphVisualizer
+                      data={problemData}
+                      directed={activeAlgo === "dfs"}
+                    />
+                  )}
+                  {currentAlgo.category === "Trees" && problemData && (
+                    <TreeVisualizer
+                      root={problemData.root}
+                      highlight={problemData.target}
+                    />
+                  )}
+                </div>
               </div>
 
               <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
                 <div className="flex items-start justify-between mb-4">
                   <h3 className="font-bold text-lg flex items-center gap-2 text-slate-800">
-                    <BookOpen size={20} className="text-indigo-500"/>
+                    <BookOpen size={20} className="text-indigo-500" />
                     Question
                   </h3>
                   <div className="flex gap-2">
-                    <button 
+                    <button
                       onClick={() => setShowTrace(!showTrace)}
                       className="text-xs flex items-center gap-1 text-slate-500 hover:text-indigo-600 transition bg-slate-100 px-2 py-1 rounded"
                     >
                       <Eye size={14} />
                       {showTrace ? "Hide Answer" : "Reveal Trace"}
                     </button>
-                    <button 
+                    <button
                       onClick={() => setShowHint(!showHint)}
                       className="text-xs flex items-center gap-1 text-slate-500 hover:text-indigo-600 transition bg-slate-100 px-2 py-1 rounded"
                     >
@@ -995,8 +1000,10 @@ export default function DSAExamPrep() {
                   </div>
                 </div>
 
-                <p className="text-slate-600 mb-4 text-sm leading-relaxed">{problemData && getQuestionText()}</p>
-                
+                <p className="text-slate-600 mb-4 text-sm leading-relaxed">
+                  {problemData && getQuestionText()}
+                </p>
+
                 {showHint && (
                   <div className="mb-4 p-3 bg-amber-50 text-amber-800 text-sm rounded border border-amber-200 flex gap-2">
                     <HelpCircle size={16} className="shrink-0 mt-0.5" />
@@ -1006,25 +1013,27 @@ export default function DSAExamPrep() {
 
                 {showTrace && (
                   <div className="mb-4 p-3 bg-slate-100 text-slate-700 text-sm rounded border border-slate-200 font-mono">
-                    <span className="font-bold text-slate-500 block mb-1">Expected Output (Trace):</span>
+                    <span className="font-bold text-slate-500 block mb-1">
+                      Expected Output (Trace):
+                    </span>
                     {String(currentAlgo.solve(problemData))}
                   </div>
                 )}
-                
+
                 <div className="flex gap-3">
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     value={userAnswer}
                     onChange={(e) => {
                       setUserAnswer(e.target.value);
                       setFeedback(null);
                       setCodeReport(null);
                     }}
-                    onKeyDown={(e) => e.key === 'Enter' && checkAnswer()}
+                    onKeyDown={(e) => e.key === "Enter" && checkAnswer()}
                     placeholder="Enter manual trace (e.g. A, B, C)..."
                     className="flex-1 border border-slate-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 outline-none transition"
                   />
-                  <button 
+                  <button
                     onClick={checkAnswer}
                     className="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 font-medium shadow-sm transition"
                   >
@@ -1032,45 +1041,50 @@ export default function DSAExamPrep() {
                   </button>
                 </div>
 
-                {feedback === 'correct' && (
+                {feedback === "correct" && (
                   <div className="mt-4 p-3 bg-green-50 text-green-700 rounded-lg border border-green-200 flex items-center gap-2">
                     <CheckCircle size={20} />
                     <span className="font-medium">Trace Correct!</span>
                   </div>
                 )}
-                {feedback === 'incorrect' && (
+                {feedback === "incorrect" && (
                   <div className="mt-4 p-3 bg-red-50 text-red-700 rounded-lg border border-red-200 flex items-center gap-2">
                     <XCircle size={20} />
-                    <span className="font-medium">Trace Incorrect. Check "Reveal Trace".</span>
+                    <span className="font-medium">
+                      Trace Incorrect. Check "Reveal Trace".
+                    </span>
                   </div>
                 )}
               </div>
             </div>
 
             <div className="flex flex-col h-full gap-4">
-              
               <div className="flex flex-col flex-1 bg-[#1e1e1e] rounded-xl shadow-lg overflow-hidden border border-slate-700 min-h-[400px]">
                 <div className="bg-[#252526] p-3 border-b border-[#333] flex justify-between items-center">
                   <div className="flex items-center gap-2 text-slate-300">
                     <Terminal size={16} className="text-purple-400" />
-                    <span className="font-mono text-xs text-purple-400">Pseudo-code / C++ / Java</span>
+                    <span className="font-mono text-xs text-purple-400">
+                      Pseudo-code / C++ / Java
+                    </span>
                   </div>
-                  <button 
+                  <button
                     onClick={() => setShowSolution(!showSolution)}
                     className="text-xs px-3 py-1 bg-[#333] text-slate-300 hover:text-white rounded border border-[#444] transition flex items-center gap-2"
                   >
                     {showSolution ? "Hide Key" : "Reveal Code Key"}
                   </button>
                 </div>
-                
+
                 <div className="flex-1 relative font-mono text-sm">
                   {showSolution ? (
-                     <div className="absolute inset-0 p-4 text-[#d4d4d4] overflow-auto whitespace-pre-wrap leading-relaxed">
-                       <span className="text-green-600 block mb-2">// Reference Implementation (C++ Style)</span>
-                       {currentAlgo.code}
-                     </div>
+                    <div className="absolute inset-0 p-4 text-[#d4d4d4] overflow-auto whitespace-pre-wrap leading-relaxed">
+                      <span className="text-green-600 block mb-2">
+                        // Reference Implementation (C++ Style)
+                      </span>
+                      {currentAlgo.code}
+                    </div>
                   ) : (
-                    <textarea 
+                    <textarea
                       value={userCode}
                       onChange={(e) => setUserCode(e.target.value)}
                       className="w-full h-full bg-[#1e1e1e] text-[#d4d4d4] p-4 resize-none outline-none leading-relaxed"
@@ -1084,41 +1098,54 @@ export default function DSAExamPrep() {
                 <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 animate-in fade-in slide-in-from-bottom-2">
                   <div className="flex justify-between items-start mb-4">
                     <h3 className="font-bold text-slate-800 flex items-center gap-2">
-                      <Search size={18} className="text-blue-500"/>
+                      <Search size={18} className="text-blue-500" />
                       Code Analysis
                     </h3>
                     <div className="text-xs font-mono px-2 py-1 bg-slate-100 rounded border border-slate-200 text-slate-500">
                       Detected: {codeReport.detectedLang}
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center gap-4 mb-4">
                     <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
-                      <div 
+                      <div
                         className={`h-full rounded-full transition-all duration-1000 ${
-                          codeReport.percentage > 80 ? 'bg-green-500' : codeReport.percentage > 50 ? 'bg-amber-500' : 'bg-red-500'
+                          codeReport.percentage > 80
+                            ? "bg-green-500"
+                            : codeReport.percentage > 50
+                            ? "bg-amber-500"
+                            : "bg-red-500"
                         }`}
                         style={{ width: `${codeReport.percentage}%` }}
                       />
                     </div>
-                    <span className="font-bold text-sm text-slate-600">{codeReport.percentage}% Match</span>
+                    <span className="font-bold text-sm text-slate-600">
+                      {codeReport.percentage}% Match
+                    </span>
                   </div>
 
                   <div className="space-y-2 max-h-40 overflow-y-auto pr-2">
                     {codeReport.feedback.map((item, i) => (
-                      <div key={i} className={`text-xs p-2 rounded flex items-center gap-2 ${
-                        item.success ? 'bg-green-50 text-green-700 border border-green-100' : 'bg-red-50 text-red-700 border border-red-100'
-                      }`}>
-                        {item.success ? <CheckCircle size={14}/> : <AlertTriangle size={14}/>}
+                      <div
+                        key={i}
+                        className={`text-xs p-2 rounded flex items-center gap-2 ${
+                          item.success
+                            ? "bg-green-50 text-green-700 border border-green-100"
+                            : "bg-red-50 text-red-700 border border-red-100"
+                        }`}
+                      >
+                        {item.success ? (
+                          <CheckCircle size={14} />
+                        ) : (
+                          <AlertTriangle size={14} />
+                        )}
                         {item.text}
                       </div>
                     ))}
                   </div>
                 </div>
               )}
-
             </div>
-
           </div>
         </div>
       </div>
@@ -1126,12 +1153,12 @@ export default function DSAExamPrep() {
   );
 }
 const SidebarItem = ({ id, label, icon, active, set }) => (
-  <button 
+  <button
     onClick={() => set(id)}
     className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-200 font-medium ${
-      active === id 
-      ? "bg-indigo-50 text-indigo-700" 
-      : "text-slate-500 hover:bg-slate-50 hover:text-slate-800"
+      active === id
+        ? "bg-indigo-50 text-indigo-700"
+        : "text-slate-500 hover:bg-slate-50 hover:text-slate-800"
     }`}
   >
     {icon}
