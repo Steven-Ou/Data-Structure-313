@@ -801,11 +801,15 @@ export default function DSAExamPrep() {
   }, [activeAlgo]);
 
   const checkAnswer = () => {
-    if(!problemData) return;
+    if (!problemData) return;
     const correctAnswer = String(currentAlgo.solve(problemData));
-    const userClean = String(userAnswer).replace(/[^a-zA-Z0-9,]/g, '').toLowerCase();
-    const correctClean = correctAnswer.replace(/[^a-zA-Z0-9,]/g, '').toLowerCase();
-    
+    const userClean = String(userAnswer)
+      .replace(/[^a-zA-Z0-9,]/g, "")
+      .toLowerCase();
+    const correctClean = correctAnswer
+      .replace(/[^a-zA-Z0-9,]/g, "")
+      .toLowerCase();
+
     // Check Result
     if (userClean === correctClean) {
       setFeedback("correct");
@@ -819,17 +823,23 @@ export default function DSAExamPrep() {
   };
 
   const getQuestionText = () => {
-    if (typeof currentAlgo.question === 'function') {
+    if (typeof currentAlgo.question === "function") {
       return currentAlgo.question(problemData);
     }
     return currentAlgo.question;
   };
 
-  return(
+  return (
     <div className="flex h-screen bg-slate-50 font-sans text-slate-800">
       <div className="w-64 bg-white border-r border-slate-200 flex flex-col">
-            
+        <div className="p-6 border-b border-slate-100">
+          <div className="flex items-center gap-2 font-bold text-xl text-indigo-600">
+            <Activity />
+            <span>DSA Prep</span>
+          </div>
+          <p className="text-xs text-slate-400 mt-1">Weiss-style Exam Cooker</p>
         </div>
+      </div>
     </div>
   );
 }
