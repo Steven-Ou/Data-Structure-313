@@ -12,7 +12,13 @@ import {
   Lightbulb,
   HelpCircle,
   ArrowRight,
+  Terminal,
+  AlertTriangle,
+  Search,
+  Eye,
 } from "lucide-react";
+
+// --- DATA STRUCTURE CLASSES FOR GENERATION ---
 
 class TreeNode {
   constructor(val, color = "white") {
@@ -24,6 +30,8 @@ class TreeNode {
     this.id = Math.random().toString(36).substr(2, 9);
   }
 }
+
+// --- STATIC CODE ANALYZER ENGINE ---
 
 const analyzeCode = (code, algoType) => {
   if (!code) return { detectedLang: "None", percentage: 0, feedback: [] };
@@ -135,6 +143,8 @@ const analyzeCode = (code, algoType) => {
   return { detectedLang, percentage, feedback };
 };
 
+// --- GENERATORS (Unchanged) ---
+
 const generateGraph = (numNodes = 5, directed = false, weighted = true) => {
   const nodes = Array.from({ length: numNodes }, (_, i) => ({
     id: i,
@@ -200,22 +210,19 @@ const generateBSTData = (count = 10) => {
 };
 
 const generateRBTData = () => {
-  // Hardcoded valid RBT scenarios for stability in quizzing
   const root = new TreeNode(50, "black");
   root.left = new TreeNode(25, "red");
   root.right = new TreeNode(75, "red");
-
   root.left.left = new TreeNode(10, "black");
   root.left.right = new TreeNode(33, "black");
-
   root.right.left = new TreeNode(60, "black");
   root.right.right = new TreeNode(89, "black");
-
   return { root };
 };
 
+// --- ALGORITHMS ---
+
 const algorithms = {
-  //Turing Machine!!!
   bfs: {
     name: "BFS (Breadth-First Search)",
     category: "Graphs",
@@ -551,6 +558,8 @@ void startDFS(Graph* G) {
   },
 };
 
+// --- VISUALIZERS ---
+
 const TreeVisualizer = ({ root, highlight }) => {
   if (!root) return null;
   const levels = [];
@@ -744,6 +753,8 @@ const GraphVisualizer = ({ data, directed }) => {
   );
 };
 
+// --- MAIN COMPONENT ---
+
 export default function DSAExamPrep() {
   const [activeAlgo, setActiveAlgo] = useState("bfs");
   const [problemData, setProblemData] = useState(null);
@@ -831,6 +842,7 @@ export default function DSAExamPrep() {
 
   return (
     <div className="flex h-screen bg-slate-50 font-sans text-slate-800">
+      {/* SIDEBAR */}
       <div className="w-64 bg-white border-r border-slate-200 flex flex-col">
         <div className="p-6 border-b border-slate-100">
           <div className="flex items-center gap-2 font-bold text-xl text-indigo-600">
@@ -937,7 +949,9 @@ export default function DSAExamPrep() {
         </div>
       </div>
 
+      {/* MAIN CONTENT */}
       <div className="flex-1 flex flex-col overflow-hidden">
+        {/* HEADER */}
         <header className="bg-white border-b px-6 py-4 flex justify-between items-center">
           <div>
             <h1 className="text-2xl font-bold text-slate-800">
@@ -955,7 +969,9 @@ export default function DSAExamPrep() {
 
         <div className="flex-1 overflow-auto p-6 bg-slate-50">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full">
+            {/* LEFT: PROBLEM & FEEDBACK */}
             <div className="flex flex-col gap-6">
+              {/* Visualizer */}
               <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col min-h-[300px]">
                 <div className="bg-slate-50 border-b border-slate-100 p-3 text-xs font-medium text-slate-500 uppercase tracking-wide text-center">
                   Visualization
@@ -976,6 +992,7 @@ export default function DSAExamPrep() {
                 </div>
               </div>
 
+              {/* Interaction */}
               <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
                 <div className="flex items-start justify-between mb-4">
                   <h3 className="font-bold text-lg flex items-center gap-2 text-slate-800">
@@ -1058,7 +1075,9 @@ export default function DSAExamPrep() {
               </div>
             </div>
 
+            {/* RIGHT: CODE EDITOR & ANALYSIS */}
             <div className="flex flex-col h-full gap-4">
+              {/* Code Editor */}
               <div className="flex flex-col flex-1 bg-[#1e1e1e] rounded-xl shadow-lg overflow-hidden border border-slate-700 min-h-[400px]">
                 <div className="bg-[#252526] p-3 border-b border-[#333] flex justify-between items-center">
                   <div className="flex items-center gap-2 text-slate-300">
@@ -1094,6 +1113,7 @@ export default function DSAExamPrep() {
                 </div>
               </div>
 
+              {/* Static Analysis Report */}
               {codeReport && (
                 <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 animate-in fade-in slide-in-from-bottom-2">
                   <div className="flex justify-between items-start mb-4">
@@ -1152,6 +1172,7 @@ export default function DSAExamPrep() {
     </div>
   );
 }
+
 const SidebarItem = ({ id, label, icon, active, set }) => (
   <button
     onClick={() => set(id)}
