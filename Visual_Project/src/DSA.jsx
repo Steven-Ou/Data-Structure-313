@@ -125,9 +125,13 @@ const analyzeCode = (code, algoType) => {
     check(["relax"], "Relax Edge", 2);
     check(["priority", "min", "extract"], "Priority Queue", 3);
   } else if (algoType === "kruskal") {
-    check(["sort", "weight"], "Sort Edges", 2);
-    check(["cycle", "union"], "Cycle Check", 3);
-    check(["empty", "tree"], "Init Tree", 2);
+    check(["sort", "weight", "increasing"], "Sort Edges", 2);
+    check(["find", "union", "set"], "Disjoint Set / Union-Find", 3);
+    check(["cycle"], "Cycle Detection", 2);
+  } else if (algoType === "hashing") {
+    check(["h(", "mod", "%"], "Hash Function", 2);
+    check(["while", "repeat", "for"], "Probing Loop", 2);
+    check(["nil", "null", "empty"], "Check Empty", 2);
   }
 
   // Generic
@@ -238,6 +242,38 @@ const generateListData = (size = 4) => {
     { length: size },
     () => Math.floor(Math.random() * 90) + 10
   );
+};
+
+// NEW: Generator for Hash Table Data
+const generateHashData = (size = 7) => {
+  const table = Array(size).fill(null);
+  // Pre-fill about 50% of the table
+  for (let i = 0; i < 3; i++) {
+    let val = Math.floor(Math.random() * 50) + 1;
+    let idx = val % size;
+    // Simple linear probe to place initial values
+    while (table[idx] !== null) {
+      idx = (idx + 1) % size;
+    }
+    table[idx] = val;
+  }
+  // Pick a key that is guaranteed to cause a collision for the problem
+  let key = Math.floor(Math.random() * 50) + 1;
+  let startIdx = key % size;
+
+  // Ensure we pick a key that hits a filled spot initially to force probing
+  // If the random key hits an empty spot, artificially shift it to hit a filled spot if possible
+  if (table[startIdx] === null) {
+    // find a filled spot
+    const filledIndex = table.findIndex((x) => x !== null);
+    if (filledIndex !== -1) {
+      // Adjust key so key % size == filledIndex
+      // e.g. if filledIndex is 2 and size is 7, make key 9 (9%7=2)
+      key = Math.floor(Math.random() * 5) * size + filledIndex;
+    }
+  }
+
+  return { table, key, size };
 };
 
 // --- ALGORITHMS ---
@@ -381,7 +417,6 @@ DFS-Visit(G,u)
       return mstWeight;
     },
     question: "Calculate the Total Weight of the MST.",
-    // Transcription of the handwritten note IMG_8867.HEIC (Bottom Left)
     code: `Kruskal's Algorithm: Main Algorithmic Greedy Strategy
 Input G=(V,E,w)
 Sort the edges by their weights from smallest to largest.
@@ -392,12 +427,12 @@ While ( V(T) != V(G) )
     If adding e to T doesn't create a cycle in T
         T <- T U {e}
     
-    // (Implicitly remove e from consideration or move to next cheap edge)
+    // (Implicitly remove e from consideration)
 End While
 Return T`,
   },
 
-  // === TREES (COMBINED) ===
+  // === TREES ===
   bst_inorder: {
     name: "BST In-Order",
     category: "Trees",
@@ -611,9 +646,27 @@ Return T`,
     name: "Hashing (Open Addr)",
     category: "Hashing",
     signature: "Hash-Insert(T, k)",
-    hint: "Probe until empty slot found.",
-    solve: (d) => "Collision",
-    question: "Write Linear Probing logic.",
+    hint: "Probe until empty slot found using h(k, i) = (k + i) % m",
+    solve: (data) => {
+      if (!data || !data.table) return "";
+      const { table, key, size } = data;
+      let i = 0;
+      let idx = key % size;
+
+      // Simulate linear probing
+      // Just to find where it WOULD go without actually modifying the visual data
+      // Limit to size to prevent infinite loop if full
+      while (table[idx] !== null && i < size) {
+        i++;
+        idx = (key + i) % size;
+      }
+
+      return i < size ? idx : "Overflow";
+    },
+    question: (data) =>
+      `Insert key ${
+        data ? data.key : "?"
+      } into the table using Linear Probing (h(k,i) = (k+i)%size). What is the resulting index?`,
     code: `Hash-Insert(T, k)
   i = 0
   repeat
@@ -622,7 +675,7 @@ Return T`,
           T[j] = k; return j
       else i = i + 1
   until i == m
-  error "overflow"`,
+  error "hash table overflow"`,
   },
 
   // === COMPLEXITY ===
@@ -791,6 +844,37 @@ const ArrayVisualizer = ({ data, label }) => {
   );
 };
 
+// NEW: Hash Visualizer to show table slots
+const HashVisualizer = ({ data }) => {
+  if (!data || !data.table)
+    return <div className="text-slate-400 p-8">No Hash Data</div>;
+  return (
+    <div className="flex flex-col items-center w-full">
+      <div className="mb-4 font-bold text-indigo-600">
+        Key to Insert: {data.key}
+      </div>
+      <div className="flex gap-1 border p-2 rounded bg-slate-100">
+        {data.table.map((val, i) => (
+          <div key={i} className="flex flex-col items-center">
+            <div
+              className={`w-10 h-10 border border-slate-300 flex items-center justify-center font-mono text-sm
+                            ${
+                              val === null
+                                ? "bg-white text-slate-300"
+                                : "bg-indigo-100 text-indigo-800 font-bold"
+                            }`}
+            >
+              {val === null ? "∅" : val}
+            </div>
+            <span className="text-xs text-slate-500 mt-1">{i}</span>
+          </div>
+        ))}
+      </div>
+      <div className="text-xs text-slate-400 mt-2">Size: {data.size}</div>
+    </div>
+  );
+};
+
 const GraphVisualizer = ({ data, directed }) => {
   if (!data || !data.nodes)
     return <div className="text-slate-400 p-8">No Graph Data</div>;
@@ -922,6 +1006,8 @@ export default function DSAExamPrep() {
       );
     else if (cat === "Sorting") setProblemData(generateSortData(7));
     else if (cat === "Linear") setProblemData(generateListData(4));
+    else if (cat === "Hashing")
+      setProblemData(generateHashData(7)); // New Hashing Data
     else if (cat === "Theory") {
       const qs = [
         { algo: "Activity Selection", answer: "O(n)" },
@@ -965,6 +1051,7 @@ export default function DSAExamPrep() {
       );
     if (cat === "Sorting") return <ArrayVisualizer data={problemData} />;
     if (cat === "Linear") return <ListVisualizer data={problemData} />;
+    if (cat === "Hashing") return <HashVisualizer data={problemData} />;
 
     return (
       <div className="text-6xl text-slate-200 text-center font-bold">?</div>
