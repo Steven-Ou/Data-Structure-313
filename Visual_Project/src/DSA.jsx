@@ -18,6 +18,8 @@ import {
   BarChart,
   List,
   Cpu,
+  Hash,
+  TrendingUp,
 } from "lucide-react";
 
 // --- DATA STRUCTURE CLASSES ---
@@ -33,15 +35,14 @@ class TreeNode {
   }
 }
 
-// --- STATIC CODE ANALYZER ENGINE (ENHANCED FOR PSEUDOCODE) ---
+// --- STATIC CODE ANALYZER ENGINE ---
 
 const analyzeCode = (code, algoType) => {
   if (!code) return { detectedLang: "None", percentage: 0, feedback: [] };
 
-  // Normalize code for analysis
   const codeLower = code
-    .replace(/[^\x20-\x7E\s]/g, " ") // Remove non-printable chars
-    .replace(/\s+/g, " ") // Collapse whitespace
+    .replace(/[^\x20-\x7E\s]/g, " ")
+    .replace(/\s+/g, " ")
     .toLowerCase();
 
   const feedback = [];
@@ -49,7 +50,7 @@ const analyzeCode = (code, algoType) => {
   let maxScore = 0;
   let detectedLang = "Pseudo-code";
 
-  // 1. Language Detection Logic
+  // 1. Language Detection
   if (
     codeLower.includes("->") ||
     codeLower.includes("cout") ||
@@ -66,17 +67,13 @@ const analyzeCode = (code, algoType) => {
     detectedLang = "Python";
   } else if (
     codeLower.includes(" for ") &&
-    (codeLower.includes(" to ") || codeLower.includes(" downto ")) &&
-    !codeLower.includes("{")
+    (codeLower.includes(" to ") || codeLower.includes(" downto "))
   ) {
-    // Specifically detects the "for j = 1 to A.length" style from your notes
     detectedLang = "Textbook Pseudocode";
   }
 
-  // Helper to check for keywords
   const check = (keywords, message, weight = 1) => {
     maxScore += weight;
-    // Check if ANY of the keywords exist
     const match = keywords.some((k) =>
       codeLower.includes(k.toLowerCase().trim())
     );
@@ -88,64 +85,57 @@ const analyzeCode = (code, algoType) => {
     }
   };
 
-  // 2. Algorithm Specific Logic Fingerprinting (Updated with your Notes' style)
-
+  // 2. Algorithm Fingerprinting
   if (algoType === "merge_sort") {
-    //
-    check(["merge(", "merge_sort"], "Merge Function Definition", 2);
-    check(["p", "q", "r", "mid"], "Indices (p, q, r)", 2);
-    check(["floor", "/2", "n1", "n2"], "Midpoint/Subarray Size Calculation", 2);
-    check(["L[", "R["], "Left/Right Subarrays", 2);
-    check(["for", "while"], "Loop Structure", 1);
+    check(["merge(", "merge_sort"], "Merge Function", 2);
+    check(["floor", "/2", "mid"], "Midpoint", 2);
+    check(["L[", "R["], "Subarrays", 2);
   } else if (algoType === "insertion_sort") {
-    //
-    check(["for j", "for i"], "Main Loop (j=2 to length)", 2);
-    check(["key", "value"], "Key Assignment", 2);
-    check(["i = j", "i=j"], "Index Initialization", 2);
-    check(["while", "> 0", "> key"], "Shift Condition", 3);
-    check(["A[i+1]", "A[i + 1]"], "Item Shifting", 2);
+    check(["for j", "for i"], "Main Loop", 2);
+    check(["key", "value"], "Key Var", 2);
+    check(["while", "> 0", "> key"], "Shift Loop", 3);
   } else if (algoType === "binary_search") {
-    //
-    check(["low", "high", "begin", "end"], "Bounds Definition", 2);
-    check(["mid", "floor", "/2"], "Midpoint Calc", 2);
-    check(["if", "==", "<", ">"], "Comparisons", 2);
-    check(["return mid", "return nil", "return -1"], "Return Statement", 1);
-  } else if (algoType.includes("bst_")) {
-    //
+    check(["low", "high", "mid"], "Bounds/Mid", 2);
+    check(["<", ">", "=="], "Comparisons", 2);
+  } else if (algoType.includes("bst_") || algoType.includes("tree_")) {
     if (algoType.includes("search")) {
-      check(["nil", "null"], "Base Case (NIL)", 2);
-      check(["key", "val"], "Key Comparison", 2);
-      check(["left", "right"], "Traversal", 2);
-    } else {
-      // Traversals
-      check(["if x", "!= nil"], "Null Check", 1);
-      check(["print", "visit"], "Visit Node", 1);
-      check(["left", "right"], "Recursive Steps", 2);
+      check(["<", ">", "key"], "Traversal Logic", 2);
+    } else if (algoType.includes("order")) {
+      check(["left", "right"], "Recursive Calls", 2);
+      check(["print"], "Output", 1);
     }
-  } else if (algoType === "stack_ops") {
-    //
-    check(["top", "s.top"], "Top Pointer Access", 2);
-    check(["push", "pop"], "Operation Name", 1);
-    check(["+ 1", "- 1", "++", "--"], "Increment/Decrement", 2);
-    check(["empty", "underflow"], "Empty Check", 2);
-  } else if (algoType === "queue_ops") {
-    //
-    check(["enqueue", "dequeue"], "Operation Name", 1);
-    check(["head", "tail", "q.head", "q.tail"], "Head/Tail Pointers", 2);
-    check(["length", "capacity"], "Wrap-around/Size check", 2);
-  }
-  // Generic Checks for graph algos (BFS/DFS/Dijkstra)
-  else if (algoType === "bfs") {
-    check(["queue", "q"], "Queue Structure", 2);
-    check(["push", "enqueue"], "Add to Queue", 2);
-    check(["pop", "dequeue"], "Remove from Queue", 2);
+  } else if (algoType.includes("rbt")) {
+    check(["color", "red", "black"], "Color Props", 2);
+    check(["rotate"], "Rotations", 2);
+    check(["fixup"], "Fixup Logic", 2);
+  } else if (algoType.includes("avl")) {
+    check(["height", "balance"], "Balance Factor", 2);
+    check(["rotate"], "Rotations", 2);
+  } else if (algoType.includes("heap")) {
+    check(["heap-size", "largest"], "Heap Properties", 2);
+    check(["left", "right", "parent"], "Index Logic", 2);
+    check(["exchange", "swap"], "Swap Logic", 2);
+  } else if (algoType === "bfs") {
+    check(["queue", "enqueue", "dequeue"], "Queue Ops", 3);
+    check(["white", "gray", "black", "visited"], "Visited State", 2);
   } else if (algoType === "dfs") {
-    check(["visited", "color"], "Visited Array/Coloring", 2);
-    check(["recurse", "dfs", "stack"], "Recursion or Stack", 3);
+    check(["recurse", "visit"], "Recursion", 3);
+    check(["white", "gray", "black", "visited"], "Visited State", 2);
+  } else if (algoType === "dijkstra") {
+    check(["relax"], "Relax Edge", 2);
+    check(["priority", "min", "extract"], "Priority Queue", 3);
+  } else if (algoType === "greedy_activity") {
+    check(["finish", "start", "s[", "f["], "Times", 2);
+    check(["k", "m", "union"], "Selection Logic", 2);
+  } else if (algoType.includes("rod_cut")) {
+    check(["max", "price", "p["], "Maximization", 2);
+    if (algoType.includes("memo"))
+      check(["memo", "return r"], "Memoization Check", 2);
+    else check(["bottom-up", "for j"], "Iterative Build", 2);
   }
 
-  // Generic Control Flow
-  check(["return", "if", "else"], "Control Flow", 1);
+  // Generic
+  check(["return", "if", "for", "while"], "Control Structures", 1);
 
   const percentage = maxScore > 0 ? Math.round((score / maxScore) * 100) : 0;
   return { detectedLang, percentage, feedback };
@@ -174,18 +164,6 @@ const generateGraph = (numNodes = 5, directed = false, weighted = true) => {
     matrix[source][target] = weight;
     if (!directed) matrix[target][source] = weight;
     connected.add(target);
-  }
-  // Add random edges
-  for (let i = 0; i < numNodes; i++) {
-    if (Math.random() > 0.7) {
-      const target = Math.floor(Math.random() * numNodes);
-      if (target !== i && matrix[i][target] === 0) {
-        const weight = weighted ? Math.floor(Math.random() * 9) + 1 : 1;
-        edges.push({ source: i, target, weight });
-        matrix[i][target] = weight;
-        if (!directed) matrix[target][i] = weight;
-      }
-    }
   }
   return { nodes, edges, matrix };
 };
@@ -229,7 +207,14 @@ const generateRBTData = () => {
   return { root };
 };
 
-const generateSortData = (size = 6) => {
+const generateHeapData = () => {
+  return Array.from(
+    { length: 7 },
+    () => Math.floor(Math.random() * 50) + 10
+  ).sort((a, b) => b - a);
+};
+
+const generateSortData = (size = 7) => {
   return Array.from({ length: size }, () => Math.floor(Math.random() * 50) + 1);
 };
 
@@ -240,6 +225,31 @@ const generateListData = (size = 4) => {
   );
 };
 
+const generateActivityData = (count = 6) => {
+  let activities = [];
+  for (let i = 0; i < count; i++) {
+    let start = Math.floor(Math.random() * 20);
+    let duration = Math.floor(Math.random() * 6) + 1;
+    activities.push({ id: i + 1, s: start, f: start + duration });
+  }
+  // Sort by finish time for the algorithm
+  activities.sort((a, b) => a.f - b.f);
+  return {
+    s: [0, ...activities.map((a) => a.s)],
+    f: [0, ...activities.map((a) => a.f)],
+    activities: activities,
+  };
+};
+
+const generateRodData = (length = 8) => {
+  let prices = [0];
+  for (let i = 1; i <= length; i++) {
+    let prev = prices[i - 1];
+    prices.push(prev + Math.floor(Math.random() * 5) + 1);
+  }
+  return { p: prices, n: length };
+};
+
 // --- ALGORITHMS ---
 
 const algorithms = {
@@ -248,44 +258,34 @@ const algorithms = {
     name: "BFS (Breadth-First Search)",
     category: "Graphs",
     signature: "BFS(G, s)",
-    hint: "Use a Queue. Enqueue start, mark visited. While Q not empty, dequeue u, visit adj[u].",
+    hint: "Use a Queue. Enqueue start. While Q !empty, dequeue and visit neighbors.",
     solve: (data) => {
       if (!data || !data.matrix) return "";
-      const { matrix } = data;
-      const start = 0;
-      const queue = [start];
-      const visited = new Set([start]);
-      const result = [];
-      while (queue.length > 0) {
+      const queue = [0];
+      const visited = new Set([0]);
+      const res = [];
+      while (queue.length) {
         const u = queue.shift();
-        result.push(String.fromCharCode(65 + u));
-        for (let v = 0; v < matrix.length; v++) {
-          if (matrix[u][v] > 0 && !visited.has(v)) {
+        res.push(String.fromCharCode(65 + u));
+        for (let v = 0; v < data.matrix.length; v++)
+          if (data.matrix[u][v] > 0 && !visited.has(v)) {
             visited.add(v);
             queue.push(v);
           }
-        }
       }
-      return result.join(", ");
+      return res.join(", ");
     },
     question: "Perform BFS starting from Node A. List visited nodes.",
     code: `BFS(G, s)
-  for each vertex u in G.V - {s}
-      u.color = WHITE
-      u.d = INF
-      u.p = NIL
-  s.color = GRAY
-  s.d = 0
-  s.p = NIL
-  Q = {}
-  Enqueue(Q, s)
+  for each u in G.V - {s}
+      u.color = WHITE, u.d = INF
+  s.color = GRAY, s.d = 0, Q = {s}
   while Q != {}
       u = Dequeue(Q)
       for each v in G.Adj[u]
           if v.color == WHITE
               v.color = GRAY
               v.d = u.d + 1
-              v.p = u
               Enqueue(Q, v)
       u.color = BLACK`,
   },
@@ -293,94 +293,78 @@ const algorithms = {
     name: "DFS (Depth-First Search)",
     category: "Graphs",
     signature: "DFS(G)",
-    hint: "Recursively visit nodes. Mark as visited (Gray/Black). Uses a stack implicitly.",
+    hint: "Recursively visit. Mark Gray on entry, Black on exit.",
     solve: (data) => {
       if (!data || !data.matrix) return "";
-      const { matrix } = data;
       const visited = new Set();
-      const result = [];
-      const recurse = (u) => {
+      const res = [];
+      const t = (u) => {
         visited.add(u);
-        result.push(String.fromCharCode(65 + u));
-        for (let v = 0; v < matrix.length; v++)
-          if (matrix[u][v] > 0 && !visited.has(v)) recurse(v);
+        res.push(String.fromCharCode(65 + u));
+        for (let v = 0; v < data.matrix.length; v++)
+          if (data.matrix[u][v] && !visited.has(v)) t(v);
       };
-      recurse(0);
-      return result.join(", ");
+      t(0);
+      return res.join(", ");
     },
     question: "Perform Pre-Order DFS starting from Node A.",
     code: `DFS(G)
-  for each vertex u in G.V
-      u.color = WHITE
-      u.p = NIL
+  for each u in G.V u.color = WHITE
   time = 0
-  for each vertex u in G.V
-      if u.color == WHITE
-          DFS-Visit(G, u)
+  for each u in G.V
+      if u.color == WHITE DFS-Visit(G,u)
 
-DFS-Visit(G, u)
-  time = time + 1
-  u.d = time
+DFS-Visit(G,u)
   u.color = GRAY
+  time = time + 1; u.d = time
   for each v in G.Adj[u]
-      if v.color == WHITE
-          v.p = u
-          DFS-Visit(G, v)
-  u.color = BLACK
-  time = time + 1
-  u.f = time`,
+      if v.color == WHITE DFS-Visit(G,v)
+  u.color = BLACK; u.f = time + 1`,
   },
   dijkstra: {
     name: "Dijkstra's Algorithm",
     category: "Graphs",
     signature: "Dijkstra(G, w, s)",
-    hint: "Relax edges using a Min-Priority Queue. Extract min, update neighbors.",
+    hint: "Relax edges using a Min-Priority Queue.",
     solve: (data) => {
       if (!data || !data.matrix) return "";
-      const { matrix, nodes } = data;
-      const dist = Array(nodes.length).fill(Infinity);
+      const n = data.nodes.length;
+      const dist = Array(n).fill(Infinity);
       dist[0] = 0;
-      const visited = Array(nodes.length).fill(false);
-      for (let i = 0; i < nodes.length; i++) {
-        let u = -1;
-        let minVal = Infinity;
-        for (let k = 0; k < nodes.length; k++)
-          if (!visited[k] && dist[k] < minVal) {
-            minVal = dist[k];
+      const visited = Array(n).fill(false);
+      for (let i = 0; i < n; i++) {
+        let u = -1,
+          min = Infinity;
+        for (let k = 0; k < n; k++)
+          if (!visited[k] && dist[k] < min) {
+            min = dist[k];
             u = k;
           }
         if (u === -1) break;
         visited[u] = true;
-        for (let v = 0; v < nodes.length; v++)
-          if (
-            matrix[u][v] > 0 &&
-            !visited[v] &&
-            dist[u] + matrix[u][v] < dist[v]
-          )
-            dist[v] = dist[u] + matrix[u][v];
+        for (let v = 0; v < n; v++)
+          if (data.matrix[u][v] && dist[u] + data.matrix[u][v] < dist[v])
+            dist[v] = dist[u] + data.matrix[u][v];
       }
-      return dist[nodes.length - 1] === Infinity
-        ? "INF"
-        : dist[nodes.length - 1];
+      return dist[n - 1] === Infinity ? "INF" : dist[n - 1];
     },
     question: "Shortest path distance from Node A to the last Node?",
     code: `Dijkstra(G, w, s)
-  Initialize-Single-Source(G, s)
-  S = {}
-  Q = G.V
+  Init-Single-Source(G, s)
+  S = {}; Q = G.V
   while Q != {}
       u = Extract-Min(Q)
       S = S U {u}
-      for each vertex v in G.Adj[u]
+      for each v in G.Adj[u]
           Relax(u, v, w)`,
   },
 
-  // === TREES ===
+  // === TREES (COMBINED) ===
   bst_inorder: {
-    name: "BST In-Order Walk",
+    name: "BST In-Order",
     category: "Trees",
     signature: "Inorder-Tree-Walk(x)",
-    hint: "Left -> Root -> Right. (Recursively)",
+    hint: "Left -> Root -> Right.",
     solve: (data) => {
       if (!data || !data.root) return "";
       const res = [];
@@ -393,7 +377,7 @@ DFS-Visit(G, u)
       t(data.root);
       return res.join(", ");
     },
-    question: "List the values of the tree in In-Order sequence.",
+    question: "List nodes in In-Order sequence.",
     code: `Inorder-Tree-Walk(x)
   if x != NIL
       Inorder-Tree-Walk(x.left)
@@ -404,48 +388,102 @@ DFS-Visit(G, u)
     name: "BST Search",
     category: "Trees",
     signature: "Tree-Search(x, k)",
-    hint: "If k < x.key, go left. If k > x.key, go right.",
+    hint: "k < x.key ? Left : Right.",
     solve: (data) => {
-      if (!data || !data.target) return "N/A";
+      if (!data || !data.values) return "N/A";
       return data.values.includes(data.target) ? "Found" : "Not Found";
     },
-    question: (data) => `Will Tree-Search(root, ${data.target}) find the node?`,
+    question: (d) => `Will Tree-Search find ${d && d.target ? d.target : "?"}?`,
     code: `Tree-Search(x, k)
   if x == NIL or k == x.key
       return x
   if k < x.key
       return Tree-Search(x.left, k)
-  else 
-      return Tree-Search(x.right, k)`,
+  else return Tree-Search(x.right, k)`,
   },
   bst_successor: {
     name: "BST Successor",
     category: "Trees",
     signature: "Tree-Successor(x)",
-    hint: "If right subtree exists: min(right). Else: travel up until we are a left child.",
+    hint: "Min of right subtree OR lowest ancestor where x is left child.",
     solve: (data) => {
-      if (!data || !data.root) return "";
-      const { root, target } = data;
-      const sorted = [];
-      const t = (n) => {
-        if (!n) return;
-        t(n.left);
-        sorted.push(n.val);
-        t(n.right);
-      };
-      t(root);
-      const idx = sorted.indexOf(target);
+      if (!data || !data.values) return "";
+      const sorted = data.values.slice().sort((a, b) => a - b);
+      const idx = sorted.indexOf(data.target);
       return idx < sorted.length - 1 ? sorted[idx + 1] : "NIL";
     },
-    question: (data) => `Find the Successor of node ${data.target}.`,
+    question: (d) => `Find Successor of ${d && d.target ? d.target : "?"}.`,
     code: `Tree-Successor(x)
   if x.right != NIL
       return Tree-Minimum(x.right)
   y = x.p
   while y != NIL and x == y.right
-      x = y
-      y = y.p
+      x = y; y = y.p
   return y`,
+  },
+  bst_ops: {
+    name: "BST Insert/Delete",
+    category: "Trees",
+    signature: "Tree-Insert(T, z)",
+    hint: "Standard BST insertion logic.",
+    solve: (d) => "Varies",
+    question: "Code the Tree-Insert logic.",
+    code: `Tree-Insert(T, z)
+  y = NIL; x = T.root
+  while x != NIL
+      y = x
+      if z.key < x.key x = x.left
+      else x = x.right
+  z.p = y
+  if y == NIL T.root = z
+  else if z.key < y.key y.left = z
+  else y.right = z`,
+  },
+  rbt_ops: {
+    name: "Red-Black Tree",
+    category: "Trees",
+    signature: "RB-Insert(T, z)",
+    hint: "Insert Red, then Fixup.",
+    solve: (d) => "Balanced",
+    question: "Write logic for RB-Insert-Fixup.",
+    code: `RB-Insert-Fixup(T, z)
+  while z.p.color == RED
+      if z.p == z.p.p.left
+          y = z.p.p.right
+          if y.color == RED
+              z.p.color = BLACK; y.color = BLACK
+              z.p.p.color = RED; z = z.p.p
+          else ...`,
+  },
+  avl_ops: {
+    name: "AVL Tree",
+    category: "Trees",
+    signature: "AVL-Insert(T, z)",
+    hint: "Check balance factor, rotate if >1 or <-1.",
+    solve: (d) => "Balanced",
+    question: "Write rotation logic for AVL.",
+    code: `AVL-Insert(T, z)
+  // Insert...
+  bf = height(left) - height(right)
+  if bf > 1 and key < left.key
+      return rightRotate(node)
+  if bf < -1 and key > right.key
+      return leftRotate(node)`,
+  },
+  heap_ops: {
+    name: "Max-Heap Operations",
+    category: "Trees",
+    signature: "Max-Heapify(A, i)",
+    hint: "Float down: swap with largest child.",
+    solve: (d) => (d && d.length ? d[0] : ""),
+    question: "What is the Max element (Root)?",
+    code: `Max-Heapify(A, i)
+  l = Left(i); r = Right(i); largest = i
+  if l <= size and A[l] > A[i] largest = l
+  if r <= size and A[r] > A[largest] largest = r
+  if largest != i
+      swap(A[i], A[largest])
+      Max-Heapify(A, largest)`,
   },
 
   // === SORTING ===
@@ -453,387 +491,387 @@ DFS-Visit(G, u)
     name: "Merge Sort",
     category: "Sorting",
     signature: "Merge-Sort(A, p, r)",
-    hint: "Divide: q = (p+r)/2. Conquer: Sort L and R. Combine: Merge.",
-    solve: (data) => {
-      if (!Array.isArray(data)) return "";
-      return [...data].sort((a, b) => a - b).join(", ");
-    },
-    question: "What will the array look like after it is fully sorted?",
+    hint: "Divide, Conquer, Combine.",
+    solve: (d) => (d ? [...d].sort((a, b) => a - b).join(", ") : ""),
+    question: "Sort this array.",
     code: `Merge-Sort(A, p, r)
   if p < r
-      q = floor((p + r) / 2)
+      q = floor((p+r)/2)
       Merge-Sort(A, p, q)
-      Merge-Sort(A, q + 1, r)
-      Merge(A, p, q, r)
-      
-Merge(A, p, q, r)
-  n1 = q - p + 1
-  n2 = r - q
-  let L[1..n1+1] and R[1..n2+1] be new arrays
-  ...`,
+      Merge-Sort(A, q+1, r)
+      Merge(A, p, q, r)`,
   },
   insertion_sort: {
     name: "Insertion Sort",
     category: "Sorting",
     signature: "Insertion-Sort(A)",
-    hint: "Insert A[j] into the sorted sequence A[1..j-1].",
-    solve: (data) => {
-      if (!Array.isArray(data)) return "";
-      const arr = [...data];
-      const k = arr[1];
+    hint: "Insert A[j] into sorted A[1..j-1].",
+    solve: (d) => {
+      if (!d) return "";
+      const a = [...d];
+      const k = a[1];
       let j = 0;
-      while (j >= 0 && arr[j] > k) {
-        arr[j + 1] = arr[j];
+      while (j >= 0 && a[j] > k) {
+        a[j + 1] = a[j];
         j--;
       }
-      arr[j + 1] = k;
-      return arr.join(", ");
+      a[j + 1] = k;
+      return a.join(", ");
     },
-    question:
-      "Perform just the FIRST pass of Insertion Sort (insert 2nd element). Result?",
+    question: "Perform first pass (insert 2nd element).",
     code: `Insertion-Sort(A)
   for j = 2 to A.length
-      key = A[j]
-      // Insert A[j] into the sorted sequence A[1..j-1]
-      i = j - 1
+      key = A[j]; i = j - 1
       while i > 0 and A[i] > key
-          A[i + 1] = A[i]
+          A[i+1] = A[i]
           i = i - 1
-      A[i + 1] = key`,
+      A[i+1] = key`,
   },
   binary_search: {
     name: "Binary Search",
     category: "Sorting",
-    signature: "Binary-Search(A, t, begin, end)",
-    hint: "Compare t with mid. If t < mid, recurse left; else recurse right.",
-    solve: (data) => {
-      if (!Array.isArray(data)) return "";
-      const sorted = [...data].sort((a, b) => a - b);
-      // Just demonstrating what the middle would be of sorted array
-      return sorted[Math.floor((sorted.length - 1) / 2)];
-    },
-    question:
-      "In a sorted version of this array, what element is at the very middle index (floor)?",
-    code: `Binary-Search(A, t, begin, end)
-  if begin > end
-      return NIL
-  mid = floor((begin + end) / 2)
-  if t == A[mid]
-      return mid
-  if t < A[mid]
-      return Binary-Search(A, t, begin, mid - 1)
-  else
-      return Binary-Search(A, t, mid + 1, end)`,
+    signature: "Binary-Search(A, t)",
+    hint: "Check mid. Recurse left or right.",
+    solve: (d) =>
+      d ? [...d].sort((a, b) => a - b)[Math.floor((d.length - 1) / 2)] : "",
+    question: "Find the middle element of sorted version.",
+    code: `Binary-Search(A, t, low, high)
+  if low > high return NIL
+  mid = floor((low+high)/2)
+  if t == A[mid] return mid
+  if t < A[mid] return Binary-Search(A, t, low, mid-1)
+  else return Binary-Search(A, t, mid+1, high)`,
   },
 
   // === LINEAR ===
   stack_ops: {
     name: "Stack Operations",
     category: "Linear",
-    signature: "Push(S, x) / Pop(S)",
-    hint: "LIFO. Push increments top. Pop decrements top.",
-    solve: (data) => {
-      return "99";
-    },
-    question:
-      "Given Stack (Top on right), perform: Pop(), Pop(), Push(99). What is Top?",
+    signature: "Push(S, x)",
+    hint: "LIFO. Increment top.",
+    solve: (d) => "99",
+    question: "Push(99). What is Top?",
     code: `Push(S, x)
   S.top = S.top + 1
-  S[S.top] = x
-
-Pop(S)
-  if Stack-Empty(S)
-      error "underflow"
-  else
-      S.top = S.top - 1
-      return S[S.top + 1]`,
+  S[S.top] = x`,
   },
   queue_ops: {
     name: "Queue Operations",
     category: "Linear",
-    signature: "Enqueue(Q, x) / Dequeue(Q)",
-    hint: "FIFO. Enqueue at tail. Dequeue from head.",
-    solve: (data) => {
-      if (!Array.isArray(data)) return "";
-      return data.length > 1 ? data[1] : "Empty";
-    },
-    question:
-      "Given Queue (Head on left). Perform Dequeue(), Enqueue(99). Who is new Head?",
+    signature: "Enqueue(Q, x)",
+    hint: "FIFO. Enqueue at Tail.",
+    solve: (d) => (d && d.length > 1 ? d[1] : ""),
+    question: "Dequeue(), who is new Head?",
     code: `Enqueue(Q, x)
   Q[Q.tail] = x
-  if Q.tail == Q.length
-      Q.tail = 1
-  else Q.tail = Q.tail + 1
-
-Dequeue(Q)
-  x = Q[Q.head]
-  if Q.head == Q.length
-      Q.head = 1
-  else Q.head = Q.head + 1
-  return x`,
+  if Q.tail == Q.length Q.tail = 1
+  else Q.tail = Q.tail + 1`,
   },
 
-  // === THEORY ===
-  complexity_quiz: {
-    name: "Time Complexity Quiz",
-    category: "Complexity",
-    signature: "Big-O Notation",
-    hint: "Analyze loops (n) and splits (log n).",
-    solve: (data) => (data ? data.answer : ""),
-    question: (data) =>
-      data
-        ? `What is the worst-case Time Complexity of ${data.algo}?`
-        : "Loading...",
-    code: `// Cheat Sheet from Notes:
-// Merge Sort: T(n) = 2T(n/2) + O(n) => O(n lg n)
-// Insertion Sort: O(n^2) worst case
-// Binary Search: T(n) = T(n/2) + O(1) => O(lg n)
-// BST Search: O(h), where h is height
-// Stack Push/Pop: O(1)`,
+  // === HASHING ===
+  hashing: {
+    name: "Hashing (Open Addr)",
+    category: "Hashing",
+    signature: "Hash-Insert(T, k)",
+    hint: "Probe until empty slot found.",
+    solve: (d) => "Collision",
+    question: "Write Linear Probing logic.",
+    code: `Hash-Insert(T, k)
+  i = 0
+  repeat
+      j = h(k, i)
+      if T[j] == NIL
+          T[j] = k; return j
+      else i = i + 1
+  until i == m
+  error "overflow"`,
+  },
+
+  // === GREEDY & DP ===
+  greedy_activity: {
+    name: "Activity Selection",
+    category: "Greedy_DP",
+    signature: "Greedy-Activity-Selector(s, f)",
+    hint: "Pick earliest finish time > current start.",
+    solve: (data) => {
+      if (!data || !data.s || !data.f) return "";
+      let k = 1;
+      let res = [1];
+      for (let m = 2; m < data.s.length; m++)
+        if (data.s[m] >= data.f[k]) {
+          res.push(m);
+          k = m;
+        }
+      return res.join(", ");
+    },
+    question: "Indices of selected activities?",
+    code: `Greedy-Activity-Selector(s, f)
+  n = s.length; A = {a1}; k = 1
+  for m = 2 to n
+      if s[m] >= f[k]
+          A = A U {am}; k = m
+  return A`,
+  },
+  dp_rod_cut_memo: {
+    name: "Rod Cutting (Memo)",
+    category: "Greedy_DP",
+    signature: "Memoized-Cut-Rod(p, n)",
+    hint: "Recursion + Cache.",
+    solve: (data) => {
+      if (!data || !data.p) return "";
+      const { p, n } = data;
+      let r = Array(n + 1).fill(-Infinity);
+      const aux = (p, n, r) => {
+        if (r[n] >= 0) return r[n];
+        let q;
+        if (n === 0) q = 0;
+        else {
+          q = -Infinity;
+          for (let i = 1; i <= n; i++) q = Math.max(q, p[i] + aux(p, n - i, r));
+        }
+        r[n] = q;
+        return q;
+      };
+      return aux(p, n, r);
+    },
+    question: (data) => `Max revenue for rod length ${data ? data.n : 0}?`,
+    code: `Memoized-Cut-Rod-Aux(p, n, r)
+  if r[n] >= 0 return r[n]
+  if n == 0 q = 0
+  else q = -INF
+      for i = 1 to n
+          q = max(q, p[i] + Aux(p, n-i, r))
+  r[n] = q; return q`,
+  },
+  dp_rod_cut_bottom: {
+    name: "Rod Cutting (Bottom-Up)",
+    category: "Greedy_DP",
+    signature: "Bottom-Up-Cut-Rod(p, n)",
+    hint: "Iterative Array Fill.",
+    solve: (data) => {
+      if (!data || !data.p) return "";
+      const { p, n } = data;
+      let r = Array(n + 1).fill(0);
+      r[0] = 0;
+      for (let j = 1; j <= n; j++) {
+        let q = -Infinity;
+        for (let i = 1; i <= j; i++) q = Math.max(q, p[i] + r[j - i]);
+        r[j] = q;
+      }
+      return r[n];
+    },
+    question: (data) => `Max revenue for rod length ${data ? data.n : 0}?`,
+    code: `Bottom-Up-Cut-Rod(p, n)
+  r[0] = 0
+  for j = 1 to n
+      q = -INF
+      for i = 1 to j
+          q = max(q, p[i] + r[j-i])
+      r[j] = q
+  return r[n]`,
+  },
+
+  // === COMPLEXITY ===
+  complexity: {
+    name: "Complexity Quiz",
+    category: "Theory",
+    signature: "Big-O",
+    hint: "Count loops.",
+    solve: (d) => (d && d.answer ? d.answer : ""),
+    question: (d) => `Complexity of ${d && d.algo ? d.algo : "..."}?`,
+    code: `// Cheat Sheet:
+// Merge Sort: O(n lg n)
+// Activity Selection: O(n)
+// Rod Cutting: O(n^2)
+// BST Search: O(n)`,
   },
 };
 
-// --- VISUALIZERS (FIXED: Added checks for data types) ---
+// --- VISUALIZERS ---
 
 const TreeVisualizer = ({ root, highlight }) => {
-  if (!root) return <div className="text-gray-400 p-4">No Tree Data</div>;
+  if (!root)
+    return <div className="text-slate-400 p-8 text-center">No Tree Data</div>;
   const levels = [];
   const traverse = (node, depth, x, spread) => {
     if (!node) return;
     if (!levels[depth]) levels[depth] = [];
-    const pos = {
+    levels[depth].push({
       x,
       y: 40 + depth * 60,
       val: node.val,
       color: node.color,
       id: node.id,
-    };
-    levels[depth].push(pos);
-    node.pos = pos;
+    });
     traverse(node.left, depth + 1, x - spread, spread / 2);
     traverse(node.right, depth + 1, x + spread, spread / 2);
   };
   traverse(root, 0, 200, 100);
-  const renderLines = (node) => {
+
+  const renderLines = (node, depth, x, spread) => {
     if (!node) return [];
     const lines = [];
-    if (node.left) {
+    if (node.left)
       lines.push(
         <line
-          key={`${node.id}-L`}
-          x1={node.pos.x}
-          y1={node.pos.y}
-          x2={node.left.pos.x}
-          y2={node.left.pos.y}
+          key={`l-${node.id}`}
+          x1={x}
+          y1={40 + depth * 60}
+          x2={x - spread}
+          y2={40 + (depth + 1) * 60}
           stroke="#cbd5e1"
           strokeWidth="2"
-        />
+        />,
+        ...renderLines(node.left, depth + 1, x - spread, spread / 2)
       );
-      lines.push(...renderLines(node.left));
-    }
-    if (node.right) {
+    if (node.right)
       lines.push(
         <line
-          key={`${node.id}-R`}
-          x1={node.pos.x}
-          y1={node.pos.y}
-          x2={node.right.pos.x}
-          y2={node.right.pos.y}
+          key={`r-${node.id}`}
+          x1={x}
+          y1={40 + depth * 60}
+          x2={x + spread}
+          y2={40 + (depth + 1) * 60}
           stroke="#cbd5e1"
           strokeWidth="2"
-        />
+        />,
+        ...renderLines(node.right, depth + 1, x + spread, spread / 2)
       );
-      lines.push(...renderLines(node.right));
-    }
     return lines;
   };
-  const renderNodes = (node) => {
-    if (!node) return [];
-    const nodesArr = [];
-    const isTarget = node.val === highlight;
-    const isRed = node.color === "red";
-    const fill = isTarget
-      ? "#fef3c7"
-      : isRed
-      ? "#fee2e2"
-      : node.color === "black"
-      ? "#334155"
-      : "white";
-    const stroke = isTarget
-      ? "#d97706"
-      : isRed
-      ? "#ef4444"
-      : node.color === "black"
-      ? "#0f172a"
-      : "#3b82f6";
-    const textFill = node.color === "black" ? "white" : "#1e293b";
-    nodesArr.push(
-      <g key={node.id}>
-        <circle
-          cx={node.pos.x}
-          cy={node.pos.y}
-          r="16"
-          fill={fill}
-          stroke={stroke}
-          strokeWidth={isTarget ? 3 : 2}
-        />
-        <text
-          x={node.pos.x}
-          y={node.pos.y}
-          dy="5"
-          textAnchor="middle"
-          fontSize="12"
-          fontWeight="bold"
-          fill={textFill}
-        >
-          {node.val}
-        </text>
-      </g>
-    );
-    nodesArr.push(...renderNodes(node.left));
-    nodesArr.push(...renderNodes(node.right));
-    return nodesArr;
-  };
+
   return (
     <svg width="400" height="350" className="mx-auto overflow-visible">
-      {renderLines(root)}
-      {renderNodes(root)}
+      {renderLines(root, 0, 200, 100)}
+      {levels.flat().map((n) => (
+        <g key={n.id}>
+          <circle
+            cx={n.x}
+            cy={n.y}
+            r="16"
+            fill={
+              n.val === highlight
+                ? "#fef3c7"
+                : n.color === "red"
+                ? "#fee2e2"
+                : n.color === "black"
+                ? "#334155"
+                : "white"
+            }
+            stroke={
+              n.val === highlight
+                ? "#d97706"
+                : n.color === "red"
+                ? "#ef4444"
+                : n.color === "black"
+                ? "#0f172a"
+                : "#3b82f6"
+            }
+            strokeWidth="2"
+          />
+          <text
+            x={n.x}
+            y={n.y}
+            dy="5"
+            textAnchor="middle"
+            fontSize="12"
+            fontWeight="bold"
+            fill={n.color === "black" ? "white" : "#1e293b"}
+          >
+            {n.val}
+          </text>
+        </g>
+      ))}
     </svg>
   );
 };
 
-const GraphVisualizer = ({ data, directed }) => {
-  if (!data || !data.nodes || !data.edges)
-    return <div className="text-gray-400 p-4">No Graph Data</div>;
-  const { nodes, edges } = data;
-  const radius = 100;
-  const centerX = 200;
-  const centerY = 150;
-  const getNodePos = (index, total) => {
-    const angle = (index / total) * 2 * Math.PI - Math.PI / 2;
-    return {
-      x: centerX + radius * Math.cos(angle),
-      y: centerY + radius * Math.sin(angle),
-    };
-  };
+const HeapVisualizer = ({ data }) => {
+  if (!data)
+    return <div className="text-slate-400 p-8 text-center">No Heap Data</div>;
   return (
-    <svg width="400" height="300" className="mx-auto overflow-visible">
-      <defs>
-        <marker
-          id="arrowhead"
-          markerWidth="10"
-          markerHeight="7"
-          refX="26"
-          refY="3.5"
-          orient="auto"
-        >
-          <polygon points="0 0, 10 3.5, 0 7" fill="#94a3b8" />
-        </marker>
-      </defs>
-      {edges.map((e, i) => {
-        const start = getNodePos(e.source, nodes.length);
-        const end = getNodePos(e.target, nodes.length);
-        return (
-          <g key={i}>
-            <line
-              x1={start.x}
-              y1={start.y}
-              x2={end.x}
-              y2={end.y}
-              stroke="#94a3b8"
-              strokeWidth="2"
-              markerEnd={directed ? "url(#arrowhead)" : ""}
-            />
-            {e.weight > 1 && (
-              <text
-                x={(start.x + end.x) / 2}
-                y={(start.y + end.y) / 2}
-                fill="#ef4444"
-                fontSize="12"
-                fontWeight="bold"
-                dy="4"
-                textAnchor="middle"
-                className="bg-white"
-              >
-                {e.weight}
-              </text>
-            )}
-          </g>
-        );
-      })}
-      {nodes.map((n, i) => {
-        const pos = getNodePos(i, nodes.length);
-        return (
-          <g key={n.id}>
-            <circle
-              cx={pos.x}
-              cy={pos.y}
-              r="18"
-              fill="white"
-              stroke="#3b82f6"
-              strokeWidth="2"
-            />
-            <text
-              x={pos.x}
-              y={pos.y}
-              dy="5"
-              textAnchor="middle"
-              fontWeight="bold"
-              fill="#1e293b"
-            >
-              {n.label}
-            </text>
-          </g>
-        );
-      })}
-    </svg>
-  );
-};
-
-const ArrayVisualizer = ({ data }) => {
-  if (!data || !Array.isArray(data))
-    return <div className="text-gray-400 p-4">No Array Data</div>;
-  const maxVal = Math.max(...data, 50);
-  return (
-    <div className="flex items-end justify-center gap-1 h-full w-full px-4 pb-4">
-      {data.map((val, i) => (
-        <div key={i} className="flex flex-col items-center gap-1 w-8 group">
+    <div className="flex flex-col items-center gap-4">
+      <div className="flex gap-2 justify-center">
+        {data.map((v, i) => (
           <div
-            className="w-full bg-indigo-500 rounded-t transition-all duration-300"
-            style={{ height: `${(val / maxVal) * 100}%` }}
-          ></div>
-          <span className="text-xs font-mono text-slate-500">{val}</span>
+            key={i}
+            className="w-10 h-10 border flex items-center justify-center rounded-full bg-orange-100 border-orange-300 font-bold text-orange-800"
+          >
+            {v}
+          </div>
+        ))}
+      </div>
+      <div className="text-xs text-slate-500">Array Representation</div>
+    </div>
+  );
+};
+
+const ArrayVisualizer = ({ data, label }) => {
+  if (!data || !Array.isArray(data))
+    return <div className="text-slate-400 p-8 text-center">No Data</div>;
+  const nums = data.filter((n) => typeof n === "number");
+  const maxVal = nums.length ? Math.max(...nums, 50) : 50;
+  return (
+    <div className="flex flex-col h-full">
+      {label && (
+        <div className="text-xs text-slate-500 mb-2 text-center">{label}</div>
+      )}
+      <div className="flex items-end justify-center gap-1 h-full w-full px-4 pb-4">
+        {data.map((val, i) => (
+          <div key={i} className="flex flex-col items-center gap-1 w-8">
+            {typeof val === "number" ? (
+              <div
+                className="w-full bg-indigo-500 rounded-t"
+                style={{ height: `${(val / maxVal) * 100}%` }}
+              ></div>
+            ) : (
+              <span className="text-xs">{val}</span>
+            )}
+            {typeof val === "number" && (
+              <span className="text-xs font-mono text-slate-500">{val}</span>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const ActivityVisualizer = ({ data }) => {
+  if (!data) return null;
+  return (
+    <div className="flex flex-col gap-2 p-4 overflow-auto">
+      {data.activities.map((act) => (
+        <div key={act.id} className="flex items-center gap-2">
+          <span className="font-mono text-xs w-6">a{act.id}</span>
+          <div className="relative h-6 bg-slate-100 rounded flex-1">
+            <div
+              className="absolute h-full bg-indigo-400 rounded opacity-80"
+              style={{
+                left: `${(act.s / 20) * 100}%`,
+                width: `${((act.f - act.s) / 20) * 100}%`,
+              }}
+            ></div>
+          </div>
         </div>
       ))}
     </div>
   );
 };
 
-const ListVisualizer = ({ data }) => {
-  if (!data || !Array.isArray(data))
-    return <div className="text-gray-400 p-4">No List Data</div>;
-  return (
-    <div className="flex flex-wrap items-center justify-center gap-2 p-4 mt-12">
-      {data.map((val, i) => (
-        <React.Fragment key={i}>
-          <div
-            className={`w-12 h-12 flex items-center justify-center border-2 rounded-lg font-bold text-slate-700 ${
-              i === data.length - 1
-                ? "border-indigo-500 bg-indigo-50"
-                : "border-slate-300 bg-white"
-            }`}
-          >
-            {val}
-          </div>
-          {i < data.length - 1 && (
-            <ArrowRight size={16} className="text-slate-400" />
-          )}
-        </React.Fragment>
+const GraphVisualizer = () => (
+  <div className="text-center p-8 text-slate-400">Graph Visualizer Active</div>
+);
+const ListVisualizer = ({ data }) => (
+  <div className="flex gap-2 justify-center p-8">
+    {data &&
+      data.map((v, i) => (
+        <div key={i} className="p-2 border rounded">
+          {v}
+        </div>
       ))}
-      <span className="text-xs font-bold text-indigo-600 ml-2">← TOP</span>
-    </div>
-  );
-};
+  </div>
+);
 
 // --- MAIN COMPONENT ---
 
@@ -848,7 +886,7 @@ export default function DSAExamPrep() {
   const [userCode, setUserCode] = useState("");
   const [codeReport, setCodeReport] = useState(null);
 
-  const currentAlgo = algorithms[activeAlgo];
+  const currentAlgo = algorithms[activeAlgo] || algorithms["bfs"];
 
   const generateNewProblem = () => {
     setFeedback(null);
@@ -857,46 +895,33 @@ export default function DSAExamPrep() {
     setShowHint(false);
     setUserAnswer("");
     setCodeReport(null);
-
-    // Set default code template based on the algorithm type to help user start
     setUserCode(
       currentAlgo.signature + "\n    // Write your implementation here...\n"
     );
 
-    // GENERATE DATA SAFELY
-    if (activeAlgo === "complexity_quiz") {
-      const opts = [
-        { algo: "Merge Sort", answer: "O(n log n)" },
-        { algo: "Insertion Sort", answer: "O(n^2)" },
-        { algo: "Binary Search", answer: "O(log n)" },
-        { algo: "Access Array Index", answer: "O(1)" },
-      ];
-      setProblemData(opts[Math.floor(Math.random() * opts.length)]);
-    } else if (currentAlgo.category === "Graphs") {
+    const cat = currentAlgo.category;
+    if (cat === "Graphs")
+      setProblemData(generateGraph(5, activeAlgo === "dfs"));
+    else if (cat === "Trees")
       setProblemData(
-        generateGraph(5, activeAlgo === "dfs", activeAlgo === "dijkstra")
+        activeAlgo.includes("heap")
+          ? generateHeapData()
+          : activeAlgo.includes("rbt")
+          ? generateRBTData()
+          : generateBSTData(7)
       );
-    } else if (currentAlgo.category === "Trees") {
-      if (activeAlgo === "rbt_props") {
-        setProblemData(generateRBTData());
-      } else {
-        const data = generateBSTData(7);
-        // Ensure valid targets for Find/Pred/Succ
-        if (activeAlgo.includes("successor")) {
-          data.target = data.values.sort((a, b) => a - b)[0]; // Smallest has successor
-        } else if (activeAlgo.includes("predecessor")) {
-          data.target = data.values.sort((a, b) => a - b)[
-            data.values.length - 1
-          ]; // Largest has pred
-        } else {
-          data.target = data.values[0];
-        }
-        setProblemData(data);
-      }
-    } else if (currentAlgo.category === "Sorting") {
-      setProblemData(generateSortData(7));
-    } else if (currentAlgo.category === "Linear") {
-      setProblemData(generateListData(4));
+    else if (cat === "Sorting") setProblemData(generateSortData(7));
+    else if (cat === "Linear") setProblemData(generateListData(4));
+    else if (cat === "Greedy_DP") {
+      if (activeAlgo === "greedy_activity")
+        setProblemData(generateActivityData());
+      else setProblemData(generateRodData());
+    } else if (cat === "Theory") {
+      const qs = [
+        { algo: "Activity Selection", answer: "O(n)" },
+        { algo: "Rod Cutting", answer: "O(n^2)" },
+      ];
+      setProblemData(qs[Math.floor(Math.random() * qs.length)]);
     }
   };
 
@@ -906,71 +931,61 @@ export default function DSAExamPrep() {
 
   const checkAnswer = () => {
     if (!problemData) return;
-    const correctAnswer = String(currentAlgo.solve(problemData));
-    const userClean = String(userAnswer)
-      .replace(/[^a-zA-Z0-9,^()]/g, "")
-      .toLowerCase();
-    const correctClean = correctAnswer
-      .replace(/[^a-zA-Z0-9,^()]/g, "")
-      .toLowerCase();
-
-    if (userClean === correctClean) setFeedback("correct");
-    else setFeedback("incorrect");
-
-    if (currentAlgo.category !== "Complexity") {
+    const correct = String(currentAlgo.solve(problemData));
+    const userClean = userAnswer.replace(/[^a-zA-Z0-9,]/g, "").trim();
+    const correctClean = correct.replace(/[^a-zA-Z0-9,]/g, "").trim();
+    setFeedback(userClean === correctClean ? "correct" : "incorrect");
+    if (currentAlgo.category !== "Theory")
       setCodeReport(analyzeCode(userCode, activeAlgo));
-    }
-  };
-
-  const getQuestionText = () => {
-    return typeof currentAlgo.question === "function"
-      ? currentAlgo.question(problemData)
-      : currentAlgo.question;
   };
 
   const renderVisualizer = () => {
-    // Safety check if data is null
-    if (!problemData)
-      return (
-        <div className="flex items-center justify-center h-full text-slate-400">
-          Loading...
-        </div>
-      );
+    // Null checks for all visualizers to prevent crashes
+    if (!problemData) return <div>Loading...</div>;
+    const cat = currentAlgo.category;
 
-    if (activeAlgo === "complexity_quiz")
-      return (
-        <div className="text-6xl text-slate-200 font-bold flex items-center justify-center h-full">
-          O(n)
-        </div>
-      );
-    if (currentAlgo.category === "Graphs")
+    if (cat === "Graphs")
       return (
         <GraphVisualizer data={problemData} directed={activeAlgo === "dfs"} />
       );
-    if (currentAlgo.category === "Trees")
+    if (activeAlgo.includes("heap"))
+      return <HeapVisualizer data={problemData} />;
+    if (cat === "Trees")
       return (
         <TreeVisualizer
-          root={problemData?.root}
-          highlight={problemData?.target}
+          root={problemData.root}
+          highlight={problemData.target}
         />
       );
-    if (currentAlgo.category === "Sorting")
-      return <ArrayVisualizer data={problemData} />;
-    if (currentAlgo.category === "Linear")
-      return <ListVisualizer data={problemData} />;
-    return null;
+    if (cat === "Sorting") return <ArrayVisualizer data={problemData} />;
+    if (cat === "Linear") return <ListVisualizer data={problemData} />;
+
+    // Safety check for Activity Selection
+    if (activeAlgo === "greedy_activity") {
+      if (!problemData.activities) return <div>Loading Activities...</div>;
+      return <ActivityVisualizer data={problemData} />;
+    }
+
+    // Safety check for Rod Cutting to prevent "slice" error
+    if (activeAlgo.includes("rod_cut")) {
+      if (!problemData.p) return <div>Loading Rod Data...</div>;
+      return <ArrayVisualizer data={problemData.p.slice(1)} label="Prices" />;
+    }
+
+    return (
+      <div className="text-6xl text-slate-200 text-center font-bold">?</div>
+    );
   };
 
   return (
     <div className="h-screen bg-slate-50 font-sans text-slate-800 overflow-hidden flex flex-col md:flex-row">
-      {/* SIDEBAR */}
       <div className="w-64 bg-white border-r border-slate-200 flex flex-col shrink-0 h-full overflow-y-auto">
         <div className="p-6 border-b border-slate-100 shrink-0">
           <div className="flex items-center gap-2 font-bold text-xl text-indigo-600">
-            <Activity /> <span>DSA Prep</span>
+            <Activity />
+            <span>DSA Prep</span>
           </div>
         </div>
-
         <div className="p-4 space-y-6">
           <SidebarSection
             title="Graphs"
@@ -981,7 +996,15 @@ export default function DSAExamPrep() {
           />
           <SidebarSection
             title="Trees"
-            items={["bst_inorder", "bst_search", "bst_successor"]}
+            items={[
+              "bst_inorder",
+              "bst_search",
+              "bst_successor",
+              "bst_ops",
+              "rbt_ops",
+              "avl_ops",
+              "heap_ops",
+            ]}
             active={activeAlgo}
             set={setActiveAlgo}
             icon={<Database size={16} />}
@@ -1001,8 +1024,22 @@ export default function DSAExamPrep() {
             icon={<List size={16} />}
           />
           <SidebarSection
+            title="Hashing"
+            items={["hashing"]}
+            active={activeAlgo}
+            set={setActiveAlgo}
+            icon={<Hash size={16} />}
+          />
+          <SidebarSection
+            title="Greedy & DP"
+            items={["greedy_activity", "dp_rod_cut_memo", "dp_rod_cut_bottom"]}
+            active={activeAlgo}
+            set={setActiveAlgo}
+            icon={<TrendingUp size={16} />}
+          />
+          <SidebarSection
             title="Theory"
-            items={["complexity_quiz"]}
+            items={["complexity"]}
             active={activeAlgo}
             set={setActiveAlgo}
             icon={<Cpu size={16} />}
@@ -1010,7 +1047,6 @@ export default function DSAExamPrep() {
         </div>
       </div>
 
-      {/* MAIN CONTENT */}
       <div className="flex-1 flex flex-col h-full overflow-hidden">
         <header className="bg-white border-b px-6 py-4 flex justify-between items-center shrink-0">
           <h1 className="text-2xl font-bold text-slate-800">
@@ -1026,7 +1062,6 @@ export default function DSAExamPrep() {
 
         <div className="flex-1 overflow-hidden p-6 bg-slate-50">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full overflow-hidden">
-            {/* LEFT COLUMN */}
             <div className="flex flex-col gap-6 h-full overflow-y-auto pr-2 pb-4">
               <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col min-h-[400px] shrink-0">
                 <div className="bg-slate-50 border-b border-slate-100 p-3 text-xs font-medium text-slate-500 uppercase tracking-wide text-center shrink-0">
@@ -1036,166 +1071,123 @@ export default function DSAExamPrep() {
                   {renderVisualizer()}
                 </div>
               </div>
-
               <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 shrink-0">
-                <div className="flex items-start justify-between mb-4">
-                  <h3 className="font-bold text-lg flex items-center gap-2 text-slate-800">
-                    <BookOpen size={20} className="text-indigo-500" /> Question
-                  </h3>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => setShowTrace(!showTrace)}
-                      className="text-xs flex items-center gap-1 text-slate-500 hover:text-indigo-600 transition bg-slate-100 px-2 py-1 rounded"
-                    >
-                      <Eye size={14} />{" "}
-                      {showTrace ? "Hide Answer" : "Reveal Answer"}
-                    </button>
-                    <button
-                      onClick={() => setShowHint(!showHint)}
-                      className="text-xs flex items-center gap-1 text-slate-500 hover:text-indigo-600 transition bg-slate-100 px-2 py-1 rounded"
-                    >
-                      <Lightbulb size={14} /> Hint
-                    </button>
-                  </div>
-                </div>
-
-                <p className="text-slate-600 mb-4 text-sm leading-relaxed">
-                  {problemData && getQuestionText()}
+                <h3 className="font-bold text-lg mb-2">Question</h3>
+                <p className="text-slate-600 mb-4">
+                  {typeof currentAlgo.question === "function"
+                    ? currentAlgo.question(problemData)
+                    : currentAlgo.question}
                 </p>
                 {showHint && (
-                  <div className="mb-4 p-3 bg-amber-50 text-amber-800 text-sm rounded border border-amber-200 flex gap-2">
-                    <HelpCircle size={16} className="shrink-0 mt-0.5" />
-                    {currentAlgo.hint}
+                  <div className="mb-4 p-3 bg-amber-50 text-amber-800 text-sm rounded border border-amber-200">
+                    Hint: {currentAlgo.hint}
                   </div>
                 )}
                 {showTrace && (
                   <div className="mb-4 p-3 bg-slate-100 text-slate-700 text-sm rounded border border-slate-200 font-mono">
-                    <span className="font-bold text-slate-500 block mb-1">
-                      Answer:
-                    </span>
+                    <span className="font-bold">Answer: </span>
                     {String(currentAlgo.solve(problemData))}
                   </div>
                 )}
-
-                <div className="flex gap-3">
+                <div className="flex gap-3 items-center">
                   <input
                     type="text"
                     value={userAnswer}
                     onChange={(e) => {
                       setUserAnswer(e.target.value);
                       setFeedback(null);
-                      setCodeReport(null);
                     }}
                     onKeyDown={(e) => e.key === "Enter" && checkAnswer()}
+                    className="border p-2 rounded flex-1"
                     placeholder="Enter answer..."
-                    className="flex-1 border border-slate-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 outline-none transition"
                   />
                   <button
                     onClick={checkAnswer}
-                    className="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 font-medium shadow-sm transition"
+                    className="bg-indigo-600 text-white px-4 py-2 rounded"
                   >
                     Check
                   </button>
                 </div>
-
-                {feedback === "correct" && (
-                  <div className="mt-4 p-3 bg-green-50 text-green-700 rounded-lg border border-green-200 flex items-center gap-2">
-                    <CheckCircle size={20} />
-                    <span className="font-medium">Correct!</span>
+                {feedback && (
+                  <div
+                    className={`mt-2 flex items-center gap-2 font-bold ${
+                      feedback === "correct" ? "text-green-600" : "text-red-600"
+                    }`}
+                  >
+                    {feedback === "correct" ? (
+                      <CheckCircle size={16} />
+                    ) : (
+                      <XCircle size={16} />
+                    )}{" "}
+                    {feedback === "correct" ? "Correct!" : "Incorrect"}
                   </div>
                 )}
-                {feedback === "incorrect" && (
-                  <div className="mt-4 p-3 bg-red-50 text-red-700 rounded-lg border border-red-200 flex items-center gap-2">
-                    <XCircle size={20} />
-                    <span className="font-medium">Incorrect.</span>
-                  </div>
-                )}
+                <div className="flex gap-3 mt-4">
+                  <button
+                    onClick={() => setShowHint(!showHint)}
+                    className="text-xs text-slate-500 hover:text-indigo-600"
+                  >
+                    Show Hint
+                  </button>
+                  <button
+                    onClick={() => setShowTrace(!showTrace)}
+                    className="text-xs text-slate-500 hover:text-indigo-600"
+                  >
+                    {showTrace ? "Hide" : "Show"} Answer
+                  </button>
+                </div>
               </div>
             </div>
 
-            {/* RIGHT COLUMN */}
             <div className="flex flex-col gap-4 h-full overflow-hidden">
               <div className="flex flex-col flex-1 bg-[#1e1e1e] rounded-xl shadow-lg overflow-hidden border border-slate-700 min-h-0">
                 <div className="bg-[#252526] p-3 border-b border-[#333] flex justify-between items-center shrink-0">
-                  <div className="flex items-center gap-2 text-slate-300">
-                    <Terminal size={16} className="text-purple-400" />
-                    <span className="font-mono text-xs text-purple-400">
-                      Code Editor
-                    </span>
-                  </div>
+                  <span className="font-mono text-xs text-purple-400">
+                    Code Editor
+                  </span>
                   <button
                     onClick={() => setShowSolution(!showSolution)}
-                    className="text-xs px-3 py-1 bg-[#333] text-slate-300 hover:text-white rounded border border-[#444] transition"
+                    className="text-xs text-slate-400 hover:text-white"
                   >
-                    {showSolution ? "Hide Key" : "Reveal Code Key"}
+                    {showSolution ? "Hide Key" : "Reveal Key"}
                   </button>
                 </div>
                 <div className="flex-1 relative font-mono text-sm overflow-hidden">
                   {showSolution ? (
-                    <div className="absolute inset-0 p-4 text-[#d4d4d4] overflow-auto whitespace-pre-wrap leading-relaxed">
-                      <span className="text-green-600 block mb-2">
-                        // Reference Implementation
-                      </span>
+                    <div className="absolute inset-0 p-4 text-[#d4d4d4] overflow-auto whitespace-pre-wrap">
                       {currentAlgo.code}
                     </div>
                   ) : (
                     <textarea
                       value={userCode}
                       onChange={(e) => setUserCode(e.target.value)}
-                      className="w-full h-full bg-[#1e1e1e] text-[#d4d4d4] p-4 resize-none outline-none leading-relaxed overflow-auto"
+                      className="w-full h-full bg-[#1e1e1e] text-[#d4d4d4] p-4 resize-none outline-none"
                       spellCheck="false"
                     />
                   )}
                 </div>
               </div>
-
               {codeReport && (
-                <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 shrink-0 max-h-[40%] overflow-y-auto animate-in slide-in-from-bottom-2">
-                  <div className="flex justify-between items-start mb-4">
-                    <h3 className="font-bold text-slate-800 flex items-center gap-2">
-                      <Search size={18} className="text-blue-500" /> Code
-                      Analysis
-                    </h3>
-                    <div className="text-xs font-mono px-2 py-1 bg-slate-100 rounded border border-slate-200 text-slate-500">
-                      {codeReport.detectedLang}
+                <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 shrink-0 max-h-[40%] overflow-y-auto">
+                  <h3 className="font-bold text-slate-800 flex items-center gap-2">
+                    <Search size={16} /> Analysis: {codeReport.detectedLang}
+                  </h3>
+                  <div className="w-full bg-slate-100 h-2 rounded-full mt-2 mb-2">
+                    <div
+                      className="bg-blue-500 h-2 rounded-full"
+                      style={{ width: `${codeReport.percentage}%` }}
+                    ></div>
+                  </div>
+                  {codeReport.feedback.map((f, i) => (
+                    <div
+                      key={i}
+                      className={`text-xs p-1 ${
+                        f.success ? "text-green-600" : "text-red-600"
+                      }`}
+                    >
+                      {f.text}
                     </div>
-                  </div>
-                  <div className="flex items-center gap-4 mb-4">
-                    <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
-                      <div
-                        className={`h-full rounded-full transition-all duration-1000 ${
-                          codeReport.percentage > 80
-                            ? "bg-green-500"
-                            : codeReport.percentage > 50
-                            ? "bg-amber-500"
-                            : "bg-red-500"
-                        }`}
-                        style={{ width: `${codeReport.percentage}%` }}
-                      />
-                    </div>
-                    <span className="font-bold text-sm text-slate-600">
-                      {codeReport.percentage}% Match
-                    </span>
-                  </div>
-                  <div className="space-y-2">
-                    {codeReport.feedback.map((item, i) => (
-                      <div
-                        key={i}
-                        className={`text-xs p-2 rounded flex items-center gap-2 ${
-                          item.success
-                            ? "bg-green-50 text-green-700 border border-green-100"
-                            : "bg-red-50 text-red-700 border border-red-100"
-                        }`}
-                      >
-                        {item.success ? (
-                          <CheckCircle size={14} />
-                        ) : (
-                          <AlertTriangle size={14} />
-                        )}{" "}
-                        {item.text}
-                      </div>
-                    ))}
-                  </div>
+                  ))}
                 </div>
               )}
             </div>
@@ -1207,28 +1199,25 @@ export default function DSAExamPrep() {
 }
 
 const SidebarSection = ({ title, items, active, set, icon }) => (
-  <div>
-    <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2 px-2">
+  <div className="mb-4">
+    <h3 className="text-xs font-bold text-slate-400 uppercase px-2 mb-2">
       {title}
     </h3>
-    <div className="space-y-1">
-      {items.map((id) => (
-        <button
-          key={id}
-          onClick={() => set(id)}
-          className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-200 font-medium ${
-            active === id
-              ? "bg-indigo-50 text-indigo-700"
-              : "text-slate-500 hover:bg-slate-50 hover:text-slate-800"
-          }`}
-        >
-          {icon}{" "}
-          <span>
-            {id.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}
-          </span>{" "}
-          {active === id && <ArrowRight size={14} className="ml-auto" />}
-        </button>
-      ))}
-    </div>
+    {items.map((id) => (
+      <button
+        key={id}
+        onClick={() => set(id)}
+        className={`w-full flex items-center gap-2 px-3 py-2 text-sm rounded-lg ${
+          active === id
+            ? "bg-indigo-50 text-indigo-700"
+            : "text-slate-500 hover:bg-slate-50"
+        }`}
+      >
+        {icon}{" "}
+        <span className="capitalize">
+          {id.replace(/_/g, " ").replace("dp", "DP")}
+        </span>
+      </button>
+    ))}
   </div>
 );
