@@ -1,5 +1,5 @@
 import React from "react";
-import DSAExamPrep from "./DSAExamPrep";
+import DSAExamPrep from "./DSA";
 import "./App.css";
 
 function App() {
