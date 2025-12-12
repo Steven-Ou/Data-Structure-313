@@ -244,7 +244,7 @@ const generateListData = (size = 4) => {
   );
 };
 
-// NEW: Generator for Hash Table Data
+// NEW: Generator for Hash Table Data with Strategy
 const generateHashData = (size = 7) => {
   const table = Array(size).fill(null);
   // Pre-fill about 50% of the table
@@ -257,23 +257,27 @@ const generateHashData = (size = 7) => {
     }
     table[idx] = val;
   }
-  // Pick a key that is guaranteed to cause a collision for the problem
-  let key = Math.floor(Math.random() * 50) + 1;
-  let startIdx = key % size;
 
-  // Ensure we pick a key that hits a filled spot initially to force probing
-  // If the random key hits an empty spot, artificially shift it to hit a filled spot if possible
-  if (table[startIdx] === null) {
-    // find a filled spot
-    const filledIndex = table.findIndex((x) => x !== null);
-    if (filledIndex !== -1) {
-      // Adjust key so key % size == filledIndex
-      // e.g. if filledIndex is 2 and size is 7, make key 9 (9%7=2)
-      key = Math.floor(Math.random() * 5) * size + filledIndex;
-    }
+  // Pick a strategy
+  const strategies = ["Linear", "Quadratic", "Double"];
+  const strategy = strategies[Math.floor(Math.random() * strategies.length)];
+
+  // Pick a key
+  let key = Math.floor(Math.random() * 50) + 1;
+
+  // Ensure the key collides initially to make the problem interesting
+  // Find a filled spot
+  const filledIndices = table
+    .map((v, i) => (v !== null ? i : -1))
+    .filter((i) => i !== -1);
+  if (filledIndices.length > 0) {
+    const targetIdx =
+      filledIndices[Math.floor(Math.random() * filledIndices.length)];
+    // Adjust key so key % size == targetIdx
+    key = Math.floor(Math.random() * 5) * size + targetIdx;
   }
 
-  return { table, key, size };
+  return { table, key, size, strategy };
 };
 
 // --- ALGORITHMS ---
@@ -646,31 +650,54 @@ Return T`,
     name: "Hashing (Open Addr)",
     category: "Hashing",
     signature: "Hash-Insert(T, k)",
-    hint: "Probe until empty slot found using h(k, i) = (k + i) % m",
+    // Dynamic Hint based on Strategy
+    hint: "Probe until empty slot found.",
     solve: (data) => {
       if (!data || !data.table) return "";
-      const { table, key, size } = data;
+      const { table, key, size, strategy } = data;
       let i = 0;
       let idx = key % size;
 
-      // Simulate linear probing
-      // Just to find where it WOULD go without actually modifying the visual data
-      // Limit to size to prevent infinite loop if full
-      while (table[idx] !== null && i < size) {
+      // Secondary hash for double hashing: h2(k) = 1 + (k % (m-1))
+      const h2 = 1 + (key % (size - 1));
+
+      // Simulate probing
+      while (table[idx] !== null && i < size * 2) {
+        // limit loop to prevent freeze
         i++;
-        idx = (key + i) % size;
+        if (strategy === "Linear") {
+          idx = (key + i) % size;
+        } else if (strategy === "Quadratic") {
+          idx = (key + i * i) % size;
+        } else if (strategy === "Double") {
+          idx = (key + i * h2) % size;
+        }
       }
 
-      return i < size ? idx : "Overflow";
+      return i < size * 2 ? idx : "Overflow";
     },
-    question: (data) =>
-      `Insert key ${
-        data ? data.key : "?"
-      } into the table using Linear Probing (h(k,i) = (k+i)%size). What is the resulting index?`,
-    code: `Hash-Insert(T, k)
+    question: (data) => {
+      if (!data) return "Insert key ?";
+      const { key, size, strategy } = data;
+      if (strategy === "Linear")
+        return `Linear Probing: Insert key ${key}. h(k,i) = (k + i) % ${size}`;
+      if (strategy === "Quadratic")
+        return `Quadratic Probing: Insert key ${key}. h(k,i) = (k + i²) % ${size}`;
+      if (strategy === "Double")
+        return `Double Hashing: Insert key ${key}. h(k,i) = (k + i*h2(k)) % ${size}, where h2(k)=1+(k%${
+          size - 1
+        })`;
+      return "Insert key";
+    },
+    code: `// Open Addressing Logic
+Hash-Insert(T, k)
   i = 0
   repeat
-      j = h(k, i)
+      // Strategies:
+      // Linear:    j = (k + i) % m
+      // Quadratic: j = (k + c1*i + c2*i^2) % m
+      // Double:    j = (h1(k) + i*h2(k)) % m
+      
       if T[j] == NIL
           T[j] = k; return j
       else i = i + 1
@@ -793,8 +820,9 @@ const TreeVisualizer = ({ root, highlight }) => {
   );
 };
 
+// FIX: Added explicit array check to prevent crash if data is null/object
 const HeapVisualizer = ({ data }) => {
-  if (!data)
+  if (!data || !Array.isArray(data))
     return <div className="text-slate-400 p-8 text-center">No Heap Data</div>;
   return (
     <div className="flex flex-col items-center gap-4">
@@ -850,14 +878,15 @@ const HashVisualizer = ({ data }) => {
     return <div className="text-slate-400 p-8">No Hash Data</div>;
   return (
     <div className="flex flex-col items-center w-full">
-      <div className="mb-4 font-bold text-indigo-600">
-        Key to Insert: {data.key}
+      <div className="mb-2 font-bold text-indigo-600">Key: {data.key}</div>
+      <div className="text-xs text-slate-500 mb-4 bg-slate-100 px-2 py-1 rounded">
+        Strategy: <span className="font-bold">{data.strategy}</span>
       </div>
-      <div className="flex gap-1 border p-2 rounded bg-slate-100">
+      <div className="flex gap-1 border p-2 rounded bg-slate-50">
         {data.table.map((val, i) => (
           <div key={i} className="flex flex-col items-center">
             <div
-              className={`w-10 h-10 border border-slate-300 flex items-center justify-center font-mono text-sm
+              className={`w-10 h-10 border border-slate-300 flex items-center justify-center font-mono text-sm shadow-sm
                             ${
                               val === null
                                 ? "bg-white text-slate-300"
@@ -870,7 +899,7 @@ const HashVisualizer = ({ data }) => {
           </div>
         ))}
       </div>
-      <div className="text-xs text-slate-400 mt-2">Size: {data.size}</div>
+      <div className="text-xs text-slate-400 mt-2">Size m = {data.size}</div>
     </div>
   );
 };
