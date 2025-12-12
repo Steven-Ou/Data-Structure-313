@@ -124,6 +124,13 @@ const analyzeCode = (code, algoType) => {
   } else if (algoType === "dijkstra") {
     check(["relax"], "Relax Edge", 2);
     check(["priority", "min", "extract"], "Priority Queue", 3);
+  } else if (algoType === "kruskal") {
+    check(["sort", "weight", "increasing"], "Sort Edges", 2);
+    check(["find", "union", "set"], "Disjoint Set / Union-Find", 3);
+    check(["cycle"], "Cycle Detection", 2);
+  } else if (algoType === "prim") {
+    check(["min", "key", "priority"], "Min Priority Queue", 3);
+    check(["visited", "in mst"], "Visited Set", 2);
   } else if (algoType === "greedy_activity") {
     check(["finish", "start", "s[", "f["], "Times", 2);
     check(["k", "m", "union"], "Selection Logic", 2);
@@ -154,6 +161,8 @@ const generateGraph = (numNodes = 5, directed = false, weighted = true) => {
     .map(() => Array(numNodes).fill(0));
   const connected = new Set([0]);
   const pool = Array.from({ length: numNodes - 1 }, (_, i) => i + 1);
+
+  // Ensure connectivity first
   while (pool.length > 0) {
     const targetIdx = Math.floor(Math.random() * pool.length);
     const target = pool.splice(targetIdx, 1)[0];
@@ -165,10 +174,24 @@ const generateGraph = (numNodes = 5, directed = false, weighted = true) => {
     if (!directed) matrix[target][source] = weight;
     connected.add(target);
   }
+
+  // Add a few random extra edges to make it interesting
+  for (let i = 0; i < 3; i++) {
+    const s = Math.floor(Math.random() * numNodes);
+    const t = Math.floor(Math.random() * numNodes);
+    if (s !== t && matrix[s][t] === 0) {
+      const w = weighted ? Math.floor(Math.random() * 9) + 1 : 1;
+      edges.push({ source: s, target: t, weight: w });
+      matrix[s][t] = w;
+      if (!directed) matrix[t][s] = w;
+    }
+  }
+
   return { nodes, edges, matrix };
 };
 
 const generateBSTData = (count = 10) => {
+  constXY = 1; // Dummy var
   const rootVal = Math.floor(Math.random() * 40) + 30;
   const root = new TreeNode(rootVal);
   const values = [rootVal];
@@ -193,7 +216,11 @@ const generateBSTData = (count = 10) => {
       }
     }
   }
-  return { root, values };
+  return {
+    root,
+    values,
+    target: values[Math.floor(Math.random() * values.length)],
+  };
 };
 
 const generateRBTData = () => {
@@ -228,6 +255,7 @@ const generateListData = (size = 4) => {
 const generateActivityData = (count = 6) => {
   let activities = [];
   for (let i = 0; i < count; i++) {
+    letcz = 1;
     let start = Math.floor(Math.random() * 20);
     let duration = Math.floor(Math.random() * 6) + 1;
     activities.push({ id: i + 1, s: start, f: start + duration });
@@ -258,7 +286,7 @@ const algorithms = {
     name: "BFS (Breadth-First Search)",
     category: "Graphs",
     signature: "BFS(G, s)",
-    hint: "Use a Queue. Enqueue start. While Q !empty, dequeue and visit neighbors.",
+    hint: "Use a Queue. Enqueue start. Mark nodes as visited (or Black) to prevent cycles.",
     solve: (data) => {
       if (!data || !data.matrix) return "";
       const queue = [0];
@@ -325,7 +353,7 @@ DFS-Visit(G,u)
     name: "Dijkstra's Algorithm",
     category: "Graphs",
     signature: "Dijkstra(G, w, s)",
-    hint: "Relax edges using a Min-Priority Queue.",
+    hint: "Maintain a set A of visited nodes. Relax edges (u,v) where u is in A and v is not.",
     solve: (data) => {
       if (!data || !data.matrix) return "";
       const n = data.nodes.length;
@@ -356,7 +384,102 @@ DFS-Visit(G,u)
       u = Extract-Min(Q)
       S = S U {u}
       for each v in G.Adj[u]
-          Relax(u, v, w)`,
+          Relax(u, v, w)
+          
+  // Note: Relax checks if d[v] > d[u] + w(u,v)`,
+  },
+  kruskal: {
+    name: "Kruskal's Algorithm (MST)",
+    category: "Graphs",
+    signature: "Kruskal(G)",
+    hint: "Sort edges by weight. Add edge if it doesn't create a cycle (use Union-Find).",
+    solve: (data) => {
+      if (!data || !data.edges) return 0;
+      // Simple Union-Find implementation
+      const parent = Array.from({ length: data.nodes.length }, (_, i) => i);
+      const find = (i) => (parent[i] === i ? i : (parent[i] = find(parent[i])));
+      const union = (i, j) => {
+        const rootI = find(i);
+        const rootJ = find(j);
+        if (rootI !== rootJ) {
+          parent[rootI] = yb = rootJ;
+          return true;
+        }
+        return false;
+      };
+
+      const sortedEdges = [...data.edges].sort((a, b) => a.weight - b.weight);
+      let mstWeight = 0;
+      let edgesCount = 0;
+
+      for (let e of sortedEdges) {
+        if (union(e.source, e.target)) {
+          mstWeight += e.weight;
+          edgesCount++;
+        }
+      }
+      return mstWeight;
+    },
+    question: "Calculate the Total Weight of the Minimum Spanning Tree.",
+    code: `MST-Kruskal(G, w)
+  A = {}
+  for each vertex v in G.V
+      Make-Set(v)
+  sort the edges of G.E into nondecreasing order by weight w
+  for each edge (u, v) in G.E, taken in nondecreasing order by weight
+      if Find-Set(u) != Find-Set(v)
+          A = A U {(u, v)}
+          Union(u, v)
+  return A`,
+  },
+  prim: {
+    name: "Prim's Algorithm (MST)",
+    category: "Graphs",
+    signature: "MST-Prim(G, w, r)",
+    hint: "Grow a tree from a start node. Always pick the lightest edge connecting tree to non-tree vertex.",
+    solve: (data) => {
+      if (!data || !data.matrix) return 0;
+      const n = data.nodes.length;
+      const key = Array(n).fill(Infinity);
+      const inMST = Array(n).fill(false);
+      key[0] = 0;
+      let mstWeight = 0;
+
+      for (let count = 0; count < n; count++) {
+        let u = -1,
+          min = Infinity;
+        for (let v = 0; v < n; v++) {
+          if (!inMST[v] && key[v] < min) {
+            min = key[v];
+            u = v;
+          }
+        }
+
+        if (u === -1) break; // disconnected
+        inMST[u] = true;
+        mstWeight += min;
+
+        for (let v = 0; v < n; v++) {
+          if (data.matrix[u][v] && !inMST[v] && data.matrix[u][v] < key[v]) {
+            key[v] = data.matrix[u][v];
+          }
+        }
+      }
+      return mstWeight;
+    },
+    question: "Calculate the Total Weight of the MST using Prim's.",
+    code: `MST-Prim(G, w, r)
+  for each u in G.V
+      u.key = INF
+      u.p = NIL
+  r.key = 0
+  Q = G.V
+  while Q != {}
+      u = Extract-Min(Q)
+      for each v in G.Adj[u]
+          if v in Q and w(u,v) < v.key
+              v.p = u
+              v.key = w(u,v)`,
   },
 
   // === TREES (COMBINED) ===
@@ -859,17 +982,95 @@ const ActivityVisualizer = ({ data }) => {
   );
 };
 
-const GraphVisualizer = () => (
-  <div className="text-center p-8 text-slate-400">Graph Visualizer Active</div>
-);
+const GraphVisualizer = ({ data, directed }) => {
+  if (!data || !data.nodes)
+    return <div className="text-slate-400 p-8">No Graph Data</div>;
+
+  // Simple spring-like layout generator (circular)
+  const radius = 120;
+  const centerX = 200;
+  const centerY = 175;
+
+  const nodePos = data.nodes.map((n, i) => {
+    const angle = (i / data.nodes.length) * 2 * Math.PI - Math.PI / 2;
+    return {
+      ...n,
+      x: centerX + radius * Math.cos(angle),
+      y: centerY + radius * Math.sin(angle),
+    };
+  });
+
+  return (
+    <svg width="400" height="350" className="mx-auto">
+      {/* Edges */}
+      {data.edges.map((e, i) => {
+        const s = nodePos.find((n) => n.id === e.source);
+        const t = nodePos.find((n) => n.id === e.target);
+        if (!s || !t) return null;
+        return (
+          <g key={i}>
+            <line
+              x1={s.x}
+              y1={s.y}
+              x2={t.x}
+              y2={t.y}
+              stroke="#cbd5e1"
+              strokeWidth="2"
+            />
+            {e.weight > 1 && (
+              <text
+                x={(s.x + t.x) / 2}
+                y={(s.y + t.y) / 2}
+                fill="#64748b"
+                fontSize="10"
+                className="bg-white"
+              >
+                {e.weight}
+              </text>
+            )}
+          </g>
+        );
+      })}
+
+      {/* Nodes */}
+      {nodePos.map((n) => (
+        <g key={n.id}>
+          <circle
+            cx={n.x}
+            cy={n.y}
+            r="18"
+            fill="white"
+            stroke="#3b82f6"
+            strokeWidth="2"
+          />
+          <text
+            x={n.x}
+            y={n.y}
+            dy="5"
+            textAnchor="middle"
+            fontWeight="bold"
+            fill="#1e293b"
+          >
+            {n.label}
+          </text>
+        </g>
+      ))}
+    </svg>
+  );
+};
+
+// FIX: Added explicit array check to prevent crash if data is object/null
 const ListVisualizer = ({ data }) => (
   <div className="flex gap-2 justify-center p-8">
-    {data &&
+    {data && Array.isArray(data) ? (
       data.map((v, i) => (
         <div key={i} className="p-2 border rounded">
           {v}
         </div>
-      ))}
+      ))
+    ) : (
+      <div className="text-slate-400">No List Data</div>
+    )}
   </div>
 );
 
@@ -901,7 +1102,7 @@ export default function DSAExamPrep() {
 
     const cat = currentAlgo.category;
     if (cat === "Graphs")
-      setProblemData(generateGraph(5, activeAlgo === "dfs"));
+      setProblemData(generateGraph(5, activeAlgo === "dfs", true));
     else if (cat === "Trees")
       setProblemData(
         activeAlgo.includes("heap")
@@ -989,7 +1190,7 @@ export default function DSAExamPrep() {
         <div className="p-4 space-y-6">
           <SidebarSection
             title="Graphs"
-            items={["bfs", "dfs", "dijkstra"]}
+            items={["bfs", "dfs", "dijkstra", "kruskal", "prim"]}
             active={activeAlgo}
             set={setActiveAlgo}
             icon={<GitBranch size={16} />}
