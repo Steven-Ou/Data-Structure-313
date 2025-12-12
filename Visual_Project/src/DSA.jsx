@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import {
   BookOpen,
-  Code,
   RefreshCw,
   CheckCircle,
   XCircle,
@@ -837,10 +836,10 @@ export default function DSAExamPrep() {
   };
 
   return (
-    <div className="flex h-screen bg-slate-50 font-sans text-slate-800 overflow-hidden">
-      {/* SIDEBAR - Fixed width, scrollable if content overflows */}
-      <div className="w-64 bg-white border-r border-slate-200 flex flex-col shrink-0">
-        <div className="p-6 border-b border-slate-100">
+    <div className="h-screen bg-slate-50 font-sans text-slate-800 overflow-hidden flex flex-col md:flex-row">
+      {/* SIDEBAR */}
+      <div className="w-64 bg-white border-r border-slate-200 flex flex-col shrink-0 h-full overflow-hidden">
+        <div className="p-6 border-b border-slate-100 shrink-0">
           <div className="flex items-center gap-2 font-bold text-xl text-indigo-600">
             <Activity />
             <span>DSA Prep</span>
@@ -945,7 +944,7 @@ export default function DSAExamPrep() {
         </div>
       </div>
 
-      {/* MAIN CONTENT - Flex container to manage remaining width */}
+      {/* MAIN CONTENT */}
       <div className="flex-1 flex flex-col h-full overflow-hidden">
         {/* HEADER */}
         <header className="bg-white border-b px-6 py-4 flex justify-between items-center shrink-0">
@@ -963,13 +962,13 @@ export default function DSAExamPrep() {
           </button>
         </header>
 
-        {/* WORKSPACE - Scrollable area */}
-        <div className="flex-1 overflow-y-auto p-6 bg-slate-50">
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 h-full min-h-0">
-            {/* LEFT COLUMN: Visuals & Questions */}
-            <div className="flex flex-col gap-6 min-h-0">
+        {/* WORKSPACE */}
+        <div className="flex-1 overflow-hidden p-6 bg-slate-50">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full overflow-hidden">
+            {/* LEFT COLUMN: Visuals & Questions (Scrollable) */}
+            <div className="flex flex-col gap-6 h-full overflow-y-auto pr-2 pb-4">
               {/* Visualizer Card */}
-              <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col min-h-[400px]">
+              <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col min-h-[400px] shrink-0">
                 <div className="bg-slate-50 border-b border-slate-100 p-3 text-xs font-medium text-slate-500 uppercase tracking-wide text-center shrink-0">
                   Visualization
                 </div>
@@ -1072,10 +1071,10 @@ export default function DSAExamPrep() {
               </div>
             </div>
 
-            {/* RIGHT COLUMN: Code Editor & Analysis */}
-            <div className="flex flex-col gap-4 min-h-0 h-full">
-              {/* Code Editor - Set to take available height */}
-              <div className="flex flex-col flex-1 bg-[#1e1e1e] rounded-xl shadow-lg overflow-hidden border border-slate-700 min-h-[400px]">
+            {/* RIGHT COLUMN: Code Editor & Analysis (Fixed Height) */}
+            <div className="flex flex-col gap-4 h-full overflow-hidden">
+              {/* Code Editor - Flex 1 to take most space */}
+              <div className="flex flex-col flex-1 bg-[#1e1e1e] rounded-xl shadow-lg overflow-hidden border border-slate-700 min-h-0">
                 <div className="bg-[#252526] p-3 border-b border-[#333] flex justify-between items-center shrink-0">
                   <div className="flex items-center gap-2 text-slate-300">
                     <Terminal size={16} className="text-purple-400" />
@@ -1110,9 +1109,9 @@ export default function DSAExamPrep() {
                 </div>
               </div>
 
-              {/* Static Analysis Report */}
+              {/* Static Analysis Report - Shrinks if needed, pushes up from bottom */}
               {codeReport && (
-                <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 animate-in fade-in slide-in-from-bottom-2 shrink-0">
+                <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 animate-in fade-in slide-in-from-bottom-2 shrink-0 max-h-[40%] overflow-y-auto">
                   <div className="flex justify-between items-start mb-4">
                     <h3 className="font-bold text-slate-800 flex items-center gap-2">
                       <Search size={18} className="text-blue-500" />
@@ -1141,7 +1140,7 @@ export default function DSAExamPrep() {
                     </span>
                   </div>
 
-                  <div className="space-y-2 max-h-40 overflow-y-auto pr-2">
+                  <div className="space-y-2">
                     {codeReport.feedback.map((item, i) => (
                       <div
                         key={i}
