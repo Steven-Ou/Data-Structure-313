@@ -33,14 +33,15 @@ class TreeNode {
   }
 }
 
-// --- STATIC CODE ANALYZER ENGINE ---
+// --- STATIC CODE ANALYZER ENGINE (ENHANCED FOR PSEUDOCODE) ---
 
 const analyzeCode = (code, algoType) => {
   if (!code) return { detectedLang: "None", percentage: 0, feedback: [] };
 
+  // Normalize code for analysis
   const codeLower = code
-    .replace(/[^\x20-\x7E\s]/g, " ")
-    .replace(/\s+/g, " ")
+    .replace(/[^\x20-\x7E\s]/g, " ") // Remove non-printable chars
+    .replace(/\s+/g, " ") // Collapse whitespace
     .toLowerCase();
 
   const feedback = [];
@@ -48,7 +49,7 @@ const analyzeCode = (code, algoType) => {
   let maxScore = 0;
   let detectedLang = "Pseudo-code";
 
-  // 1. Language Detection
+  // 1. Language Detection Logic
   if (
     codeLower.includes("->") ||
     codeLower.includes("cout") ||
@@ -63,10 +64,19 @@ const analyzeCode = (code, algoType) => {
     detectedLang = "Java";
   } else if (codeLower.includes("def ") || codeLower.includes("self.")) {
     detectedLang = "Python";
+  } else if (
+    codeLower.includes(" for ") &&
+    (codeLower.includes(" to ") || codeLower.includes(" downto ")) &&
+    !codeLower.includes("{")
+  ) {
+    // Specifically detects the "for j = 1 to A.length" style from your notes
+    detectedLang = "Textbook Pseudocode";
   }
 
+  // Helper to check for keywords
   const check = (keywords, message, weight = 1) => {
     maxScore += weight;
+    // Check if ANY of the keywords exist
     const match = keywords.some((k) =>
       codeLower.includes(k.toLowerCase().trim())
     );
@@ -78,46 +88,64 @@ const analyzeCode = (code, algoType) => {
     }
   };
 
-  // --- EXISTING CHECKS ---
-  if (algoType === "bfs") {
-    check(["queue", "deque", "list"], "Queue Declaration", 2);
-    check(["push", "add", "enqueue", "offer"], "Enqueue", 2);
-    check(["front", "pop", "poll", "remove"], "Dequeue", 2);
-    check(["while", "empty"], "Main Loop", 2);
-  } else if (algoType === "dfs") {
-    if (codeLower.includes("stack")) {
-      check(["stack", "push", "pop"], "Stack Usage", 2);
-    } else {
-      check(["dfs", "recurse", "solve"], "Recursive Call", 3);
-    }
-    check(["visited", "seen"], "Visited Tracking", 2);
-  } else if (algoType === "dijkstra") {
-    check(["priority_queue", "minheap", "heap"], "Priority Queue", 3);
-    check(["dist", "distance"], "Distance Array", 1);
-    check(["<", ">", "if"], "Relaxation Logic", 3);
-  } else if (algoType.includes("bst_")) {
-    if (algoType.includes("order")) {
-      check(["left", "right"], "Recursive Steps", 2);
-      check(["print", "cout", "val"], "Process Node", 2);
-    }
-  }
-  // --- NEW CHECKS ---
-  else if (algoType === "merge_sort") {
-    check(["merge", "mid", "split"], "Divide Step", 2);
-    check(["left", "right", "arr"], "Subarrays", 2);
-    check(["while", "for"], "Merge Loop", 2);
+  // 2. Algorithm Specific Logic Fingerprinting (Updated with your Notes' style)
+
+  if (algoType === "merge_sort") {
+    //
+    check(["merge(", "merge_sort"], "Merge Function Definition", 2);
+    check(["p", "q", "r", "mid"], "Indices (p, q, r)", 2);
+    check(["floor", "/2", "n1", "n2"], "Midpoint/Subarray Size Calculation", 2);
+    check(["L[", "R["], "Left/Right Subarrays", 2);
+    check(["for", "while"], "Loop Structure", 1);
   } else if (algoType === "insertion_sort") {
-    check(["for", "i"], "Outer Loop", 1);
-    check(["while", "j", ">"], "Shift Loop", 3);
-    check(["=", "temp", "key"], "Insert Step", 2);
+    //
+    check(["for j", "for i"], "Main Loop (j=2 to length)", 2);
+    check(["key", "value"], "Key Assignment", 2);
+    check(["i = j", "i=j"], "Index Initialization", 2);
+    check(["while", "> 0", "> key"], "Shift Condition", 3);
+    check(["A[i+1]", "A[i + 1]"], "Item Shifting", 2);
+  } else if (algoType === "binary_search") {
+    //
+    check(["low", "high", "begin", "end"], "Bounds Definition", 2);
+    check(["mid", "floor", "/2"], "Midpoint Calc", 2);
+    check(["if", "==", "<", ">"], "Comparisons", 2);
+    check(["return mid", "return nil", "return -1"], "Return Statement", 1);
+  } else if (algoType.includes("bst_")) {
+    //
+    if (algoType.includes("search")) {
+      check(["nil", "null"], "Base Case (NIL)", 2);
+      check(["key", "val"], "Key Comparison", 2);
+      check(["left", "right"], "Traversal", 2);
+    } else {
+      // Traversals
+      check(["if x", "!= nil"], "Null Check", 1);
+      check(["print", "visit"], "Visit Node", 1);
+      check(["left", "right"], "Recursive Steps", 2);
+    }
   } else if (algoType === "stack_ops") {
-    check(["top", "head"], "Top Pointer", 2);
-    check(["push", "next"], "Push Logic", 2);
-    check(["pop", "null"], "Pop Logic", 2);
+    //
+    check(["top", "s.top"], "Top Pointer Access", 2);
+    check(["push", "pop"], "Operation Name", 1);
+    check(["+ 1", "- 1", "++", "--"], "Increment/Decrement", 2);
+    check(["empty", "underflow"], "Empty Check", 2);
+  } else if (algoType === "queue_ops") {
+    //
+    check(["enqueue", "dequeue"], "Operation Name", 1);
+    check(["head", "tail", "q.head", "q.tail"], "Head/Tail Pointers", 2);
+    check(["length", "capacity"], "Wrap-around/Size check", 2);
+  }
+  // Generic Checks for graph algos (BFS/DFS/Dijkstra)
+  else if (algoType === "bfs") {
+    check(["queue", "q"], "Queue Structure", 2);
+    check(["push", "enqueue"], "Add to Queue", 2);
+    check(["pop", "dequeue"], "Remove from Queue", 2);
+  } else if (algoType === "dfs") {
+    check(["visited", "color"], "Visited Array/Coloring", 2);
+    check(["recurse", "dfs", "stack"], "Recursion or Stack", 3);
   }
 
-  // Generic Checks
-  check(["return", "void", "int"], "Function Structure", 1);
+  // Generic Control Flow
+  check(["return", "if", "else"], "Control Flow", 1);
 
   const percentage = maxScore > 0 ? Math.round((score / maxScore) * 100) : 0;
   return { detectedLang, percentage, feedback };
@@ -219,8 +247,8 @@ const algorithms = {
   bfs: {
     name: "BFS (Breadth-First Search)",
     category: "Graphs",
-    signature: "void bfs(Graph* G, int startNode) {",
-    hint: "Use a Queue. Push start, mark visited. While !q.empty(), pop, visit neighbors.",
+    signature: "BFS(G, s)",
+    hint: "Use a Queue. Enqueue start, mark visited. While Q not empty, dequeue u, visit adj[u].",
     solve: (data) => {
       if (!data || !data.matrix) return "";
       const { matrix } = data;
@@ -241,24 +269,31 @@ const algorithms = {
       return result.join(", ");
     },
     question: "Perform BFS starting from Node A. List visited nodes.",
-    code: `void bfs(Graph* G, int startNode) {
-    queue<int> q;
-    vector<bool> visited(G->V, false);
-    q.push(startNode); visited[startNode] = true;
-    while (!q.empty()) {
-        int u = q.front(); q.pop();
-        cout << u << " ";
-        for (auto v : G->adj[u]) {
-            if (!visited[v]) { visited[v] = true; q.push(v); }
-        }
-    }
-}`,
+    code: `BFS(G, s)
+  for each vertex u in G.V - {s}
+      u.color = WHITE
+      u.d = INF
+      u.p = NIL
+  s.color = GRAY
+  s.d = 0
+  s.p = NIL
+  Q = {}
+  Enqueue(Q, s)
+  while Q != {}
+      u = Dequeue(Q)
+      for each v in G.Adj[u]
+          if v.color == WHITE
+              v.color = GRAY
+              v.d = u.d + 1
+              v.p = u
+              Enqueue(Q, v)
+      u.color = BLACK`,
   },
   dfs: {
     name: "DFS (Depth-First Search)",
     category: "Graphs",
-    signature: "void dfs(Graph* G, int u, vector<bool>& visited) {",
-    hint: "Use Recursion. Mark u as visited, print u. Recurse on unvisited neighbors.",
+    signature: "DFS(G)",
+    hint: "Recursively visit nodes. Mark as visited (Gray/Black). Uses a stack implicitly.",
     solve: (data) => {
       if (!data || !data.matrix) return "";
       const { matrix } = data;
@@ -273,20 +308,33 @@ const algorithms = {
       recurse(0);
       return result.join(", ");
     },
-    question:
-      "Perform Pre-Order DFS starting from Node A. (Tie-breaker: lower letter first).",
-    code: `void dfs(Graph* G, int u, vector<bool>& visited) {
-    visited[u] = true; cout << u << " ";
-    for (auto v : G->adj[u]) {
-        if (!visited[v]) dfs(G, v, visited);
-    }
-}`,
+    question: "Perform Pre-Order DFS starting from Node A.",
+    code: `DFS(G)
+  for each vertex u in G.V
+      u.color = WHITE
+      u.p = NIL
+  time = 0
+  for each vertex u in G.V
+      if u.color == WHITE
+          DFS-Visit(G, u)
+
+DFS-Visit(G, u)
+  time = time + 1
+  u.d = time
+  u.color = GRAY
+  for each v in G.Adj[u]
+      if v.color == WHITE
+          v.p = u
+          DFS-Visit(G, v)
+  u.color = BLACK
+  time = time + 1
+  u.f = time`,
   },
   dijkstra: {
     name: "Dijkstra's Algorithm",
     category: "Graphs",
-    signature: "void dijkstra(Graph* G, int s) {",
-    hint: "Use priority_queue. Relax edges: if (dist[u] + w < dist[v]) update.",
+    signature: "Dijkstra(G, w, s)",
+    hint: "Relax edges using a Min-Priority Queue. Extract min, update neighbors.",
     solve: (data) => {
       if (!data || !data.matrix) return "";
       const { matrix, nodes } = data;
@@ -316,26 +364,23 @@ const algorithms = {
         : dist[nodes.length - 1];
     },
     question: "Shortest path distance from Node A to the last Node?",
-    code: `void dijkstra(Graph* G, int s) {
-    priority_queue<pair<int,int>, vector<pair<int,int>>, greater<>> pq;
-    vector<int> dist(G->V, INF); dist[s] = 0; pq.push({0, s});
-    while (!pq.empty()) {
-        int u = pq.top().second; pq.pop();
-        for (auto edge : G->adj[u]) {
-            if (dist[u] + edge.weight < dist[edge.dest]) {
-                dist[edge.dest] = dist[u] + edge.weight;
-                pq.push({dist[edge.dest], edge.dest});
-            }
-        }
-    }
-}`,
+    code: `Dijkstra(G, w, s)
+  Initialize-Single-Source(G, s)
+  S = {}
+  Q = G.V
+  while Q != {}
+      u = Extract-Min(Q)
+      S = S U {u}
+      for each vertex v in G.Adj[u]
+          Relax(u, v, w)`,
   },
+
   // === TREES ===
   bst_inorder: {
-    name: "In-Order Traversal",
+    name: "BST In-Order Walk",
     category: "Trees",
-    signature: "void inorder(Node* root) {",
-    hint: "Left -> Root -> Right. Produces sorted output.",
+    signature: "Inorder-Tree-Walk(x)",
+    hint: "Left -> Root -> Right. (Recursively)",
     solve: (data) => {
       if (!data || !data.root) return "";
       const res = [];
@@ -349,62 +394,35 @@ const algorithms = {
       return res.join(", ");
     },
     question: "List the values of the tree in In-Order sequence.",
-    code: `void inorder(Node* root) {
-    if (!root) return;
-    inorder(root->left); cout << root->val << " "; inorder(root->right);
-}`,
+    code: `Inorder-Tree-Walk(x)
+  if x != NIL
+      Inorder-Tree-Walk(x.left)
+      print x.key
+      Inorder-Tree-Walk(x.right)`,
   },
-  bst_preorder: {
-    name: "Pre-Order Traversal",
+  bst_search: {
+    name: "BST Search",
     category: "Trees",
-    signature: "void preorder(Node* root) {",
-    hint: "Root -> Left -> Right.",
+    signature: "Tree-Search(x, k)",
+    hint: "If k < x.key, go left. If k > x.key, go right.",
     solve: (data) => {
-      if (!data || !data.root) return "";
-      const res = [];
-      const t = (n) => {
-        if (!n) return;
-        res.push(n.val);
-        t(n.left);
-        t(n.right);
-      };
-      t(data.root);
-      return res.join(", ");
+      if (!data || !data.target) return "N/A";
+      return data.values.includes(data.target) ? "Found" : "Not Found";
     },
-    question: "List the values of the tree in Pre-Order sequence.",
-    code: `void preorder(Node* root) {
-    if (!root) return;
-    cout << root->val << " "; preorder(root->left); preorder(root->right);
-}`,
-  },
-  bst_postorder: {
-    name: "Post-Order Traversal",
-    category: "Trees",
-    signature: "void postorder(Node* root) {",
-    hint: "Left -> Right -> Root.",
-    solve: (data) => {
-      if (!data || !data.root) return "";
-      const res = [];
-      const t = (n) => {
-        if (!n) return;
-        t(n.left);
-        t(n.right);
-        res.push(n.val);
-      };
-      t(data.root);
-      return res.join(", ");
-    },
-    question: "List the values of the tree in Post-Order sequence.",
-    code: `void postorder(Node* root) {
-    if (!root) return;
-    postorder(root->left); postorder(root->right); cout << root->val << " ";
-}`,
+    question: (data) => `Will Tree-Search(root, ${data.target}) find the node?`,
+    code: `Tree-Search(x, k)
+  if x == NIL or k == x.key
+      return x
+  if k < x.key
+      return Tree-Search(x.left, k)
+  else 
+      return Tree-Search(x.right, k)`,
   },
   bst_successor: {
-    name: "In-Order Successor",
+    name: "BST Successor",
     category: "Trees",
-    signature: "Node* successor(Node* root, int val) {",
-    hint: "Smallest node > val.",
+    signature: "Tree-Successor(x)",
+    hint: "If right subtree exists: min(right). Else: travel up until we are a left child.",
     solve: (data) => {
       if (!data || !data.root) return "";
       const { root, target } = data;
@@ -417,122 +435,48 @@ const algorithms = {
       };
       t(root);
       const idx = sorted.indexOf(target);
-      return idx < sorted.length - 1 ? sorted[idx + 1] : "None";
+      return idx < sorted.length - 1 ? sorted[idx + 1] : "NIL";
     },
-    question: (data) => `Find the In-Order Successor of node ${data.target}.`,
-    code: `Node* successor(Node* root, int val) {
-    Node* succ = nullptr;
-    while (root) {
-        if (val < root->val) { succ = root; root = root->left; }
-        else root = root->right;
-    }
-    return succ;
-}`,
-  },
-  bst_predecessor: {
-    name: "In-Order Predecessor",
-    category: "Trees",
-    signature: "Node* predecessor(Node* root, int val) {",
-    hint: "Largest node < val.",
-    solve: (data) => {
-      if (!data || !data.root) return "";
-      const { root, target } = data;
-      const sorted = [];
-      const t = (n) => {
-        if (!n) return;
-        t(n.left);
-        sorted.push(n.val);
-        t(n.right);
-      };
-      t(root);
-      const idx = sorted.indexOf(target);
-      return idx > 0 ? sorted[idx - 1] : "None";
-    },
-    question: (data) => `Find the In-Order Predecessor of node ${data.target}.`,
-    code: `Node* predecessor(Node* root, int val) {
-    Node* pred = nullptr;
-    while (root) {
-        if (val > root->val) { pred = root; root = root->right; }
-        else root = root->left;
-    }
-    return pred;
-}`,
-  },
-  bst_parent: {
-    name: "Find Parent Node",
-    category: "Trees",
-    signature: "Node* findParent(Node* root, int val) {",
-    hint: "Traverse. If root->left == val OR root->right == val, current is parent.",
-    solve: (data) => {
-      if (!data || !data.root) return "";
-      const { root, target } = data;
-      let parent = null;
-      let curr = root;
-      while (curr) {
-        if (curr.val === target) break;
-        parent = curr.val;
-        if (target < curr.val) curr = curr.left;
-        else curr = curr.right;
-      }
-      return parent === null ? "None" : parent;
-    },
-    question: (data) =>
-      `Find the Parent of node ${data.target}. (Return None if root)`,
-    code: `Node* findParent(Node* root, int val) {
-    if (!root || root->val == val) return nullptr;
-    while(root) {
-        if((root->left && root->left->val == val) || (root->right && root->right->val == val)) return root;
-        if(val < root->val) root = root->left; else root = root->right;
-    }
-    return nullptr;
-}`,
-  },
-  rbt_props: {
-    name: "Red-Black Tree Properties",
-    category: "Trees",
-    signature: "int blackHeight(Node* root) {",
-    hint: "Black Height: Number of black nodes on any path from root to NIL.",
-    solve: (data) => "2",
-    question:
-      "What is the 'Black Height' of the root (50)? (Count black nodes on path to any null leaf).",
-    code: `int blackHeight(Node* root) {
-    if (!root) return 0;
-    return blackHeight(root->left) + (root->color == BLACK ? 1 : 0);
-}`,
+    question: (data) => `Find the Successor of node ${data.target}.`,
+    code: `Tree-Successor(x)
+  if x.right != NIL
+      return Tree-Minimum(x.right)
+  y = x.p
+  while y != NIL and x == y.right
+      x = y
+      y = y.p
+  return y`,
   },
 
   // === SORTING ===
   merge_sort: {
     name: "Merge Sort",
     category: "Sorting",
-    signature: "void merge(int arr[], int p, int q, int r)",
-    hint: "Recursively divide array in half, sort, then merge sorted halves.",
+    signature: "Merge-Sort(A, p, r)",
+    hint: "Divide: q = (p+r)/2. Conquer: Sort L and R. Combine: Merge.",
     solve: (data) => {
       if (!Array.isArray(data)) return "";
       return [...data].sort((a, b) => a - b).join(", ");
     },
     question: "What will the array look like after it is fully sorted?",
-    code: `// [Source: Sort.java]
-public static void merge(int arr[], int p, int q, int r){
-    int n1 = q - p + 1; int n2 = r - q;
-    int[] L = new int[n1]; int[] R = new int[n2];
-    for(int i=0; i<n1; i++) L[i] = arr[p+i];
-    for(int j=0; j<n2; j++) R[j] = arr[q+1+j];
-    
-    int i=0, j=0, k=p;
-    while(i<n1 && j<n2) {
-        if(L[i] <= R[j]) arr[k++] = L[i++];
-        else arr[k++] = R[j++];
-    }
-    while(i<n1) arr[k++] = L[i++];
-    while(j<n2) arr[k++] = R[j++];
-}`,
+    code: `Merge-Sort(A, p, r)
+  if p < r
+      q = floor((p + r) / 2)
+      Merge-Sort(A, p, q)
+      Merge-Sort(A, q + 1, r)
+      Merge(A, p, q, r)
+      
+Merge(A, p, q, r)
+  n1 = q - p + 1
+  n2 = r - q
+  let L[1..n1+1] and R[1..n2+1] be new arrays
+  ...`,
   },
   insertion_sort: {
     name: "Insertion Sort",
     category: "Sorting",
-    signature: "void insertion_sort(int[] a)",
-    hint: "Take element at i, shift elements > key to the right, insert key.",
+    signature: "Insertion-Sort(A)",
+    hint: "Insert A[j] into the sorted sequence A[1..j-1].",
     solve: (data) => {
       if (!Array.isArray(data)) return "";
       const arr = [...data];
@@ -547,39 +491,86 @@ public static void merge(int arr[], int p, int q, int r){
     },
     question:
       "Perform just the FIRST pass of Insertion Sort (insert 2nd element). Result?",
-    code: `// [Source: Sort.java]
-public static void insertion_sort(int[] a) {
-    for (int i = 1; i < a.length; i++) {
-        int k = a[i]; int j = i - 1;
-        while (j >= 0 && a[j] > k) {
-            a[j + 1] = a[j]; j--;
-        }
-        a[j + 1] = k;
-    }
-}`,
+    code: `Insertion-Sort(A)
+  for j = 2 to A.length
+      key = A[j]
+      // Insert A[j] into the sorted sequence A[1..j-1]
+      i = j - 1
+      while i > 0 and A[i] > key
+          A[i + 1] = A[i]
+          i = i - 1
+      A[i + 1] = key`,
+  },
+  binary_search: {
+    name: "Binary Search",
+    category: "Sorting",
+    signature: "Binary-Search(A, t, begin, end)",
+    hint: "Compare t with mid. If t < mid, recurse left; else recurse right.",
+    solve: (data) => {
+      if (!Array.isArray(data)) return "";
+      const sorted = [...data].sort((a, b) => a - b);
+      // Just demonstrating what the middle would be of sorted array
+      return sorted[Math.floor((sorted.length - 1) / 2)];
+    },
+    question:
+      "In a sorted version of this array, what element is at the very middle index (floor)?",
+    code: `Binary-Search(A, t, begin, end)
+  if begin > end
+      return NIL
+  mid = floor((begin + end) / 2)
+  if t == A[mid]
+      return mid
+  if t < A[mid]
+      return Binary-Search(A, t, begin, mid - 1)
+  else
+      return Binary-Search(A, t, mid + 1, end)`,
   },
 
   // === LINEAR ===
   stack_ops: {
     name: "Stack Operations",
     category: "Linear",
-    signature: "void push(T val) / T pop()",
-    hint: "LIFO: Last In, First Out. Push to head, Pop from head.",
+    signature: "Push(S, x) / Pop(S)",
+    hint: "LIFO. Push increments top. Pop decrements top.",
     solve: (data) => {
       return "99";
     },
     question:
       "Given Stack (Top on right), perform: Pop(), Pop(), Push(99). What is Top?",
-    code: `// [Source: LinkedListStack.java]
-public void push(T value) {
-    Node<T> newNode = new Node<>(value);
-    newNode.next = top; top = newNode;
-}
-public T pop() {
-    if (isEmpty()) throw new EmptyStackException();
-    T data = top.data; top = top.next;
-    return data;
-}`,
+    code: `Push(S, x)
+  S.top = S.top + 1
+  S[S.top] = x
+
+Pop(S)
+  if Stack-Empty(S)
+      error "underflow"
+  else
+      S.top = S.top - 1
+      return S[S.top + 1]`,
+  },
+  queue_ops: {
+    name: "Queue Operations",
+    category: "Linear",
+    signature: "Enqueue(Q, x) / Dequeue(Q)",
+    hint: "FIFO. Enqueue at tail. Dequeue from head.",
+    solve: (data) => {
+      if (!Array.isArray(data)) return "";
+      return data.length > 1 ? data[1] : "Empty";
+    },
+    question:
+      "Given Queue (Head on left). Perform Dequeue(), Enqueue(99). Who is new Head?",
+    code: `Enqueue(Q, x)
+  Q[Q.tail] = x
+  if Q.tail == Q.length
+      Q.tail = 1
+  else Q.tail = Q.tail + 1
+
+Dequeue(Q)
+  x = Q[Q.head]
+  if Q.head == Q.length
+      Q.head = 1
+  else Q.head = Q.head + 1
+  return x`,
   },
 
   // === THEORY ===
@@ -593,19 +584,19 @@ public T pop() {
       data
         ? `What is the worst-case Time Complexity of ${data.algo}?`
         : "Loading...",
-    code: `// Cheat Sheet:
-// Merge Sort: O(n log n)
-// Bubble/Insertion Sort: O(n^2)
-// Binary Search: O(log n)
-// Array Access: O(1)
-// BST Search: O(h)`,
+    code: `// Cheat Sheet from Notes:
+// Merge Sort: T(n) = 2T(n/2) + O(n) => O(n lg n)
+// Insertion Sort: O(n^2) worst case
+// Binary Search: T(n) = T(n/2) + O(1) => O(lg n)
+// BST Search: O(h), where h is height
+// Stack Push/Pop: O(1)`,
   },
 };
 
-// --- VISUALIZERS ---
+// --- VISUALIZERS (FIXED: Added checks for data types) ---
 
 const TreeVisualizer = ({ root, highlight }) => {
-  if (!root) return null;
+  if (!root) return <div className="text-gray-400 p-4">No Tree Data</div>;
   const levels = [];
   const traverse = (node, depth, x, spread) => {
     if (!node) return;
@@ -712,7 +703,8 @@ const TreeVisualizer = ({ root, highlight }) => {
 };
 
 const GraphVisualizer = ({ data, directed }) => {
-  if (!data || !data.nodes || !data.edges) return null; // Added check for nodes/edges
+  if (!data || !data.nodes || !data.edges)
+    return <div className="text-gray-400 p-4">No Graph Data</div>;
   const { nodes, edges } = data;
   const radius = 100;
   const centerX = 200;
@@ -799,7 +791,8 @@ const GraphVisualizer = ({ data, directed }) => {
 };
 
 const ArrayVisualizer = ({ data }) => {
-  if (!data || !Array.isArray(data)) return null; // Added Array check
+  if (!data || !Array.isArray(data))
+    return <div className="text-gray-400 p-4">No Array Data</div>;
   const maxVal = Math.max(...data, 50);
   return (
     <div className="flex items-end justify-center gap-1 h-full w-full px-4 pb-4">
@@ -817,7 +810,8 @@ const ArrayVisualizer = ({ data }) => {
 };
 
 const ListVisualizer = ({ data }) => {
-  if (!data || !Array.isArray(data)) return null; // Added Array check
+  if (!data || !Array.isArray(data))
+    return <div className="text-gray-400 p-4">No List Data</div>;
   return (
     <div className="flex flex-wrap items-center justify-center gap-2 p-4 mt-12">
       {data.map((val, i) => (
@@ -863,10 +857,13 @@ export default function DSAExamPrep() {
     setShowHint(false);
     setUserAnswer("");
     setCodeReport(null);
+
+    // Set default code template based on the algorithm type to help user start
     setUserCode(
       currentAlgo.signature + "\n    // Write your implementation here...\n"
     );
 
+    // GENERATE DATA SAFELY
     if (activeAlgo === "complexity_quiz") {
       const opts = [
         { algo: "Merge Sort", answer: "O(n log n)" },
@@ -884,12 +881,13 @@ export default function DSAExamPrep() {
         setProblemData(generateRBTData());
       } else {
         const data = generateBSTData(7);
+        // Ensure valid targets for Find/Pred/Succ
         if (activeAlgo.includes("successor")) {
-          data.target = data.values.sort((a, b) => a - b)[0];
+          data.target = data.values.sort((a, b) => a - b)[0]; // Smallest has successor
         } else if (activeAlgo.includes("predecessor")) {
           data.target = data.values.sort((a, b) => a - b)[
             data.values.length - 1
-          ];
+          ]; // Largest has pred
         } else {
           data.target = data.values[0];
         }
@@ -931,6 +929,14 @@ export default function DSAExamPrep() {
   };
 
   const renderVisualizer = () => {
+    // Safety check if data is null
+    if (!problemData)
+      return (
+        <div className="flex items-center justify-center h-full text-slate-400">
+          Loading...
+        </div>
+      );
+
     if (activeAlgo === "complexity_quiz")
       return (
         <div className="text-6xl text-slate-200 font-bold flex items-center justify-center h-full">
@@ -957,6 +963,7 @@ export default function DSAExamPrep() {
 
   return (
     <div className="h-screen bg-slate-50 font-sans text-slate-800 overflow-hidden flex flex-col md:flex-row">
+      {/* SIDEBAR */}
       <div className="w-64 bg-white border-r border-slate-200 flex flex-col shrink-0 h-full overflow-y-auto">
         <div className="p-6 border-b border-slate-100 shrink-0">
           <div className="flex items-center gap-2 font-bold text-xl text-indigo-600">
@@ -973,34 +980,22 @@ export default function DSAExamPrep() {
             icon={<GitBranch size={16} />}
           />
           <SidebarSection
-            title="Traversals"
-            items={["bst_preorder", "bst_inorder", "bst_postorder"]}
+            title="Trees"
+            items={["bst_inorder", "bst_search", "bst_successor"]}
             active={activeAlgo}
             set={setActiveAlgo}
             icon={<Database size={16} />}
           />
           <SidebarSection
-            title="Tree Ops"
-            items={[
-              "bst_successor",
-              "bst_predecessor",
-              "bst_parent",
-              "rbt_props",
-            ]}
-            active={activeAlgo}
-            set={setActiveAlgo}
-            icon={<Layers size={16} />}
-          />
-          <SidebarSection
             title="Sorting"
-            items={["merge_sort", "insertion_sort"]}
+            items={["merge_sort", "insertion_sort", "binary_search"]}
             active={activeAlgo}
             set={setActiveAlgo}
             icon={<BarChart size={16} />}
           />
           <SidebarSection
             title="Linear"
-            items={["stack_ops"]}
+            items={["stack_ops", "queue_ops"]}
             active={activeAlgo}
             set={setActiveAlgo}
             icon={<List size={16} />}
@@ -1015,6 +1010,7 @@ export default function DSAExamPrep() {
         </div>
       </div>
 
+      {/* MAIN CONTENT */}
       <div className="flex-1 flex flex-col h-full overflow-hidden">
         <header className="bg-white border-b px-6 py-4 flex justify-between items-center shrink-0">
           <h1 className="text-2xl font-bold text-slate-800">
@@ -1030,7 +1026,7 @@ export default function DSAExamPrep() {
 
         <div className="flex-1 overflow-hidden p-6 bg-slate-50">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full overflow-hidden">
-            {/* LEFT */}
+            {/* LEFT COLUMN */}
             <div className="flex flex-col gap-6 h-full overflow-y-auto pr-2 pb-4">
               <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col min-h-[400px] shrink-0">
                 <div className="bg-slate-50 border-b border-slate-100 p-3 text-xs font-medium text-slate-500 uppercase tracking-wide text-center shrink-0">
@@ -1117,7 +1113,7 @@ export default function DSAExamPrep() {
               </div>
             </div>
 
-            {/* RIGHT */}
+            {/* RIGHT COLUMN */}
             <div className="flex flex-col gap-4 h-full overflow-hidden">
               <div className="flex flex-col flex-1 bg-[#1e1e1e] rounded-xl shadow-lg overflow-hidden border border-slate-700 min-h-0">
                 <div className="bg-[#252526] p-3 border-b border-[#333] flex justify-between items-center shrink-0">
