@@ -37,12 +37,9 @@ const analyzeCode = (code, algoType) => {
   if (!code) return { detectedLang: "None", percentage: 0, feedback: [] };
 
   // AGGRESSIVE SANITIZATION:
-  // 1. Keep only ASCII printable characters (codes 32-126) and newlines/tabs
-  // 2. Collapse whitespace
-  // 3. Lowercase
   const codeLower = code
-    .replace(/[^\x20-\x7E\s]/g, " ") // Replace non-ASCII with space
-    .replace(/\s+/g, " ") // Collapse multiple spaces
+    .replace(/[^\x20-\x7E\s]/g, " ")
+    .replace(/\s+/g, " ")
     .toLowerCase();
 
   const feedback = [];
@@ -76,8 +73,6 @@ const analyzeCode = (code, algoType) => {
   // Helper to check requirements
   const check = (keywords, message, weight = 1) => {
     maxScore += weight;
-    // Check if ANY of the keywords exist in the sanitized string
-    // We trim keywords to ensure no accidental spaces in definitions match
     const match = keywords.some((k) =>
       codeLower.includes(k.toLowerCase().trim())
     );
@@ -143,7 +138,7 @@ const analyzeCode = (code, algoType) => {
   return { detectedLang, percentage, feedback };
 };
 
-// --- GENERATORS (Unchanged) ---
+// --- GENERATORS ---
 
 const generateGraph = (numNodes = 5, directed = false, weighted = true) => {
   const nodes = Array.from({ length: numNodes }, (_, i) => ({
@@ -385,7 +380,7 @@ void startDFS(Graph* G) {
         t(n.right);
       };
       t(data.root);
-      return res.join(", ");
+      return result.join(", ");
     },
     question:
       "List the values of the tree in In-Order sequence (comma separated).",
@@ -660,7 +655,7 @@ const TreeVisualizer = ({ root, highlight }) => {
     return nodesArr;
   };
   return (
-    <svg width="400" height="350" className="mx-auto">
+    <svg width="400" height="350" className="mx-auto overflow-visible">
       {renderLines(root)}
       {renderNodes(root)}
     </svg>
@@ -681,7 +676,7 @@ const GraphVisualizer = ({ data, directed }) => {
     };
   };
   return (
-    <svg width="400" height="300" className="mx-auto">
+    <svg width="400" height="300" className="mx-auto overflow-visible">
       <defs>
         <marker
           id="arrowhead"
@@ -717,6 +712,7 @@ const GraphVisualizer = ({ data, directed }) => {
                 fontWeight="bold"
                 dy="4"
                 textAnchor="middle"
+                className="bg-white"
               >
                 {e.weight}
               </text>
@@ -841,9 +837,9 @@ export default function DSAExamPrep() {
   };
 
   return (
-    <div className="flex h-screen bg-slate-50 font-sans text-slate-800">
-      {/* SIDEBAR */}
-      <div className="w-64 bg-white border-r border-slate-200 flex flex-col">
+    <div className="flex h-screen bg-slate-50 font-sans text-slate-800 overflow-hidden">
+      {/* SIDEBAR - Fixed width, scrollable if content overflows */}
+      <div className="w-64 bg-white border-r border-slate-200 flex flex-col shrink-0">
         <div className="p-6 border-b border-slate-100">
           <div className="flex items-center gap-2 font-bold text-xl text-indigo-600">
             <Activity />
@@ -949,10 +945,10 @@ export default function DSAExamPrep() {
         </div>
       </div>
 
-      {/* MAIN CONTENT */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      {/* MAIN CONTENT - Flex container to manage remaining width */}
+      <div className="flex-1 flex flex-col h-full overflow-hidden">
         {/* HEADER */}
-        <header className="bg-white border-b px-6 py-4 flex justify-between items-center">
+        <header className="bg-white border-b px-6 py-4 flex justify-between items-center shrink-0">
           <div>
             <h1 className="text-2xl font-bold text-slate-800">
               {currentAlgo.name}
@@ -967,16 +963,17 @@ export default function DSAExamPrep() {
           </button>
         </header>
 
-        <div className="flex-1 overflow-auto p-6 bg-slate-50">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full">
-            {/* LEFT: PROBLEM & FEEDBACK */}
-            <div className="flex flex-col gap-6">
-              {/* Visualizer */}
-              <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col min-h-[300px]">
-                <div className="bg-slate-50 border-b border-slate-100 p-3 text-xs font-medium text-slate-500 uppercase tracking-wide text-center">
+        {/* WORKSPACE - Scrollable area */}
+        <div className="flex-1 overflow-y-auto p-6 bg-slate-50">
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 h-full min-h-0">
+            {/* LEFT COLUMN: Visuals & Questions */}
+            <div className="flex flex-col gap-6 min-h-0">
+              {/* Visualizer Card */}
+              <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col min-h-[400px]">
+                <div className="bg-slate-50 border-b border-slate-100 p-3 text-xs font-medium text-slate-500 uppercase tracking-wide text-center shrink-0">
                   Visualization
                 </div>
-                <div className="flex-1 flex items-center justify-center p-4">
+                <div className="flex-1 flex items-center justify-center p-4 overflow-auto">
                   {currentAlgo.category === "Graphs" && problemData && (
                     <GraphVisualizer
                       data={problemData}
@@ -992,8 +989,8 @@ export default function DSAExamPrep() {
                 </div>
               </div>
 
-              {/* Interaction */}
-              <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+              {/* Interaction Card */}
+              <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 shrink-0">
                 <div className="flex items-start justify-between mb-4">
                   <h3 className="font-bold text-lg flex items-center gap-2 text-slate-800">
                     <BookOpen size={20} className="text-indigo-500" />
@@ -1075,11 +1072,11 @@ export default function DSAExamPrep() {
               </div>
             </div>
 
-            {/* RIGHT: CODE EDITOR & ANALYSIS */}
-            <div className="flex flex-col h-full gap-4">
-              {/* Code Editor */}
+            {/* RIGHT COLUMN: Code Editor & Analysis */}
+            <div className="flex flex-col gap-4 min-h-0 h-full">
+              {/* Code Editor - Set to take available height */}
               <div className="flex flex-col flex-1 bg-[#1e1e1e] rounded-xl shadow-lg overflow-hidden border border-slate-700 min-h-[400px]">
-                <div className="bg-[#252526] p-3 border-b border-[#333] flex justify-between items-center">
+                <div className="bg-[#252526] p-3 border-b border-[#333] flex justify-between items-center shrink-0">
                   <div className="flex items-center gap-2 text-slate-300">
                     <Terminal size={16} className="text-purple-400" />
                     <span className="font-mono text-xs text-purple-400">
@@ -1094,7 +1091,7 @@ export default function DSAExamPrep() {
                   </button>
                 </div>
 
-                <div className="flex-1 relative font-mono text-sm">
+                <div className="flex-1 relative font-mono text-sm overflow-hidden">
                   {showSolution ? (
                     <div className="absolute inset-0 p-4 text-[#d4d4d4] overflow-auto whitespace-pre-wrap leading-relaxed">
                       <span className="text-green-600 block mb-2">
@@ -1106,7 +1103,7 @@ export default function DSAExamPrep() {
                     <textarea
                       value={userCode}
                       onChange={(e) => setUserCode(e.target.value)}
-                      className="w-full h-full bg-[#1e1e1e] text-[#d4d4d4] p-4 resize-none outline-none leading-relaxed"
+                      className="w-full h-full bg-[#1e1e1e] text-[#d4d4d4] p-4 resize-none outline-none leading-relaxed overflow-auto"
                       spellCheck="false"
                     />
                   )}
@@ -1115,7 +1112,7 @@ export default function DSAExamPrep() {
 
               {/* Static Analysis Report */}
               {codeReport && (
-                <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 animate-in fade-in slide-in-from-bottom-2">
+                <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 animate-in fade-in slide-in-from-bottom-2 shrink-0">
                   <div className="flex justify-between items-start mb-4">
                     <h3 className="font-bold text-slate-800 flex items-center gap-2">
                       <Search size={18} className="text-blue-500" />
