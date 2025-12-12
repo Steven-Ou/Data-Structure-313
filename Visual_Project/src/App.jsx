@@ -1,6 +1,6 @@
-import React from 'react';
-import DSAExamPrep from './DSAexamprep'; // Ensure filename casing matches
-import './App.css';
+import React from "react";
+import DSAExamPrep from "./DSAExamPrep";
+import "./App.css";
 
 function App() {
   return (
