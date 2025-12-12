@@ -15,9 +15,9 @@ import {
   AlertTriangle,
   Search,
   Eye,
-  BarChart, // New icon for Sorting
-  List, // New icon for Linear
-  Cpu, // New icon for Complexity
+  BarChart,
+  List,
+  Cpu,
 } from "lucide-react";
 
 // --- DATA STRUCTURE CLASSES ---
@@ -201,12 +201,10 @@ const generateRBTData = () => {
   return { root };
 };
 
-// New: Generate Array for Sorting
 const generateSortData = (size = 6) => {
   return Array.from({ length: size }, () => Math.floor(Math.random() * 50) + 1);
 };
 
-// New: Generate Stack/List Data
 const generateListData = (size = 4) => {
   return Array.from(
     { length: size },
@@ -217,13 +215,14 @@ const generateListData = (size = 4) => {
 // --- ALGORITHMS ---
 
 const algorithms = {
-  // === ORIGINAL ALGORITHMS ===
+  // === GRAPHS ===
   bfs: {
     name: "BFS (Breadth-First Search)",
     category: "Graphs",
     signature: "void bfs(Graph* G, int startNode) {",
     hint: "Use a Queue. Push start, mark visited. While !q.empty(), pop, visit neighbors.",
     solve: (data) => {
+      if (!data || !data.matrix) return "";
       const { matrix } = data;
       const start = 0;
       const queue = [start];
@@ -261,6 +260,7 @@ const algorithms = {
     signature: "void dfs(Graph* G, int u, vector<bool>& visited) {",
     hint: "Use Recursion. Mark u as visited, print u. Recurse on unvisited neighbors.",
     solve: (data) => {
+      if (!data || !data.matrix) return "";
       const { matrix } = data;
       const visited = new Set();
       const result = [];
@@ -288,6 +288,7 @@ const algorithms = {
     signature: "void dijkstra(Graph* G, int s) {",
     hint: "Use priority_queue. Relax edges: if (dist[u] + w < dist[v]) update.",
     solve: (data) => {
+      if (!data || !data.matrix) return "";
       const { matrix, nodes } = data;
       const dist = Array(nodes.length).fill(Infinity);
       dist[0] = 0;
@@ -329,12 +330,14 @@ const algorithms = {
     }
 }`,
   },
+  // === TREES ===
   bst_inorder: {
     name: "In-Order Traversal",
     category: "Trees",
     signature: "void inorder(Node* root) {",
     hint: "Left -> Root -> Right. Produces sorted output.",
     solve: (data) => {
+      if (!data || !data.root) return "";
       const res = [];
       const t = (n) => {
         if (!n) return;
@@ -357,6 +360,7 @@ const algorithms = {
     signature: "void preorder(Node* root) {",
     hint: "Root -> Left -> Right.",
     solve: (data) => {
+      if (!data || !data.root) return "";
       const res = [];
       const t = (n) => {
         if (!n) return;
@@ -379,6 +383,7 @@ const algorithms = {
     signature: "void postorder(Node* root) {",
     hint: "Left -> Right -> Root.",
     solve: (data) => {
+      if (!data || !data.root) return "";
       const res = [];
       const t = (n) => {
         if (!n) return;
@@ -401,6 +406,7 @@ const algorithms = {
     signature: "Node* successor(Node* root, int val) {",
     hint: "Smallest node > val.",
     solve: (data) => {
+      if (!data || !data.root) return "";
       const { root, target } = data;
       const sorted = [];
       const t = (n) => {
@@ -429,6 +435,7 @@ const algorithms = {
     signature: "Node* predecessor(Node* root, int val) {",
     hint: "Largest node < val.",
     solve: (data) => {
+      if (!data || !data.root) return "";
       const { root, target } = data;
       const sorted = [];
       const t = (n) => {
@@ -457,6 +464,7 @@ const algorithms = {
     signature: "Node* findParent(Node* root, int val) {",
     hint: "Traverse. If root->left == val OR root->right == val, current is parent.",
     solve: (data) => {
+      if (!data || !data.root) return "";
       const { root, target } = data;
       let parent = null;
       let curr = root;
@@ -493,14 +501,14 @@ const algorithms = {
 }`,
   },
 
-  // === NEW ALGORITHMS (ADDED) ===
-
+  // === SORTING ===
   merge_sort: {
     name: "Merge Sort",
     category: "Sorting",
     signature: "void merge(int arr[], int p, int q, int r)",
     hint: "Recursively divide array in half, sort, then merge sorted halves.",
     solve: (data) => {
+      if (!Array.isArray(data)) return "";
       return [...data].sort((a, b) => a - b).join(", ");
     },
     question: "What will the array look like after it is fully sorted?",
@@ -526,6 +534,7 @@ public static void merge(int arr[], int p, int q, int r){
     signature: "void insertion_sort(int[] a)",
     hint: "Take element at i, shift elements > key to the right, insert key.",
     solve: (data) => {
+      if (!Array.isArray(data)) return "";
       const arr = [...data];
       const k = arr[1];
       let j = 0;
@@ -549,14 +558,14 @@ public static void insertion_sort(int[] a) {
     }
 }`,
   },
+
+  // === LINEAR ===
   stack_ops: {
     name: "Stack Operations",
     category: "Linear",
     signature: "void push(T val) / T pop()",
     hint: "LIFO: Last In, First Out. Push to head, Pop from head.",
     solve: (data) => {
-      // Data is [A, B, C, D] (D is top)
-      // Sim: Pop (D), Pop (C), Push 99. Top is 99.
       return "99";
     },
     question:
@@ -572,14 +581,18 @@ public T pop() {
     return data;
 }`,
   },
+
+  // === THEORY ===
   complexity_quiz: {
     name: "Time Complexity Quiz",
     category: "Complexity",
     signature: "Big-O Notation",
     hint: "Analyze loops (n) and splits (log n).",
-    solve: (data) => data.answer,
+    solve: (data) => (data ? data.answer : ""),
     question: (data) =>
-      `What is the worst-case Time Complexity of ${data.algo}?`,
+      data
+        ? `What is the worst-case Time Complexity of ${data.algo}?`
+        : "Loading...",
     code: `// Cheat Sheet:
 // Merge Sort: O(n log n)
 // Bubble/Insertion Sort: O(n^2)
@@ -591,7 +604,6 @@ public T pop() {
 
 // --- VISUALIZERS ---
 
-// 1. Original Tree Visualizer (Restored)
 const TreeVisualizer = ({ root, highlight }) => {
   if (!root) return null;
   const levels = [];
@@ -699,9 +711,8 @@ const TreeVisualizer = ({ root, highlight }) => {
   );
 };
 
-// 2. Original Graph Visualizer (Restored)
 const GraphVisualizer = ({ data, directed }) => {
-  if (!data) return null;
+  if (!data || !data.nodes || !data.edges) return null; // Added check for nodes/edges
   const { nodes, edges } = data;
   const radius = 100;
   const centerX = 200;
@@ -787,9 +798,8 @@ const GraphVisualizer = ({ data, directed }) => {
   );
 };
 
-// 3. NEW Visualizers (Array & List)
 const ArrayVisualizer = ({ data }) => {
-  if (!data) return null;
+  if (!data || !Array.isArray(data)) return null; // Added Array check
   const maxVal = Math.max(...data, 50);
   return (
     <div className="flex items-end justify-center gap-1 h-full w-full px-4 pb-4">
@@ -807,7 +817,7 @@ const ArrayVisualizer = ({ data }) => {
 };
 
 const ListVisualizer = ({ data }) => {
-  if (!data) return null;
+  if (!data || !Array.isArray(data)) return null; // Added Array check
   return (
     <div className="flex flex-wrap items-center justify-center gap-2 p-4 mt-12">
       {data.map((val, i) => (
@@ -874,13 +884,12 @@ export default function DSAExamPrep() {
         setProblemData(generateRBTData());
       } else {
         const data = generateBSTData(7);
-        // Ensure valid targets for Find/Pred/Succ
         if (activeAlgo.includes("successor")) {
-          data.target = data.values.sort((a, b) => a - b)[0]; // Smallest has successor
+          data.target = data.values.sort((a, b) => a - b)[0];
         } else if (activeAlgo.includes("predecessor")) {
           data.target = data.values.sort((a, b) => a - b)[
             data.values.length - 1
-          ]; // Largest has pred
+          ];
         } else {
           data.target = data.values[0];
         }
@@ -948,7 +957,6 @@ export default function DSAExamPrep() {
 
   return (
     <div className="h-screen bg-slate-50 font-sans text-slate-800 overflow-hidden flex flex-col md:flex-row">
-      {/* SIDEBAR */}
       <div className="w-64 bg-white border-r border-slate-200 flex flex-col shrink-0 h-full overflow-y-auto">
         <div className="p-6 border-b border-slate-100 shrink-0">
           <div className="flex items-center gap-2 font-bold text-xl text-indigo-600">
@@ -1007,7 +1015,6 @@ export default function DSAExamPrep() {
         </div>
       </div>
 
-      {/* MAIN CONTENT */}
       <div className="flex-1 flex flex-col h-full overflow-hidden">
         <header className="bg-white border-b px-6 py-4 flex justify-between items-center shrink-0">
           <h1 className="text-2xl font-bold text-slate-800">
@@ -1023,7 +1030,7 @@ export default function DSAExamPrep() {
 
         <div className="flex-1 overflow-hidden p-6 bg-slate-50">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full overflow-hidden">
-            {/* LEFT COLUMN */}
+            {/* LEFT */}
             <div className="flex flex-col gap-6 h-full overflow-y-auto pr-2 pb-4">
               <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col min-h-[400px] shrink-0">
                 <div className="bg-slate-50 border-b border-slate-100 p-3 text-xs font-medium text-slate-500 uppercase tracking-wide text-center shrink-0">
@@ -1110,7 +1117,7 @@ export default function DSAExamPrep() {
               </div>
             </div>
 
-            {/* RIGHT COLUMN */}
+            {/* RIGHT */}
             <div className="flex flex-col gap-4 h-full overflow-hidden">
               <div className="flex flex-col flex-1 bg-[#1e1e1e] rounded-xl shadow-lg overflow-hidden border border-slate-700 min-h-0">
                 <div className="bg-[#252526] p-3 border-b border-[#333] flex justify-between items-center shrink-0">
