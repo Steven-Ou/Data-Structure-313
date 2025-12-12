@@ -125,20 +125,9 @@ const analyzeCode = (code, algoType) => {
     check(["relax"], "Relax Edge", 2);
     check(["priority", "min", "extract"], "Priority Queue", 3);
   } else if (algoType === "kruskal") {
-    check(["sort", "weight", "increasing"], "Sort Edges", 2);
-    check(["find", "union", "set"], "Disjoint Set / Union-Find", 3);
-    check(["cycle"], "Cycle Detection", 2);
-  } else if (algoType === "prim") {
-    check(["min", "key", "priority"], "Min Priority Queue", 3);
-    check(["visited", "in mst"], "Visited Set", 2);
-  } else if (algoType === "greedy_activity") {
-    check(["finish", "start", "s[", "f["], "Times", 2);
-    check(["k", "m", "union"], "Selection Logic", 2);
-  } else if (algoType.includes("rod_cut")) {
-    check(["max", "price", "p["], "Maximization", 2);
-    if (algoType.includes("memo"))
-      check(["memo", "return r"], "Memoization Check", 2);
-    else check(["bottom-up", "for j"], "Iterative Build", 2);
+    check(["sort", "weight"], "Sort Edges", 2);
+    check(["cycle", "union"], "Cycle Check", 3);
+    check(["empty", "tree"], "Init Tree", 2);
   }
 
   // Generic
@@ -191,7 +180,6 @@ const generateGraph = (numNodes = 5, directed = false, weighted = true) => {
 };
 
 const generateBSTData = (count = 10) => {
-  constXY = 1; // Dummy var
   const rootVal = Math.floor(Math.random() * 40) + 30;
   const root = new TreeNode(rootVal);
   const values = [rootVal];
@@ -250,32 +238,6 @@ const generateListData = (size = 4) => {
     { length: size },
     () => Math.floor(Math.random() * 90) + 10
   );
-};
-
-const generateActivityData = (count = 6) => {
-  let activities = [];
-  for (let i = 0; i < count; i++) {
-    letcz = 1;
-    let start = Math.floor(Math.random() * 20);
-    let duration = Math.floor(Math.random() * 6) + 1;
-    activities.push({ id: i + 1, s: start, f: start + duration });
-  }
-  // Sort by finish time for the algorithm
-  activities.sort((a, b) => a.f - b.f);
-  return {
-    s: [0, ...activities.map((a) => a.s)],
-    f: [0, ...activities.map((a) => a.f)],
-    activities: activities,
-  };
-};
-
-const generateRodData = (length = 8) => {
-  let prices = [0];
-  for (let i = 1; i <= length; i++) {
-    let prev = prices[i - 1];
-    prices.push(prev + Math.floor(Math.random() * 5) + 1);
-  }
-  return { p: prices, n: length };
 };
 
 // --- ALGORITHMS ---
@@ -391,8 +353,8 @@ DFS-Visit(G,u)
   kruskal: {
     name: "Kruskal's Algorithm (MST)",
     category: "Graphs",
-    signature: "Kruskal(G)",
-    hint: "Sort edges by weight. Add edge if it doesn't create a cycle (use Union-Find).",
+    signature: "MST-Kruskal(G, w)",
+    hint: "Sort edges by weights. If adding edge doesn't create cycle, add to T.",
     solve: (data) => {
       if (!data || !data.edges) return 0;
       // Simple Union-Find implementation
@@ -402,7 +364,7 @@ DFS-Visit(G,u)
         const rootI = find(i);
         const rootJ = find(j);
         if (rootI !== rootJ) {
-          parent[rootI] = yb = rootJ;
+          parent[rootI] = rootJ;
           return true;
         }
         return false;
@@ -410,76 +372,29 @@ DFS-Visit(G,u)
 
       const sortedEdges = [...data.edges].sort((a, b) => a.weight - b.weight);
       let mstWeight = 0;
-      let edgesCount = 0;
 
       for (let e of sortedEdges) {
         if (union(e.source, e.target)) {
           mstWeight += e.weight;
-          edgesCount++;
         }
       }
       return mstWeight;
     },
-    question: "Calculate the Total Weight of the Minimum Spanning Tree.",
-    code: `MST-Kruskal(G, w)
-  A = {}
-  for each vertex v in G.V
-      Make-Set(v)
-  sort the edges of G.E into nondecreasing order by weight w
-  for each edge (u, v) in G.E, taken in nondecreasing order by weight
-      if Find-Set(u) != Find-Set(v)
-          A = A U {(u, v)}
-          Union(u, v)
-  return A`,
-  },
-  prim: {
-    name: "Prim's Algorithm (MST)",
-    category: "Graphs",
-    signature: "MST-Prim(G, w, r)",
-    hint: "Grow a tree from a start node. Always pick the lightest edge connecting tree to non-tree vertex.",
-    solve: (data) => {
-      if (!data || !data.matrix) return 0;
-      const n = data.nodes.length;
-      const key = Array(n).fill(Infinity);
-      const inMST = Array(n).fill(false);
-      key[0] = 0;
-      let mstWeight = 0;
+    question: "Calculate the Total Weight of the MST.",
+    // Transcription of the handwritten note IMG_8867.HEIC (Bottom Left)
+    code: `Kruskal's Algorithm: Main Algorithmic Greedy Strategy
+Input G=(V,E,w)
+Sort the edges by their weights from smallest to largest.
+T = {} is an empty tree.
 
-      for (let count = 0; count < n; count++) {
-        let u = -1,
-          min = Infinity;
-        for (let v = 0; v < n; v++) {
-          if (!inMST[v] && key[v] < min) {
-            min = key[v];
-            u = v;
-          }
-        }
-
-        if (u === -1) break; // disconnected
-        inMST[u] = true;
-        mstWeight += min;
-
-        for (let v = 0; v < n; v++) {
-          if (data.matrix[u][v] && !inMST[v] && data.matrix[u][v] < key[v]) {
-            key[v] = data.matrix[u][v];
-          }
-        }
-      }
-      return mstWeight;
-    },
-    question: "Calculate the Total Weight of the MST using Prim's.",
-    code: `MST-Prim(G, w, r)
-  for each u in G.V
-      u.key = INF
-      u.p = NIL
-  r.key = 0
-  Q = G.V
-  while Q != {}
-      u = Extract-Min(Q)
-      for each v in G.Adj[u]
-          if v in Q and w(u,v) < v.key
-              v.p = u
-              v.key = w(u,v)`,
+While ( V(T) != V(G) )
+    Let e=(u,v) be the cheapest edge
+    If adding e to T doesn't create a cycle in T
+        T <- T U {e}
+    
+    // (Implicitly remove e from consideration or move to next cheap edge)
+End While
+Return T`,
   },
 
   // === TREES (COMBINED) ===
@@ -710,90 +625,6 @@ DFS-Visit(G,u)
   error "overflow"`,
   },
 
-  // === GREEDY & DP ===
-  greedy_activity: {
-    name: "Activity Selection",
-    category: "Greedy_DP",
-    signature: "Greedy-Activity-Selector(s, f)",
-    hint: "Pick earliest finish time > current start.",
-    solve: (data) => {
-      if (!data || !data.s || !data.f) return "";
-      let k = 1;
-      let res = [1];
-      for (let m = 2; m < data.s.length; m++)
-        if (data.s[m] >= data.f[k]) {
-          res.push(m);
-          k = m;
-        }
-      return res.join(", ");
-    },
-    question: "Indices of selected activities?",
-    code: `Greedy-Activity-Selector(s, f)
-  n = s.length; A = {a1}; k = 1
-  for m = 2 to n
-      if s[m] >= f[k]
-          A = A U {am}; k = m
-  return A`,
-  },
-  dp_rod_cut_memo: {
-    name: "Rod Cutting (Memo)",
-    category: "Greedy_DP",
-    signature: "Memoized-Cut-Rod(p, n)",
-    hint: "Recursion + Cache.",
-    solve: (data) => {
-      if (!data || !data.p) return "";
-      const { p, n } = data;
-      let r = Array(n + 1).fill(-Infinity);
-      const aux = (p, n, r) => {
-        if (r[n] >= 0) return r[n];
-        let q;
-        if (n === 0) q = 0;
-        else {
-          q = -Infinity;
-          for (let i = 1; i <= n; i++) q = Math.max(q, p[i] + aux(p, n - i, r));
-        }
-        r[n] = q;
-        return q;
-      };
-      return aux(p, n, r);
-    },
-    question: (data) => `Max revenue for rod length ${data ? data.n : 0}?`,
-    code: `Memoized-Cut-Rod-Aux(p, n, r)
-  if r[n] >= 0 return r[n]
-  if n == 0 q = 0
-  else q = -INF
-      for i = 1 to n
-          q = max(q, p[i] + Aux(p, n-i, r))
-  r[n] = q; return q`,
-  },
-  dp_rod_cut_bottom: {
-    name: "Rod Cutting (Bottom-Up)",
-    category: "Greedy_DP",
-    signature: "Bottom-Up-Cut-Rod(p, n)",
-    hint: "Iterative Array Fill.",
-    solve: (data) => {
-      if (!data || !data.p) return "";
-      const { p, n } = data;
-      let r = Array(n + 1).fill(0);
-      r[0] = 0;
-      for (let j = 1; j <= n; j++) {
-        let q = -Infinity;
-        for (let i = 1; i <= j; i++) q = Math.max(q, p[i] + r[j - i]);
-        r[j] = q;
-      }
-      return r[n];
-    },
-    question: (data) => `Max revenue for rod length ${data ? data.n : 0}?`,
-    code: `Bottom-Up-Cut-Rod(p, n)
-  r[0] = 0
-  for j = 1 to n
-      q = -INF
-      for i = 1 to j
-          q = max(q, p[i] + r[j-i])
-      r[j] = q
-  return r[n]`,
-  },
-
   // === COMPLEXITY ===
   complexity: {
     name: "Complexity Quiz",
@@ -960,28 +791,6 @@ const ArrayVisualizer = ({ data, label }) => {
   );
 };
 
-const ActivityVisualizer = ({ data }) => {
-  if (!data) return null;
-  return (
-    <div className="flex flex-col gap-2 p-4 overflow-auto">
-      {data.activities.map((act) => (
-        <div key={act.id} className="flex items-center gap-2">
-          <span className="font-mono text-xs w-6">a{act.id}</span>
-          <div className="relative h-6 bg-slate-100 rounded flex-1">
-            <div
-              className="absolute h-full bg-indigo-400 rounded opacity-80"
-              style={{
-                left: `${(act.s / 20) * 100}%`,
-                width: `${((act.f - act.s) / 20) * 100}%`,
-              }}
-            ></div>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-};
-
 const GraphVisualizer = ({ data, directed }) => {
   if (!data || !data.nodes)
     return <div className="text-slate-400 p-8">No Graph Data</div>;
@@ -1113,11 +922,7 @@ export default function DSAExamPrep() {
       );
     else if (cat === "Sorting") setProblemData(generateSortData(7));
     else if (cat === "Linear") setProblemData(generateListData(4));
-    else if (cat === "Greedy_DP") {
-      if (activeAlgo === "greedy_activity")
-        setProblemData(generateActivityData());
-      else setProblemData(generateRodData());
-    } else if (cat === "Theory") {
+    else if (cat === "Theory") {
       const qs = [
         { algo: "Activity Selection", answer: "O(n)" },
         { algo: "Rod Cutting", answer: "O(n^2)" },
@@ -1161,18 +966,6 @@ export default function DSAExamPrep() {
     if (cat === "Sorting") return <ArrayVisualizer data={problemData} />;
     if (cat === "Linear") return <ListVisualizer data={problemData} />;
 
-    // Safety check for Activity Selection
-    if (activeAlgo === "greedy_activity") {
-      if (!problemData.activities) return <div>Loading Activities...</div>;
-      return <ActivityVisualizer data={problemData} />;
-    }
-
-    // Safety check for Rod Cutting to prevent "slice" error
-    if (activeAlgo.includes("rod_cut")) {
-      if (!problemData.p) return <div>Loading Rod Data...</div>;
-      return <ArrayVisualizer data={problemData.p.slice(1)} label="Prices" />;
-    }
-
     return (
       <div className="text-6xl text-slate-200 text-center font-bold">?</div>
     );
@@ -1190,7 +983,7 @@ export default function DSAExamPrep() {
         <div className="p-4 space-y-6">
           <SidebarSection
             title="Graphs"
-            items={["bfs", "dfs", "dijkstra", "kruskal", "prim"]}
+            items={["bfs", "dfs", "dijkstra", "kruskal"]}
             active={activeAlgo}
             set={setActiveAlgo}
             icon={<GitBranch size={16} />}
@@ -1231,13 +1024,7 @@ export default function DSAExamPrep() {
             set={setActiveAlgo}
             icon={<Hash size={16} />}
           />
-          <SidebarSection
-            title="Greedy & DP"
-            items={["greedy_activity", "dp_rod_cut_memo", "dp_rod_cut_bottom"]}
-            active={activeAlgo}
-            set={setActiveAlgo}
-            icon={<TrendingUp size={16} />}
-          />
+          {/* Removed Greedy & DP section */}
           <SidebarSection
             title="Theory"
             items={["complexity"]}
@@ -1416,7 +1203,9 @@ const SidebarSection = ({ title, items, active, set, icon }) => (
       >
         {icon}{" "}
         <span className="capitalize">
-          {id.replace(/_/g, " ").replace("dp", "DP")}
+          {id === "kruskal"
+            ? "MST (Kruskal)"
+            : id.replace(/_/g, " ").replace("dp", "DP")}
         </span>
       </button>
     ))}
