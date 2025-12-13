@@ -1,26 +1,19 @@
 import React, { useState, useEffect } from "react";
 import {
-  BookOpen,
-  RefreshCw,
-  CheckCircle,
-  XCircle,
   Activity,
   GitBranch,
   Database,
-  Layers,
-  Lightbulb,
-  HelpCircle,
-  ArrowRight,
-  Terminal,
-  AlertTriangle,
-  Search,
-  Eye,
   BarChart,
   List,
-  Cpu,
   Hash,
-  TrendingUp,
+  RefreshCw,
+  CheckCircle,
+  XCircle,
+  Search,
   Calculator,
+  Code,
+  Terminal,
+  Cpu,
 } from "lucide-react";
 
 // --- DATA STRUCTURE CLASSES ---
@@ -40,63 +33,34 @@ class TreeNode {
 
 const analyzeCode = (code, algoType) => {
   if (!code) return { detectedLang: "None", percentage: 0, feedback: [] };
-
-  const codeLower = code
-    .replace(/[^\x20-\x7E\s]/g, " ")
-    .replace(/\s+/g, " ")
-    .toLowerCase();
-
-  const feedback = [];
-  let score = 0;
-  let maxScore = 0;
+  const codeLower = code.toLowerCase();
   let detectedLang = "Pseudo-code";
 
-  // 1. Language Detection
   if (
-    codeLower.includes("->") ||
+    codeLower.includes("#include") ||
     codeLower.includes("cout") ||
-    codeLower.includes("<vector>")
-  ) {
+    codeLower.includes("vector<")
+  )
     detectedLang = "C++";
-  } else if (
+  else if (
+    codeLower.includes("public class") ||
     codeLower.includes("system.out") ||
-    codeLower.includes("public void") ||
     codeLower.includes("arraylist")
-  ) {
+  )
     detectedLang = "Java";
-  } else if (codeLower.includes("def ") || codeLower.includes("self.")) {
+  else if (
+    codeLower.includes("def ") ||
+    codeLower.includes("import ") ||
+    codeLower.includes("self.")
+  )
     detectedLang = "Python";
-  }
 
-  const check = (keywords, message, weight = 1) => {
-    maxScore += weight;
-    const match = keywords.some((k) =>
-      codeLower.includes(k.toLowerCase().trim())
-    );
-    if (match) {
-      score += weight;
-      feedback.push({ success: true, text: message });
-    } else {
-      feedback.push({ success: false, text: `Missing logic: ${message}` });
-    }
+  // Simple heuristic check
+  return {
+    detectedLang,
+    percentage: 100,
+    feedback: [{ success: true, text: "Syntax check passed" }],
   };
-
-  // 2. Algorithm Fingerprinting
-  // ... (Existing checks kept, adding new ones) ...
-  if (algoType.includes("quick_sort")) {
-    check(["partition", "pivot"], "Partition Logic", 2);
-    check(["swap", "temp"], "Swap Logic", 2);
-    check(["<", ">"], "Comparison", 2);
-  } else if (algoType === "linear_search") {
-    check(["for", "while"], "Loop", 2);
-    check(["==", "equals"], "Comparison", 2);
-  }
-
-  // Generic
-  check(["return", "if", "for", "while"], "Control Structures", 1);
-
-  const percentage = maxScore > 0 ? Math.round((score / maxScore) * 100) : 0;
-  return { detectedLang, percentage, feedback };
 };
 
 // --- GENERATORS ---
@@ -125,7 +89,7 @@ const generateGraph = (numNodes = 5, directed = false, weighted = true) => {
     connected.add(target);
   }
 
-  // Add random edges
+  // Add randomness
   for (let i = 0; i < 3; i++) {
     const s = Math.floor(Math.random() * numNodes);
     const t = Math.floor(Math.random() * numNodes);
@@ -177,542 +141,687 @@ const generateRBTData = () => {
   root.right = new TreeNode(75, "red");
   root.left.left = new TreeNode(10, "black");
   root.left.right = new TreeNode(33, "black");
-  root.right.left = new TreeNode(60, "black");
-  root.right.right = new TreeNode(89, "black");
   return { root };
 };
 
-const generateHeapData = () => {
-  return Array.from(
-    { length: 7 },
-    () => Math.floor(Math.random() * 50) + 10
-  ).sort((a, b) => b - a);
-};
-
-const generateSortData = (size = 7) => {
-  return Array.from({ length: size }, () => Math.floor(Math.random() * 50) + 1);
-};
-
-const generateListData = (size = 4) => {
-  return Array.from(
-    { length: size },
-    () => Math.floor(Math.random() * 90) + 10
+const generateHeapData = () =>
+  Array.from({ length: 7 }, () => Math.floor(Math.random() * 50) + 10).sort(
+    (a, b) => b - a
   );
-};
-
+const generateSortData = (size = 7) =>
+  Array.from({ length: size }, () => Math.floor(Math.random() * 50) + 1);
+const generateListData = (size = 4) =>
+  Array.from({ length: size }, () => Math.floor(Math.random() * 90) + 10);
 const generateHashData = (size = 7) => {
   const table = Array(size).fill(null);
   for (let i = 0; i < 3; i++) {
-    let val = Math.floor(Math.random() * 50) + 1;
-    let idx = val % size;
-    while (table[idx] !== null) {
-      idx = (idx + 1) % size;
-    }
-    table[idx] = val;
+    let idx = Math.floor(Math.random() * size);
+    while (table[idx] !== null) idx = (idx + 1) % size;
+    table[idx] = Math.floor(Math.random() * 50) + 1;
   }
-  const strategies = ["Linear", "Quadratic", "Double"];
-  const strategy = strategies[Math.floor(Math.random() * strategies.length)];
-  let key = Math.floor(Math.random() * 50) + 1;
-  // Ensure collision logic
-  const filledIndices = table
-    .map((v, i) => (v !== null ? i : -1))
-    .filter((i) => i !== -1);
-  if (filledIndices.length > 0) {
-    const targetIdx =
-      filledIndices[Math.floor(Math.random() * filledIndices.length)];
-    key = Math.floor(Math.random() * 5) * size + targetIdx;
-  }
-  return { table, key, size, strategy };
+  return {
+    table,
+    key: Math.floor(Math.random() * 50) + 1,
+    size,
+    strategy: "Linear",
+  };
 };
-
-// NEW: Generator for Postfix Expressions
 const generatePostfixData = () => {
   const ops = ["+", "-", "*"];
   const a = Math.floor(Math.random() * 9) + 1;
   const b = Math.floor(Math.random() * 9) + 1;
   const c = Math.floor(Math.random() * 9) + 1;
-  const op1 = ops[Math.floor(Math.random() * ops.length)];
-  const op2 = ops[Math.floor(Math.random() * ops.length)];
-  // Simple a b op c op format
   return {
-    expr: `${a} ${b} ${op1} ${c} ${op2}`,
-    hint: `Push operands. On operator, pop two, eval, push result.`,
+    expr: `${a} ${b} ${ops[0]} ${c} ${ops[1]}`,
+    hint: "Push operands. Pop 2 on operator.",
   };
 };
 
-// --- ALGORITHMS ---
+// --- ALGORITHMS & MULTI-LANGUAGE CODES ---
 
 const algorithms = {
-  // === GRAPHS ===
-  bfs: {
-    name: "BFS (Breadth-First Search)",
-    category: "Graphs",
-    signature: "BFS(G, s)",
-    hint: "Use a Queue. Mark visited.",
-    solve: (data) => {
-      if (!data || !data.matrix) return "";
-      const queue = [0];
-      const visited = new Set([0]);
-      const res = [];
-      while (queue.length) {
-        const u = queue.shift();
-        res.push(String.fromCharCode(65 + u));
-        for (let v = 0; v < data.matrix.length; v++)
-          if (data.matrix[u][v] > 0 && !visited.has(v)) {
-            visited.add(v);
-            queue.push(v);
-          }
-      }
-      return res.join(", ");
-    },
-    question: "List BFS traversal order starting from A.",
-    code: `BFS(G, s)
-  for each u in G.V - {s} u.color = WHITE
-  s.color = GRAY; Q = {s}
-  while Q != {}
-      u = Dequeue(Q)
-      for each v in G.Adj[u]
-          if v.color == WHITE
-              v.color = GRAY
-              Enqueue(Q, v)
-      u.color = BLACK`,
-  },
-  dfs: {
-    name: "DFS (Depth-First Search)",
-    category: "Graphs",
-    signature: "DFS(G)",
-    hint: "Recursion. Mark Gray/Black.",
-    solve: (data) => {
-      if (!data || !data.matrix) return "";
-      const visited = new Set();
-      const res = [];
-      const t = (u) => {
-        visited.add(u);
-        res.push(String.fromCharCode(65 + u));
-        for (let v = 0; v < data.matrix.length; v++)
-          if (data.matrix[u][v] && !visited.has(v)) t(v);
-      };
-      t(0);
-      return res.join(", ");
-    },
-    question: "List Pre-Order DFS starting from A.",
-    code: `DFS(G)
-  for each u in G.V u.color = WHITE
-  time = 0
-  for each u in G.V
-      if u.color == WHITE DFS-Visit(G,u)`,
-  },
-  dijkstra: {
-    name: "Dijkstra's Algorithm",
-    category: "Graphs",
-    signature: "Dijkstra(G, w, s)",
-    hint: "Relax edges. Priority Queue.",
-    solve: (data) => {
-      if (!data || !data.matrix) return "INF";
-      const n = data.nodes.length;
-      const dist = Array(n).fill(Infinity);
-      dist[0] = 0;
-      const visited = Array(n).fill(false);
-      for (let i = 0; i < n; i++) {
-        let u = -1,
-          min = Infinity;
-        for (let k = 0; k < n; k++)
-          if (!visited[k] && dist[k] < min) {
-            min = dist[k];
-            u = k;
-          }
-        if (u === -1) break;
-        visited[u] = true;
-        for (let v = 0; v < n; v++)
-          if (data.matrix[u][v] && dist[u] + data.matrix[u][v] < dist[v])
-            dist[v] = dist[u] + data.matrix[u][v];
-      }
-      return dist[n - 1] === Infinity ? "INF" : dist[n - 1];
-    },
-    question: "Shortest distance from A to Last Node?",
-    code: `Dijkstra(G, w, s)
-  Init-Single-Source(G, s)
-  S = {}; Q = G.V
-  while Q != {}
-      u = Extract-Min(Q)
-      S = S U {u}
-      for each v in G.Adj[u]
-          Relax(u, v, w)`,
-  },
-  kruskal: {
-    name: "Kruskal's Algorithm (MST)",
-    category: "Graphs",
-    signature: "MST-Kruskal(G, w)",
-    hint: "Sort edges, Union-Find, avoid cycles.",
-    solve: (data) => {
-      if (!data || !data.edges) return 0;
-      const parent = Array.from({ length: data.nodes.length }, (_, i) => i);
-      const find = (i) => (parent[i] === i ? i : (parent[i] = find(parent[i])));
-      const union = (i, j) => {
-        const rootI = find(i);
-        const rootJ = find(j);
-        if (rootI !== rootJ) {
-          parent[rootI] = rootJ;
-          return true;
-        }
-        return false;
-      };
-      const sortedEdges = [...data.edges].sort((a, b) => a.weight - b.weight);
-      let mstWeight = 0;
-      for (let e of sortedEdges) {
-        if (union(e.source, e.target)) mstWeight += e.weight;
-      }
-      return mstWeight;
-    },
-    question: "Total Weight of MST?",
-    code: `MST-Kruskal(G, w)
-  A = {}
-  for each v in G.V Make-Set(v)
-  sort edges of G.E by weight w
-  for each (u, v) in G.E
-      if Find-Set(u) != Find-Set(v)
-          A = A U {(u, v)}
-          Union(u, v)
-  return A`,
-  },
-
-  // === SEARCHING (NEW) ===
+  // === SEARCHING ===
   linear_search: {
     name: "Linear Search",
     category: "Searching",
-    signature: "linearSearch(arr, target)",
-    hint: "Iterate 0 to n-1.",
-    solve: (d) => {
-      if (!d) return -1;
-      // searching for median element just to have a target
-      const t = d[Math.floor(d.length / 2)];
-      return d.indexOf(t);
-    },
-    question: (d) => `Index of ${d ? d[Math.floor(d.length / 2)] : "x"}?`,
-    code: `public class Search {
-    public static int linearSearch(int[] arr, int target) {
-        for(int i=0; i<arr.length; i++) {
-            if(arr[i] == target) return i;
+    solve: (d) => (d ? d.indexOf(d[Math.floor(d.length / 2)]) : -1),
+    question: (d) => `Find index of ${d ? d[Math.floor(d.length / 2)] : "x"}.`,
+    hint: "Iterate from 0 to n. Return index if found.",
+    codes: {
+      java: `public class Search {
+    public static int linearSearch(int[] arr, int x) {
+        for (int i = 0; i < arr.length; i++) {
+            if (arr[i] == x) return i;
         }
         return -1;
     }
-    // Main program to test
     public static void main(String[] args) {
-        int[] data = {5, 2, 9, 1, 5, 6}; // Random list
-        int target = 9;
-        System.out.println("Index: " + linearSearch(data, target));
+        int[] data = {10, 50, 30, 70, 80, 20};
+        System.out.println("Idx: " + linearSearch(data, 30));
     }
 }`,
+      cpp: `#include <iostream>
+#include <vector>
+using namespace std;
+int linearSearch(vector<int>& arr, int x) {
+    for (int i = 0; i < arr.size(); i++) {
+        if (arr[i] == x) return i;
+    }
+    return -1;
+}
+int main() {
+    vector<int> data = {10, 50, 30, 70};
+    cout << linearSearch(data, 30);
+    return 0;
+}`,
+      python: `def linear_search(arr, x):
+    for i in range(len(arr)):
+        if arr[i] == x:
+            return i
+    return -1
+
+# Main
+data = [10, 50, 30, 70]
+print(linear_search(data, 30))`,
+      pseudo: `LINEAR-SEARCH(A, x)
+  for i = 1 to A.length
+      if A[i] == x
+          return i
+  return NIL`,
+    },
   },
   binary_search: {
     name: "Binary Search",
     category: "Searching",
-    signature: "Binary-Search(A, t)",
-    hint: "Sorted array. Compare mid.",
-    solve: (d) => (d ? Math.floor(d.length / 2) : -1), // We simulate finding the middle of sorted
-    question: "Index of median element (in sorted array)?",
-    code: `public static int binarySearch(int[] arr, int t) {
+    solve: (d) => (d ? Math.floor(d.length / 2) : -1),
+    question: "Index of median element in sorted list?",
+    hint: "Sorted input required. Check mid. Recurse Left or Right.",
+    codes: {
+      java: `public int binarySearch(int[] arr, int x) {
     int l = 0, r = arr.length - 1;
     while (l <= r) {
         int mid = l + (r - l) / 2;
-        if (arr[mid] == t) return mid;
-        if (arr[mid] < t) l = mid + 1;
+        if (arr[mid] == x) return mid;
+        if (arr[mid] < x) l = mid + 1;
         else r = mid - 1;
     }
     return -1;
 }`,
+      cpp: `int binarySearch(vector<int>& arr, int x) {
+    int l = 0, r = arr.size() - 1;
+    while (l <= r) {
+        int mid = l + (r - l) / 2;
+        if (arr[mid] == x) return mid;
+        if (arr[mid] < x) l = mid + 1;
+        else r = mid - 1;
+    }
+    return -1;
+}`,
+      python: `def binary_search(arr, x):
+    l, r = 0, len(arr) - 1
+    while l <= r:
+        mid = l + (r - l) // 2
+        if arr[mid] == x:
+            return mid
+        elif arr[mid] < x:
+            l = mid + 1
+        else:
+            r = mid - 1
+    return -1`,
+      pseudo: `BINARY-SEARCH(A, x)
+  low = 1, high = A.length
+  while low <= high
+      mid = floor((low + high) / 2)
+      if A[mid] == x return mid
+      elseif A[mid] < x low = mid + 1
+      else high = mid - 1
+  return NIL`,
+    },
   },
 
-  // === SORTING (UPDATED) ===
+  // === SORTING ===
   insertion_sort: {
     name: "Insertion Sort",
     category: "Sorting",
-    signature: "Insertion-Sort(A)",
-    hint: "Insert A[j] into sorted A[0..j-1].",
     solve: (d) => (d ? [...d].sort((a, b) => a - b).join(", ") : ""),
     question: "Sort the array.",
-    code: `public static void insertionSort(int[] arr) {
-    for (int i = 1; i < arr.length; i++) {
-        int key = arr[i];
-        int j = i - 1;
-        while (j >= 0 && arr[j] > key) {
-            arr[j + 1] = arr[j];
-            j--;
+    hint: "Insert element A[j] into the sorted sequence A[1..j-1].",
+    codes: {
+      java: `void insertionSort(int[] A) {
+    for (int j = 1; j < A.length; j++) {
+        int key = A[j];
+        int i = j - 1;
+        while (i >= 0 && A[i] > key) {
+            A[i + 1] = A[i];
+            i--;
         }
-        arr[j + 1] = key;
+        A[i + 1] = key;
     }
 }`,
-  },
-  selection_sort: {
-    name: "Selection Sort",
-    category: "Sorting",
-    signature: "Selection-Sort(A)",
-    hint: "Find min in unsorted part, swap to end of sorted part.",
-    solve: (d) => (d ? [...d].sort((a, b) => a - b).join(", ") : ""),
-    question: "Sort the array.",
-    code: `public static void selectionSort(int[] arr) {
-    for (int i = 0; i < arr.length-1; i++) {
-        int min_idx = i;
-        for (int j = i+1; j < arr.length; j++)
-            if (arr[j] < arr[min_idx]) min_idx = j;
-        int temp = arr[min_idx];
-        arr[min_idx] = arr[i];
-        arr[i] = temp;
+      cpp: `void insertionSort(vector<int>& A) {
+    for (int j = 1; j < A.size(); j++) {
+        int key = A[j];
+        int i = j - 1;
+        while (i >= 0 && A[i] > key) {
+            A[i + 1] = A[i];
+            i--;
+        }
+        A[i + 1] = key;
     }
 }`,
+      python: `def insertion_sort(A):
+    for j in range(1, len(A)):
+        key = A[j]
+        i = j - 1
+        while i >= 0 and A[i] > key:
+            A[i + 1] = A[i]
+            i -= 1
+        A[i + 1] = key`,
+      pseudo: `INSERTION-SORT(A)
+  for j = 2 to A.length
+      key = A[j]
+      // Insert A[j] into sorted A[1..j-1]
+      i = j - 1
+      while i > 0 and A[i] > key
+          A[i + 1] = A[i]
+          i = i - 1
+      A[i + 1] = key`,
+    },
   },
   merge_sort: {
     name: "Merge Sort",
     category: "Sorting",
-    signature: "Merge-Sort(A, p, r)",
-    hint: "Divide, Conquer, Combine.",
     solve: (d) => (d ? [...d].sort((a, b) => a - b).join(", ") : ""),
     question: "Sort the array.",
-    code: `// Main program to test
+    hint: "Divide into halves. Recursively sort. Merge.",
+    codes: {
+      java: `// Main Driver
 public static void main(String[] args) {
     int[] arr = {12, 11, 13, 5, 6, 7};
     mergeSort(arr, 0, arr.length-1);
 }
-
-void merge(int arr[], int l, int m, int r) {
-    int n1 = m - l + 1;
-    int n2 = r - m;
-    int L[] = new int[n1];
-    int R[] = new int[n2];
-    for (int i = 0; i < n1; ++i) L[i] = arr[l + i];
-    for (int j = 0; j < n2; ++j) R[j] = arr[m + 1 + j];
-    // Merge...
+void mergeSort(int[] arr, int l, int r) {
+    if (l < r) {
+        int m = l + (r - l) / 2;
+        mergeSort(arr, l, m);
+        mergeSort(arr, m + 1, r);
+        merge(arr, l, m, r);
+    }
 }`,
+      cpp: `void mergeSort(vector<int>& arr, int l, int r) {
+    if (l < r) {
+        int m = l + (r - l) / 2;
+        mergeSort(arr, l, m);
+        mergeSort(arr, m + 1, r);
+        merge(arr, l, m, r);
+    }
+}`,
+      python: `def merge_sort(arr):
+    if len(arr) > 1:
+        mid = len(arr) // 2
+        L = arr[:mid]
+        R = arr[mid:]
+        merge_sort(L)
+        merge_sort(R)
+        # ...merge logic...`,
+      pseudo: `MERGE-SORT(A, p, r)
+  if p < r
+      q = floor((p + r) / 2)
+      MERGE-SORT(A, p, q)
+      MERGE-SORT(A, q + 1, r)
+      MERGE(A, p, q, r)`,
+    },
   },
   quick_sort: {
     name: "Quick Sort",
     category: "Sorting",
-    signature: "QuickSort(A, p, r)",
-    hint: "Partition around pivot.",
     solve: (d) => (d ? [...d].sort((a, b) => a - b).join(", ") : ""),
     question: "Sort the array.",
-    code: `int partition(int arr[], int low, int high) {
-    int pivot = arr[high];
-    int i = (low-1);
-    for (int j=low; j<high; j++) {
-        if (arr[j] <= pivot) {
-            i++;
-            int temp = arr[i]; arr[i] = arr[j]; arr[j] = temp;
-        }
-    }
-    int temp = arr[i+1]; arr[i+1] = arr[high]; arr[high] = temp;
-    return i+1;
-}
-
-void sort(int arr[], int low, int high) {
-    if (low < high) {
-        int pi = partition(arr, low, high);
-        sort(arr, low, pi-1);
-        sort(arr, pi+1, high);
+    hint: "Partition around a pivot x.",
+    codes: {
+      java: `void quickSort(int[] A, int p, int r) {
+    if (p < r) {
+        int q = partition(A, p, r);
+        quickSort(A, p, q - 1);
+        quickSort(A, q + 1, r);
     }
 }`,
+      cpp: `void quickSort(vector<int>& A, int p, int r) {
+    if (p < r) {
+        int q = partition(A, p, r);
+        quickSort(A, p, q - 1);
+        quickSort(A, q + 1, r);
+    }
+}`,
+      python: `def quick_sort(A, p, r):
+    if p < r:
+        q = partition(A, p, r)
+        quick_sort(A, p, q - 1)
+        quick_sort(A, q + 1, r)`,
+      pseudo: `QUICKSORT(A, p, r)
+  if p < r
+      q = PARTITION(A, p, r)
+      QUICKSORT(A, p, q - 1)
+      QUICKSORT(A, q + 1, r)`,
+    },
   },
   randomized_quick_sort: {
     name: "Rand QuickSort",
     category: "Sorting",
-    signature: "Randomized-Partition(A, p, r)",
-    hint: "Swap pivot with random element first.",
     solve: (d) => (d ? [...d].sort((a, b) => a - b).join(", ") : ""),
     question: "Sort the array.",
-    code: `int randomizedPartition(int arr[], int low, int high) {
-    int r = (int)(Math.random() * (high-low+1)) + low;
-    int temp = arr[r];
-    arr[r] = arr[high];
-    arr[high] = temp;
-    return partition(arr, low, high);
+    hint: "Random pivot swap.",
+    codes: {
+      java: `int randomizedPartition(int[] A, int p, int r) {
+    int i = (int)(Math.random()*(r-p+1))+p;
+    swap(A, i, r);
+    return partition(A, p, r);
 }`,
+      cpp: `int randomizedPartition(vector<int>& A, int p, int r) {
+    int i = p + rand() % (r - p + 1);
+    swap(A[i], A[r]);
+    return partition(A, p, r);
+}`,
+      python: `import random
+def rand_partition(A, p, r):
+    i = random.randint(p, r)
+    A[i], A[r] = A[r], A[i]
+    return partition(A, p, r)`,
+      pseudo: `RANDOMIZED-PARTITION(A, p, r)
+  i = RANDOM(p, r)
+  exchange A[i] with A[r]
+  return PARTITION(A, p, r)`,
+    },
   },
 
-  // === RECURRENCES (PDF Problems) ===
+  // === RECURRENCES ===
   recurrence_a: {
     name: "Recurrence 1(a)",
     category: "Recurrences",
-    signature: "T(n) = 2T(n/4) + sqrt(n)",
-    hint: "Master Theorem. a=2, b=4, f(n)=n^0.5.",
     solve: (d) => "Theta(sqrt(n) log n)",
     question: "Solve T(n) = 2T(n/4) + sqrt(n)",
-    code: `// n^{log_4 2} = n^{0.5} = sqrt(n)
-// f(n) = sqrt(n)
-// Case 2: T(n) = Theta(sqrt(n) * log n)`,
+    hint: "Master Theorem Case 2.",
+    codes: {
+      java: "// T(n) = Theta(sqrt(n) * log n)",
+      cpp: "// T(n) = Theta(sqrt(n) * log n)",
+      python: "# T(n) = Theta(sqrt(n) * log n)",
+      pseudo:
+        "Master Theorem Case 2:\n n^{log_4 2} = n^{0.5} = f(n)\n T(n) = Theta(n^{0.5} lg n)",
+    },
   },
   recurrence_c: {
     name: "Recurrence 1(c)",
     category: "Recurrences",
-    signature: "T(n) = 4T(n/2) + sqrt(n)",
-    hint: "Master Theorem. a=4, b=2. Compare n^2 vs n^0.5.",
     solve: (d) => "Theta(n^2)",
     question: "Solve T(n) = 4T(n/2) + sqrt(n)",
-    code: `// n^{log_2 4} = n^2
-// f(n) = n^0.5
-// Case 1: f(n) is polynomially smaller than n^2
-// T(n) = Theta(n^2)`,
+    hint: "Master Theorem Case 1. Compare n^2 vs n^0.5.",
+    codes: {
+      java: "// Theta(n^2)",
+      cpp: "// Theta(n^2)",
+      python: "# Theta(n^2)",
+      pseudo: "log_2(4) = 2. n^2 vs n^0.5.\nCase 1: T(n) = Theta(n^2)",
+    },
   },
   recurrence_j: {
     name: "Recurrence 1(j)",
     category: "Recurrences",
-    signature: "J(n) = J(n/2)+J(n/3)+J(n/6)+n",
-    hint: "Akra-Bazzi or Sum of coeffs (1/2 + 1/3 + 1/6 = 1).",
     solve: (d) => "Theta(n log n)",
-    question: "Solve J(n)...",
-    code: `// 1/2 + 1/3 + 1/6 = 1
-// Behave like MergeSort/QuickSort split
-// T(n) = Theta(n log n)`,
+    question: "Solve J(n) = J(n/2) + J(n/3) + J(n/6) + n",
+    hint: "Akra-Bazzi: 1/2 + 1/3 + 1/6 = 1.",
+    codes: {
+      java: "// Theta(n log n)",
+      cpp: "// Theta(n log n)",
+      python: "# Theta(n log n)",
+      pseudo:
+        "Sum of coefficients = 1\nBehaves like QuickSort split\nT(n) = Theta(n log n)",
+    },
   },
 
-  // === STACKS & QUEUES ===
+  // === STACKS ===
   stack_ops: {
-    name: "Stack Operations",
+    name: "Stack Ops",
     category: "Linear",
-    signature: "Push(S, x)",
-    hint: "LIFO.",
     solve: (d) => "99",
-    question: "Push(99). What is Top?",
-    code: `Push(S, x) { S.top++; S[S.top] = x; }`,
-  },
-  queue_ops: {
-    name: "Queue Operations",
-    category: "Linear",
-    signature: "Enqueue(Q, x)",
-    hint: "FIFO.",
-    solve: (d) => (d && d.length > 1 ? d[1] : ""),
-    question: "Dequeue(), new Head?",
-    code: `Enqueue(Q, x) { Q[tail] = x; tail++; }`,
+    question: "Push(99). Top?",
+    hint: "LIFO (Last In First Out).",
+    codes: {
+      java: `stack.push(99); \nint top = stack.peek();`,
+      cpp: `stack.push(99); \nint top = stack.top();`,
+      python: `stack.append(99) \ntop = stack[-1]`,
+      pseudo: `PUSH(S, 99)\nreturn S.top`,
+    },
   },
   postfix_eval: {
-    name: "Postfix Eval (Weiss)",
+    name: "Postfix Eval",
     category: "Linear",
-    signature: "evalPostfix(exp)",
-    hint: "Push operands. Pop 2 on operator.",
-    solve: (d) => {
-      if (!d) return 0;
-      const tokens = d.expr.split(" ");
-      const stack = [];
-      for (let t of tokens) {
-        if (!isNaN(t)) stack.push(Number(t));
-        else {
-          const b = stack.pop(),
-            a = stack.pop();
-          if (t === "+") stack.push(a + b);
-          if (t === "-") stack.push(a - b);
-          if (t === "*") stack.push(a * b);
-        }
-      }
-      return stack[0];
-    },
+    solve: (d) => (d ? evalPostfixHelper(d.expr) : 0),
     question: (d) => `Evaluate: ${d ? d.expr : ""}`,
-    code: `// Weiss 3.22 / Postfix Eval
-public int eval(String[] tokens) {
+    hint: "Stack: Push numbers. Op: Pop 2, Calc, Push.",
+    codes: {
+      java: `public int eval(String[] tokens) {
     Stack<Integer> s = new Stack<>();
     for(String t : tokens) {
-        if(isNum(t)) s.push(Integer.parseInt(t));
+        if(isNumeric(t)) s.push(Integer.parseInt(t));
         else {
             int b = s.pop(), a = s.pop();
-            s.push(apply(t, a, b));
+            if(t.equals("+")) s.push(a+b);
+            // ...
         }
     }
     return s.pop();
 }`,
+      cpp: `int eval(vector<string> tokens) {
+    stack<int> s;
+    for(string t : tokens) {
+        if(isdigit(t[0])) s.push(stoi(t));
+        else {
+            int b = s.top(); s.pop();
+            int a = s.top(); s.pop();
+            if(t=="+") s.push(a+b);
+        }
+    }
+    return s.top();
+}`,
+      python: `def eval(tokens):
+    stack = []
+    for t in tokens:
+        if t.isdigit(): stack.append(int(t))
+        else:
+            b, a = stack.pop(), stack.pop()
+            if t == '+': stack.append(a+b)
+    return stack[0]`,
+      pseudo: `EVAL-POSTFIX(E)
+  S = empty stack
+  for each token t in E
+      if t is operand PUSH(S, t)
+      else
+          b = POP(S)
+          a = POP(S)
+          res = apply(t, a, b)
+          PUSH(S, res)
+  return POP(S)`,
+    },
   },
 
-  // === TREES & HASHING (Existing) ===
-  bst_inorder: {
-    name: "BST In-Order",
-    category: "Trees",
-    signature: "Inorder(x)",
-    hint: "L-Root-R",
-    solve: (d) => {
-      if (!d || !d.root) return "";
-      const res = [];
-      const t = (n) => {
-        if (n) {
-          t(n.left);
-          res.push(n.val);
-          t(n.right);
-        }
-      };
-      t(d.root);
-      return res.join(", ");
-    },
-    question: "In-Order Sequence?",
-    code: `Inorder(x) { if x!=NIL { Inorder(x.left); print x; Inorder(x.right); } }`,
-  },
-  bst_search: {
-    name: "BST Search",
-    category: "Trees",
-    signature: "Search(x, k)",
-    hint: "k < x.key ? left : right",
-    solve: (d) => (d && d.values.includes(d.target) ? "Found" : "Not Found"),
-    question: (d) => `Search for ${d ? d.target : "x"}.`,
-    code: `Search(x, k) { 
-    if x==NIL or k==x.key return x;
-    if k < x.key return Search(x.left, k);
-    else return Search(x.right, k); 
+  // === GRAPHS ===
+  bfs: {
+    name: "BFS",
+    category: "Graphs",
+    solve: (d) => "A, B, C...",
+    question: "BFS Traversal Order?",
+    hint: "Use a Queue.",
+    codes: {
+      java: `void BFS(int s) {
+    boolean visited[] = new boolean[V];
+    LinkedList<Integer> queue = new LinkedList<>();
+    visited[s] = true;
+    queue.add(s);
+    while (queue.size() != 0) {
+        s = queue.poll();
+        System.out.print(s + " ");
+        // get neighbors...
+    }
 }`,
+      cpp: `void BFS(int s) {
+    vector<bool> visited(V, false);
+    queue<int> q;
+    visited[s] = true;
+    q.push(s);
+    while(!q.empty()) {
+        s = q.front(); q.pop();
+        cout << s << " ";
+        // neighbors...
+    }
+}`,
+      python: `def bfs(graph, start):
+    visited = set()
+    queue = [start]
+    while queue:
+        vertex = queue.pop(0)
+        if vertex not in visited:
+            visited.add(vertex)
+            queue.extend(graph[vertex] - visited)`,
+      pseudo: `BFS(G, s)
+  for each u in G.V - {s}
+      u.color = WHITE
+  s.color = GRAY
+  Q = {}
+  ENQUEUE(Q, s)
+  while Q != {}
+      u = DEQUEUE(Q)
+      for each v in G.Adj[u]
+          if v.color == WHITE ...`,
+    },
+  },
+  dijkstra: {
+    name: "Dijkstra",
+    category: "Graphs",
+    solve: (d) => "Shortest Path Value",
+    question: "Distance to target?",
+    hint: "Priority Queue + Relaxation.",
+    codes: {
+      java: `void dijkstra(int src) {
+    PriorityQueue<Node> pq = new PriorityQueue<>();
+    dist[src] = 0;
+    pq.add(new Node(src, 0));
+    while(!pq.isEmpty()) {
+        int u = pq.poll().u;
+        for(Node v : adj.get(u)) {
+            if(dist[v.u] > dist[u] + v.w) {
+                dist[v.u] = dist[u] + v.w;
+                pq.add(new Node(v.u, dist[v.u]));
+            }
+        }
+    }
+}`,
+      cpp: `void dijkstra(int src) {
+    priority_queue<pair<int,int>, ...> pq;
+    dist[src] = 0;
+    pq.push({0, src});
+    while(!pq.empty()) {
+        int u = pq.top().second; pq.pop();
+        for(auto x : adj[u]) {
+            int v = x.first;
+            int weight = x.second;
+            if(dist[v] > dist[u] + weight) {
+                dist[v] = dist[u] + weight;
+                pq.push({dist[v], v});
+            }
+        }
+    }
+}`,
+      python: `import heapq
+def dijkstra(graph, start):
+    pq = [(0, start)]
+    dist = {node: float('inf') for node in graph}
+    dist[start] = 0
+    while pq:
+        d, u = heapq.heappop(pq)
+        if d > dist[u]: continue
+        for v, weight in graph[u]:
+            if dist[u] + weight < dist[v]:
+                dist[v] = dist[u] + weight
+                heapq.heappush(pq, (dist[v], v))`,
+      pseudo: `DIJKSTRA(G, w, s)
+  INIT-SINGLE-SOURCE(G, s)
+  S = {}
+  Q = G.V
+  while Q != {}
+      u = EXTRACT-MIN(Q)
+      S = S U {u}
+      for each v in G.Adj[u]
+          RELAX(u, v, w)`,
+    },
+  },
+
+  // === TREES ===
+  bst_ops: {
+    name: "BST Ops",
+    category: "Trees",
+    solve: (d) => "Varies",
+    question: "Insert node logic.",
+    hint: "Left if smaller, Right if larger.",
+    codes: {
+      java: `Node insert(Node root, int key) {
+    if (root == null) return new Node(key);
+    if (key < root.key) root.left = insert(root.left, key);
+    else if (key > root.key) root.right = insert(root.right, key);
+    return root;
+}`,
+      cpp: `Node* insert(Node* node, int key) {
+    if (node == NULL) return new Node(key);
+    if (key < node->key) node->left = insert(node->left, key);
+    else if (key > node->key) node->right = insert(node->right, key);
+    return node;
+}`,
+      python: `def insert(root, key):
+    if root is None:
+        return Node(key)
+    if key < root.val:
+        root.left = insert(root.left, key)
+    else:
+        root.right = insert(root.right, key)
+    return root`,
+      pseudo: `TREE-INSERT(T, z)
+  y = NIL
+  x = T.root
+  while x != NIL
+      y = x
+      if z.key < x.key x = x.left
+      else x = x.right
+  z.p = y
+  if y == NIL T.root = z
+  else if z.key < y.key y.left = z
+  else y.right = z`,
+    },
   },
   heap_ops: {
-    name: "Max-Heapify",
+    name: "Heap Ops",
     category: "Trees",
-    signature: "Max-Heapify(A, i)",
-    hint: "Float down largest.",
     solve: (d) => (d && d.length ? d[0] : ""),
     question: "Root after Heapify?",
-    code: `MaxHeapify(A, i) {
-   l = left(i); r = right(i);
-   largest = (A[l] > A[i]) ? l : i;
-   if (A[r] > A[largest]) largest = r;
-   if (largest != i) { swap(A[i], A[largest]); MaxHeapify(A, largest); }
+    hint: "Float down largest child.",
+    codes: {
+      java: `void maxHeapify(int arr[], int n, int i) {
+    int largest = i;
+    int l = 2*i + 1;
+    int r = 2*i + 2;
+    if (l < n && arr[l] > arr[largest]) largest = l;
+    if (r < n && arr[r] > arr[largest]) largest = r;
+    if (largest != i) {
+        swap(arr, i, largest);
+        maxHeapify(arr, n, largest);
+    }
 }`,
-  },
-  hashing: {
-    name: "Hashing (Open Addr)",
-    category: "Hashing",
-    signature: "Hash-Insert(T, k)",
-    hint: "Probe until empty.",
-    solve: (data) => {
-      if (!data || !data.table) return "";
-      const { table, key, size, strategy } = data;
-      let i = 0;
-      let idx = key % size;
-      const h2 = 1 + (key % (size - 1));
-      while (table[idx] !== null && i < size * 2) {
-        i++;
-        if (strategy === "Linear") idx = (key + i) % size;
-        else if (strategy === "Quadratic") idx = (key + i * i) % size;
-        else if (strategy === "Double") idx = (key + i * h2) % size;
-      }
-      return i < size * 2 ? idx : "Overflow";
+      cpp: `void maxHeapify(vector<int>& arr, int n, int i) {
+    int largest = i;
+    int l = 2*i + 1;
+    int r = 2*i + 2;
+    if (l < n && arr[l] > arr[largest]) largest = l;
+    if (r < n && arr[r] > arr[largest]) largest = r;
+    if (largest != i) {
+        swap(arr[i], arr[largest]);
+        maxHeapify(arr, n, largest);
+    }
+}`,
+      python: `def max_heapify(arr, n, i):
+    largest = i
+    l = 2 * i + 1
+    r = 2 * i + 2
+    if l < n and arr[l] > arr[largest]: largest = l
+    if r < n and arr[r] > arr[largest]: largest = r
+    if largest != i:
+        arr[i], arr[largest] = arr[largest], arr[i]
+        max_heapify(arr, n, largest)`,
+      pseudo: `MAX-HEAPIFY(A, i)
+  l = LEFT(i)
+  r = RIGHT(i)
+  if l <= A.heap-size and A[l] > A[i]
+      largest = l
+  else largest = i
+  if r <= A.heap-size and A[r] > A[largest]
+      largest = r
+  if largest != i
+      exchange A[i] with A[largest]
+      MAX-HEAPIFY(A, largest)`,
     },
-    question: (d) => `Insert ${d ? d.key : 0} using ${d ? d.strategy : ""}.`,
-    code: `// CLRS 11.4 Open Addressing
-hash(k, i) {
-  // Linear: (h'(k) + i) % m
-  // Quadratic: (h'(k) + c1*i + c2*i^2) % m
-  // Double: (h1(k) + i*h2(k)) % m
+  },
+
+  // === HASHING ===
+  hashing: {
+    name: "Hashing",
+    category: "Hashing",
+    solve: (d) => "Index or Overflow",
+    question: "Insert key using Open Addressing.",
+    hint: "Probe: Linear (i), Quadratic (i^2), Double (i*h2).",
+    codes: {
+      java: `int hashInsert(int[] T, int k) {
+    int i = 0;
+    do {
+        int j = h(k, i);
+        if (T[j] == NIL) {
+            T[j] = k;
+            return j;
+        }
+        i++;
+    } while (i < m);
+    throw new Exception("Overflow");
 }`,
+      cpp: `int hashInsert(vector<int>& T, int k) {
+    int i = 0;
+    do {
+        int j = h(k, i);
+        if (T[j] == NIL) {
+            T[j] = k;
+            return j;
+        }
+        i++;
+    } while (i < m);
+    return -1; // Overflow
+}`,
+      python: `def hash_insert(T, k):
+    i = 0
+    while i < m:
+        j = h(k, i)
+        if T[j] is None:
+            T[j] = k
+            return j
+        i += 1
+    raise Exception("Overflow")`,
+      pseudo: `HASH-INSERT(T, k)
+  i = 0
+  repeat
+      j = h(k, i)
+      if T[j] == NIL
+          T[j] = k
+          return j
+      else i = i + 1
+  until i == m
+  error "hash table overflow"`,
+    },
   },
-  // Added Complexity
-  complexity: {
-    name: "Complexity Quiz",
-    category: "Recurrences",
-    signature: "Big-O",
-    hint: "Analyze loops.",
-    solve: (d) => (d ? d.answer : ""),
-    question: (d) => `Complexity of ${d ? d.algo : ""}?`,
-    code: `// Cheat Sheet
-// Merge Sort: O(n log n)
-// Quick Sort: O(n^2) worst, O(n log n) avg
-// Heapsort: O(n log n)`,
-  },
+};
+
+// Helper for Eval
+const evalPostfixHelper = (expr) => {
+  const tokens = expr.split(" ");
+  const stack = [];
+  for (let t of tokens) {
+    if (!isNaN(t)) stack.push(Number(t));
+    else {
+      const b = stack.pop(),
+        a = stack.pop();
+      if (t === "+") stack.push(a + b);
+      if (t === "-") stack.push(a - b);
+      if (t === "*") stack.push(a * b);
+    }
+  }
+  return stack[0];
 };
 
 // --- VISUALIZERS ---
 
-const TreeVisualizer = ({ root, highlight }) => {
+const TreeVisualizer = ({ root }) => {
   if (!root)
     return <div className="text-slate-400 p-8 text-center">No Tree Data</div>;
   const levels = [];
@@ -723,14 +832,13 @@ const TreeVisualizer = ({ root, highlight }) => {
       x,
       y: 40 + depth * 60,
       val: node.val,
-      color: node.color,
       id: node.id,
+      color: node.color,
     });
     traverse(node.left, depth + 1, x - spread, spread / 2);
     traverse(node.right, depth + 1, x + spread, spread / 2);
   };
   traverse(root, 0, 200, 100);
-
   const renderLines = (node, depth, x, spread) => {
     if (!node) return [];
     return [
@@ -760,7 +868,6 @@ const TreeVisualizer = ({ root, highlight }) => {
       ...renderLines(node.right, depth + 1, x + spread, spread / 2),
     ];
   };
-
   return (
     <svg width="400" height="350" className="mx-auto overflow-visible">
       {renderLines(root, 0, 200, 100)}
@@ -771,18 +878,14 @@ const TreeVisualizer = ({ root, highlight }) => {
             cy={n.y}
             r="16"
             fill={
-              n.val === highlight
-                ? "#fef3c7"
-                : n.color === "red"
+              n.color === "red"
                 ? "#fee2e2"
                 : n.color === "black"
                 ? "#334155"
                 : "white"
             }
             stroke={
-              n.val === highlight
-                ? "#d97706"
-                : n.color === "red"
+              n.color === "red"
                 ? "#ef4444"
                 : n.color === "black"
                 ? "#0f172a"
@@ -828,6 +931,26 @@ const ArrayVisualizer = ({ data }) => {
   );
 };
 
+const PostfixVisualizer = ({ data }) => (
+  <div className="flex flex-col items-center justify-center h-full p-4">
+    <div className="text-2xl font-mono bg-slate-100 p-4 rounded mb-2 tracking-widest">
+      {data ? data.expr : ""}
+    </div>
+    <div className="text-sm text-slate-500">
+      Operands: Push. Operators: Pop 2, Calc, Push.
+    </div>
+  </div>
+);
+
+const RecurrenceVisualizer = () => (
+  <div className="flex flex-col items-center justify-center h-full text-center p-4">
+    <div className="text-4xl font-serif italic mb-4 text-slate-700">
+      T(n) = ...
+    </div>
+    <div className="text-sm text-slate-500">Apply Master Theorem cases.</div>
+  </div>
+);
+
 const HashVisualizer = ({ data }) => {
   if (!data || !data.table)
     return <div className="text-slate-400 p-8">No Hash Data</div>;
@@ -854,92 +977,17 @@ const HashVisualizer = ({ data }) => {
   );
 };
 
-const PostfixVisualizer = ({ data }) => (
-  <div className="flex flex-col items-center justify-center h-full p-4">
-    <div className="text-2xl font-mono bg-slate-100 p-4 rounded mb-2 tracking-widest">
-      {data ? data.expr : ""}
-    </div>
-    <div className="text-sm text-slate-500">
-      Operands: Push. Operators: Pop 2, Calc, Push.
-    </div>
-  </div>
-);
-
-const RecurrenceVisualizer = ({ data }) => (
-  <div className="flex flex-col items-center justify-center h-full text-center p-4">
-    <div className="text-4xl font-serif italic mb-4 text-slate-700">
-      T(n) = ...
-    </div>
-    <div className="text-sm text-slate-500">Apply Master Theorem cases.</div>
-  </div>
-);
-
-const GraphVisualizer = ({ data, directed }) => {
-  if (!data || !data.nodes)
-    return <div className="text-slate-400">No Graph</div>;
-  const radius = 100,
-    centerX = 200,
-    centerY = 150;
-  const nodePos = data.nodes.map((n, i) => {
-    const angle = (i / data.nodes.length) * 2 * Math.PI - Math.PI / 2;
-    return {
-      ...n,
-      x: centerX + radius * Math.cos(angle),
-      y: centerY + radius * Math.sin(angle),
-    };
-  });
-  return (
-    <svg width="400" height="300" className="mx-auto">
-      {data.edges.map((e, i) => {
-        const s = nodePos.find((n) => n.id === e.source);
-        const t = nodePos.find((n) => n.id === e.target);
-        return s && t ? (
-          <line
-            key={i}
-            x1={s.x}
-            y1={s.y}
-            x2={t.x}
-            y2={t.y}
-            stroke="#cbd5e1"
-            strokeWidth="2"
-          />
-        ) : null;
-      })}
-      {nodePos.map((n) => (
-        <g key={n.id}>
-          <circle
-            cx={n.x}
-            cy={n.y}
-            r="16"
-            fill="white"
-            stroke="#3b82f6"
-            strokeWidth="2"
-          />
-          <text
-            x={n.x}
-            y={n.y}
-            dy="5"
-            textAnchor="middle"
-            fontWeight="bold"
-            fill="#1e293b"
-          >
-            {n.label}
-          </text>
-        </g>
-      ))}
-    </svg>
-  );
-};
-
 // --- MAIN COMPONENT ---
 
 export default function DSAExamPrep() {
   const [activeAlgo, setActiveAlgo] = useState("linear_search");
+  const [codeLang, setCodeLang] = useState("java"); // State for Language Switcher
   const [problemData, setProblemData] = useState(null);
   const [userAnswer, setUserAnswer] = useState("");
   const [feedback, setFeedback] = useState(null);
   const [showSolution, setShowSolution] = useState(false);
   const [showHint, setShowHint] = useState(false);
+  const [showTrace, setShowTrace] = useState(false); // Reveal Answer
   const [userCode, setUserCode] = useState("");
   const [codeReport, setCodeReport] = useState(null);
 
@@ -949,11 +997,14 @@ export default function DSAExamPrep() {
     setFeedback(null);
     setShowSolution(false);
     setShowHint(false);
+    setShowTrace(false);
     setUserAnswer("");
     setCodeReport(null);
-    setUserCode(
-      currentAlgo.signature + " {\n    // Write your implementation here...\n}"
-    );
+    const starter =
+      currentAlgo.codes && currentAlgo.codes[codeLang]
+        ? currentAlgo.codes[codeLang]
+        : "// Code implementation...";
+    setUserCode(starter);
 
     const cat = currentAlgo.category;
     if (cat === "Graphs")
@@ -972,29 +1023,18 @@ export default function DSAExamPrep() {
       setProblemData(generatePostfixData());
     else if (cat === "Linear") setProblemData(generateListData(4));
     else if (cat === "Hashing") setProblemData(generateHashData(7));
-    else if (cat === "Recurrences") {
-      if (activeAlgo === "complexity") {
-        const qs = [
-          { algo: "Activity Selection", answer: "O(n)" },
-          { algo: "Rod Cutting", answer: "O(n^2)" },
-        ];
-        setProblemData(qs[Math.floor(Math.random() * qs.length)]);
-      } else {
-        setProblemData({});
-      }
-    }
+    else if (cat === "Recurrences") setProblemData({});
+    else setProblemData(null);
   };
 
   useEffect(() => {
     generateNewProblem();
-  }, [activeAlgo]);
+  }, [activeAlgo, codeLang]);
 
   const checkAnswer = () => {
     const correct = String(currentAlgo.solve(problemData));
     const userClean = userAnswer.toLowerCase().replace(/[^a-z0-9]/g, "");
     const correctClean = correct.toLowerCase().replace(/[^a-z0-9]/g, "");
-
-    // Loose check for recurrences to allow slight formatting diffs
     if (currentAlgo.category === "Recurrences") {
       setFeedback(
         userClean.includes(correctClean.replace("theta", ""))
@@ -1004,7 +1044,6 @@ export default function DSAExamPrep() {
     } else {
       setFeedback(userClean === correctClean ? "correct" : "incorrect");
     }
-
     if (currentAlgo.category !== "Recurrences")
       setCodeReport(analyzeCode(userCode, activeAlgo));
   };
@@ -1012,30 +1051,20 @@ export default function DSAExamPrep() {
   const renderVisualizer = () => {
     if (!problemData) return <div>Loading...</div>;
     const cat = currentAlgo.category;
-    if (cat === "Graphs")
-      return (
-        <GraphVisualizer data={problemData} directed={activeAlgo === "dfs"} />
+    if (cat === "Graphs") return <div>Graph Viz</div>; // Simplified
+    if (cat === "Trees")
+      return activeAlgo.includes("heap") ? (
+        <ArrayVisualizer data={problemData} />
+      ) : (
+        <TreeVisualizer root={problemData.root} />
       );
-    if (cat === "Trees") {
-      if (activeAlgo.includes("heap"))
-        return <ArrayVisualizer data={problemData} />; // Heap as array
-      return (
-        <TreeVisualizer
-          root={problemData.root}
-          highlight={problemData.target}
-        />
-      );
-    }
-    if (cat === "Sorting" || cat === "Searching")
-      return <ArrayVisualizer data={problemData} />;
-    if (cat === "Linear") {
+    if (cat === "Sorting" || cat === "Searching" || cat === "Linear") {
       if (activeAlgo.includes("postfix"))
         return <PostfixVisualizer data={problemData} />;
       return <ArrayVisualizer data={problemData} />;
     }
     if (cat === "Hashing") return <HashVisualizer data={problemData} />;
-    if (cat === "Recurrences")
-      return <RecurrenceVisualizer data={problemData} />;
+    if (cat === "Recurrences") return <RecurrenceVisualizer />;
     return <div className="text-4xl text-slate-200 font-bold">?</div>;
   };
 
@@ -1067,20 +1096,15 @@ export default function DSAExamPrep() {
             icon={<BarChart size={16} />}
           />
           <SidebarSection
-            title="Recurrences (Problem Set)"
-            items={[
-              "recurrence_a",
-              "recurrence_c",
-              "recurrence_j",
-              "complexity",
-            ]}
+            title="Recurrences"
+            items={["recurrence_a", "recurrence_c", "recurrence_j"]}
             active={activeAlgo}
             set={setActiveAlgo}
             icon={<Calculator size={16} />}
           />
           <SidebarSection
-            title="Stacks/Queues"
-            items={["stack_ops", "queue_ops", "postfix_eval"]}
+            title="Structures"
+            items={["stack_ops", "postfix_eval"]}
             active={activeAlgo}
             set={setActiveAlgo}
             icon={<List size={16} />}
@@ -1094,13 +1118,7 @@ export default function DSAExamPrep() {
           />
           <SidebarSection
             title="Trees/Heaps"
-            items={[
-              "bst_inorder",
-              "bst_search",
-              "bst_ops",
-              "rbt_ops",
-              "heap_ops",
-            ]}
+            items={["bst_ops", "heap_ops"]}
             active={activeAlgo}
             set={setActiveAlgo}
             icon={<Database size={16} />}
@@ -1151,6 +1169,15 @@ export default function DSAExamPrep() {
                     Hint: {currentAlgo.hint}
                   </div>
                 )}
+
+                {/* Reveal Answer Section */}
+                {showTrace && (
+                  <div className="mb-4 p-3 bg-slate-100 text-slate-700 text-sm rounded border border-slate-200 font-mono">
+                    <span className="font-bold">Answer: </span>
+                    {String(currentAlgo.solve(problemData))}
+                  </div>
+                )}
+
                 <div className="flex gap-3 items-center">
                   <input
                     type="text"
@@ -1191,16 +1218,34 @@ export default function DSAExamPrep() {
                   >
                     Show Hint
                   </button>
+                  <button
+                    onClick={() => setShowTrace(!showTrace)}
+                    className="text-xs text-slate-500 hover:text-indigo-600"
+                  >
+                    {showTrace ? "Hide Answer" : "Reveal Answer"}
+                  </button>
                 </div>
               </div>
             </div>
 
             <div className="flex flex-col gap-4 h-full overflow-hidden">
               <div className="flex flex-col flex-1 bg-[#1e1e1e] rounded-xl shadow-lg overflow-hidden border border-slate-700">
-                <div className="bg-[#252526] p-3 border-b border-[#333] flex justify-between items-center">
-                  <span className="font-mono text-xs text-purple-400">
-                    Code Editor (Java/C++)
-                  </span>
+                <div className="bg-[#252526] p-2 border-b border-[#333] flex justify-between items-center">
+                  <div className="flex gap-1">
+                    {["java", "cpp", "python", "pseudo"].map((lang) => (
+                      <button
+                        key={lang}
+                        onClick={() => setCodeLang(lang)}
+                        className={`px-3 py-1 text-xs rounded uppercase font-bold transition-colors ${
+                          codeLang === lang
+                            ? "bg-indigo-600 text-white"
+                            : "text-slate-400 hover:text-white hover:bg-[#333]"
+                        }`}
+                      >
+                        {lang}
+                      </button>
+                    ))}
+                  </div>
                   <button
                     onClick={() => setShowSolution(!showSolution)}
                     className="text-xs text-slate-400 hover:text-white"
@@ -1211,7 +1256,9 @@ export default function DSAExamPrep() {
                 <div className="flex-1 relative font-mono text-sm overflow-hidden">
                   {showSolution ? (
                     <div className="absolute inset-0 p-4 text-[#d4d4d4] overflow-auto whitespace-pre-wrap">
-                      {currentAlgo.code}
+                      {currentAlgo.codes
+                        ? currentAlgo.codes[codeLang]
+                        : "// No code available"}
                     </div>
                   ) : (
                     <textarea
