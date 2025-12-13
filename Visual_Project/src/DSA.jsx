@@ -84,7 +84,7 @@ const generateGraph = (numNodes = 5, directed = false, weighted = true) => {
     if (!directed) matrix[target][source] = weight;
     connected.add(target);
   }
-  return { nodes, edges, matrix };
+  return { nodes, edges, matrix, directed, weighted };
 };
 
 const generateBSTData = (count = 10) => {
@@ -721,6 +721,73 @@ DFS-VISIT(G, u)
  13. else y.right = z`,
     },
   },
+  // --- ADDED ROTATIONS FOR QC CSCI 313 ---
+  left_rotate: {
+    name: "Left Rotate",
+    category: "Trees",
+    solve: (d) => "Rotated",
+    question: "Implement Left-Rotate(T, x).",
+    hint: "x's right child becomes x's parent.",
+    codes: {
+      java: `void leftRotate(Node x) {
+    Node y = x.right;
+    x.right = y.left;
+    if (y.left != null) y.left.parent = x;
+    y.parent = x.parent;
+    if (x.parent == null) root = y;
+    else if (x == x.parent.left) x.parent.left = y;
+    else x.parent.right = y;
+    y.left = x;
+    x.parent = y;
+}`,
+      pseudo: `LEFT-ROTATE(T, x)
+ 1. y = x.right             // Set y
+ 2. x.right = y.left        // Turn y's left subtree into x's right subtree
+ 3. if y.left != NIL
+ 4.     y.left.p = x
+ 5. y.p = x.p               // Link x's parent to y
+ 6. if x.p == NIL
+ 7.     T.root = y
+ 8. elseif x == x.p.left
+ 9.     x.p.left = y
+10. else x.p.right = y
+11. y.left = x              // Put x on y's left
+12. x.p = y`,
+    },
+  },
+  right_rotate: {
+    name: "Right Rotate",
+    category: "Trees",
+    solve: (d) => "Rotated",
+    question: "Implement Right-Rotate(T, y).",
+    hint: "y's left child becomes y's parent.",
+    codes: {
+      java: `void rightRotate(Node y) {
+    Node x = y.left;
+    y.left = x.right;
+    if (x.right != null) x.right.parent = y;
+    x.parent = y.parent;
+    if (y.parent == null) root = x;
+    else if (y == y.parent.right) y.parent.right = x;
+    else y.parent.left = x;
+    x.right = y;
+    y.parent = x;
+}`,
+      pseudo: `RIGHT-ROTATE(T, y)
+ 1. x = y.left              // Set x
+ 2. y.left = x.right        // Turn x's right subtree into y's left subtree
+ 3. if x.right != NIL
+ 4.     x.right.p = y
+ 5. x.p = y.p               // Link y's parent to x
+ 6. if y.p == NIL
+ 7.     T.root = x
+ 8. elseif y == y.p.right
+ 9.     y.p.right = x
+10. else y.p.left = x
+11. x.right = y             // Put y on x's right
+12. y.p = x`,
+    },
+  },
   rbt_ops: {
     name: "RBT Ops",
     category: "Trees",
@@ -1000,6 +1067,99 @@ const HashVisualizer = ({ data }) => {
   );
 };
 
+// --- NEW GRAPH VISUALIZER FOR CSCI 313 ---
+const GraphVisualizer = ({ data }) => {
+  if (!data || !data.nodes) return <div>No Graph Data</div>;
+  const { nodes, edges } = data;
+  const width = 400;
+  const height = 300;
+  const cx = 200;
+  const cy = 150;
+  const r = 100;
+
+  // Simple circular layout for nodes
+  const getNodePos = (i, total) => {
+    const angle = (i / total) * 2 * Math.PI - Math.PI / 2;
+    return {
+      x: cx + r * Math.cos(angle),
+      y: cy + r * Math.sin(angle),
+    };
+  };
+
+  return (
+    <svg width={width} height={height} className="mx-auto overflow-visible">
+      <defs>
+        <marker
+          id="arrowhead"
+          markerWidth="10"
+          markerHeight="7"
+          refX="24"
+          refY="3.5"
+          orient="auto"
+        >
+          <polygon points="0 0, 10 3.5, 0 7" fill="#cbd5e1" />
+        </marker>
+      </defs>
+      {edges.map((e, i) => {
+        const start = getNodePos(e.source, nodes.length);
+        const end = getNodePos(e.target, nodes.length);
+        return (
+          <g key={`e-${i}`}>
+            <line
+              x1={start.x}
+              y1={start.y}
+              x2={end.x}
+              y2={end.y}
+              stroke="#cbd5e1"
+              strokeWidth="2"
+              markerEnd={data.directed ? "url(#arrowhead)" : ""}
+            />
+            {e.weight > 1 && (
+              <text
+                x={(start.x + end.x) / 2}
+                y={(start.y + end.y) / 2}
+                dy="-5"
+                textAnchor="middle"
+                fill="#ef4444"
+                fontSize="10"
+                fontWeight="bold"
+              >
+                {e.weight}
+              </text>
+            )}
+          </g>
+        );
+      })}
+      {nodes.map((n, i) => {
+        const pos = getNodePos(i, nodes.length);
+        return (
+          <g key={`n-${n.id}`}>
+            <circle
+              cx={pos.x}
+              cy={pos.y}
+              r="16"
+              fill="white"
+              stroke="#3b82f6"
+              strokeWidth="2"
+            />
+            <text
+              x={pos.x}
+              y={pos.y}
+              dy="5"
+              textAnchor="middle"
+              fontSize="12"
+              fontWeight="bold"
+              fill="#1e40af"
+            >
+              {n.label}
+            </text>
+          </g>
+        );
+      })}
+    </svg>
+  );
+};
+
 // --- MAIN COMPONENT ---
 
 export default function DSAExamPrep() {
@@ -1044,7 +1204,9 @@ export default function DSAExamPrep() {
 
     const cat = currentAlgo.category;
     if (cat === "Graphs")
-      setProblemData(generateGraph(5, activeAlgo === "dfs", true));
+      setProblemData(
+        generateGraph(5, true, true)
+      ); // defaulting to directed for viz
     else if (cat === "Trees")
       setProblemData(
         activeAlgo.includes("heap")
@@ -1110,7 +1272,8 @@ export default function DSAExamPrep() {
   const renderVisualizer = () => {
     if (!problemData) return <div>Loading...</div>;
     const cat = currentAlgo.category;
-    if (cat === "Graphs") return <div>Graph Viz (Nodes & Edges)</div>;
+    // --- UPDATED: Use new GraphVisualizer ---
+    if (cat === "Graphs") return <GraphVisualizer data={problemData} />;
     if (cat === "Trees")
       return activeAlgo.includes("heap") ? (
         <ArrayVisualizer data={problemData} />
@@ -1177,7 +1340,13 @@ export default function DSAExamPrep() {
           />
           <SidebarSection
             title="Trees/Heaps"
-            items={["bst_ops", "rbt_ops", "heap_ops"]}
+            items={[
+              "bst_ops",
+              "left_rotate",
+              "right_rotate",
+              "rbt_ops",
+              "heap_ops",
+            ]}
             active={activeAlgo}
             set={setActiveAlgo}
             icon={<Database size={16} />}
