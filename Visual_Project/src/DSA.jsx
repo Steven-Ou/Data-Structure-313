@@ -172,28 +172,30 @@ const algorithms = {
     question: (d) => `Find index of ${d ? d[Math.floor(d.length / 2)] : "x"}.`,
     hint: "Iterate from 0 to n. Return index if found.",
     codes: {
-      java: `public int linearSearch(int[] arr, int x) {
-    for (int i = 0; i < arr.length; i++) {
-        if (arr[i] == x) return i;
+      java: `public static int linear_search(int arr[], int target){
+    for(int i = 0; i < arr.length; i++){
+        if(arr[i] == target){
+            return i;
+        }
     }
     return -1;
 }`,
-      cpp: `int linearSearch(vector<int>& arr, int x) {
+      cpp: `int linearSearch(vector<int>& arr, int target) {
     for (int i = 0; i < arr.size(); i++) {
-        if (arr[i] == x) return i;
+        if (arr[i] == target) return i;
     }
     return -1;
 }`,
-      python: `def linear_search(arr, x):
+      python: `def linear_search(arr, target):
     for i in range(len(arr)):
-        if arr[i] == x:
+        if arr[i] == target:
             return i
     return -1`,
       pseudo: `LINEAR-SEARCH(A, x)
-  for i = 1 to A.length
-      if A[i] == x
-          return i
-  return NIL`,
+  1. for i = 1 to A.length
+  2.     if A[i] == x
+  3.         return i
+  4. return NIL`,
     },
   },
   binary_search: {
@@ -203,19 +205,54 @@ const algorithms = {
     question: "Index of median element in sorted list?",
     hint: "Sorted input required. Check mid. Recurse Left or Right.",
     codes: {
-      java: `public int binarySearch(int[] arr, int x) {
-    int l = 0, r = arr.length - 1;
-    while (l <= r) {
-        int mid = l + (r - l) / 2;
-        if (arr[mid] == x) return mid;
-        if (arr[mid] < x) l = mid + 1;
-        else r = mid - 1;
+      java: `public static int binary_Search(int arr[], int n, int target ){
+    int low = 0;
+    int high = n-1;
+    while(low <= high){
+        int mid = low + (high-low)/2;
+        if(arr[mid] == target){
+            return mid;
+        }else if(arr[mid] < target){
+            low = mid + 1;
+        }else{
+            high = mid - 1;
+        }
     }
     return -1;
 }`,
-      cpp: `int binarySearch(vector<int>& arr, int x) { ... }`,
-      python: `def binary_search(arr, x): ...`,
-      pseudo: `BINARY-SEARCH(A, x)\n...`,
+      cpp: `int binarySearch(vector<int>& arr, int target) {
+    int low = 0, high = arr.size() - 1;
+    while (low <= high) {
+        int mid = low + (high - low) / 2;
+        if (arr[mid] == target) return mid;
+        else if (arr[mid] < target) low = mid + 1;
+        else high = mid - 1;
+    }
+    return -1;
+}`,
+      python: `def binary_search(arr, target):
+    low, high = 0, len(arr) - 1
+    while low <= high:
+        mid = (low + high) // 2
+        if arr[mid] == target:
+            return mid
+        elif arr[mid] < target:
+            low = mid + 1
+        else:
+            high = mid - 1
+    return -1`,
+      pseudo: `BINARY-SEARCH(A, v)
+  1. low = 1
+  2. high = A.length
+  3. while low <= high
+  4.     mid = floor((low + high) / 2)
+  5.     if A[mid] == v
+  6.         return mid
+  7.     elseif A[mid] < v
+  8.         low = mid + 1
+  9.     else
+ 10.         high = mid - 1
+ 11. return NIL`,
     },
   },
 
@@ -227,20 +264,45 @@ const algorithms = {
     question: "Sort the array.",
     hint: "Insert element A[j] into the sorted sequence A[1..j-1].",
     codes: {
-      java: `void insertionSort(int[] A) {
-    for (int j = 1; j < A.length; j++) {
-        int key = A[j];
-        int i = j - 1;
-        while (i >= 0 && A[i] > key) {
-            A[i + 1] = A[i];
-            i--;
+      java: `public static void insertion_sort(int[] a) {
+    for (int i = 1; i < a.length; i++) {
+        int k = a[i];
+        int j = i - 1;
+        while (j >= 0 && a[j] > k) {
+            a[j + 1] = a[j];
+            j = j - 1;
         }
-        A[i + 1] = key;
+        a[j + 1] = k;
     }
 }`,
-      cpp: `void insertionSort(vector<int>& A) { ... }`,
-      python: `def insertion_sort(A): ...`,
-      pseudo: `INSERTION-SORT(A)\n...`,
+      cpp: `void insertionSort(vector<int>& a) {
+    for (int i = 1; i < a.size(); i++) {
+        int key = a[i];
+        int j = i - 1;
+        while (j >= 0 && a[j] > key) {
+            a[j + 1] = a[j];
+            j = j - 1;
+        }
+        a[j + 1] = key;
+    }
+}`,
+      python: `def insertion_sort(a):
+    for i in range(1, len(a)):
+        key = a[i]
+        j = i - 1
+        while j >= 0 and a[j] > key:
+            a[j + 1] = a[j]
+            j -= 1
+        a[j + 1] = key`,
+      pseudo: `INSERTION-SORT(A)
+  1. for j = 2 to A.length
+  2.     key = A[j]
+  3.     // Insert A[j] into the sorted sequence A[1..j-1]
+  4.     i = j - 1
+  5.     while i > 0 and A[i] > key
+  6.         A[i + 1] = A[i]
+  7.         i = i - 1
+  8.     A[i + 1] = key`,
     },
   },
   selection_sort: {
@@ -256,19 +318,20 @@ const algorithms = {
         int min_idx = i;
         for (int j = i+1; j < n; j++)
             if (arr[j] < arr[min_idx]) min_idx = j;
+        // Swap
         int temp = arr[min_idx];
         arr[min_idx] = arr[i];
         arr[i] = temp;
     }
 }`,
       pseudo: `SELECTION-SORT(A)
-  n = A.length
-  for i = 1 to n - 1
-      min = i
-      for j = i + 1 to n
-          if A[j] < A[min]
-              min = j
-      exchange A[i] with A[min]`,
+  1. n = A.length
+  2. for i = 1 to n - 1
+  3.     min = i
+  4.     for j = i + 1 to n
+  5.         if A[j] < A[min]
+  6.             min = j
+  7.     exchange A[i] with A[min]`,
     },
   },
   merge_sort: {
@@ -278,8 +341,29 @@ const algorithms = {
     question: "Sort the array.",
     hint: "Divide into halves. Recursively sort. Merge.",
     codes: {
-      java: `void mergeSort(int[] arr, int l, int r) { ... }`,
-      pseudo: `MERGE-SORT(A, p, r)\n...`,
+      java: `public static void merge(int arr[], int p, int q, int r){
+    int n1 = q - p + 1;
+    int n2 = r - q;
+    int[] L = new int[n1];
+    int[] R = new int[n2];
+    for(int i = 0; i < n1; i++) L[i] = arr[p + i];
+    for(int j = 0; j < n2; j++) R[j] = arr[q + 1 + j];
+    
+    int i = 0, j = 0, k = p;
+    while(i < n1 && j < n2){
+        if(L[i] <= R[j]) { arr[k] = L[i]; i++; }
+        else { arr[k] = R[j]; j++; }
+        k++;
+    }
+    while(i < n1) { arr[k] = L[i]; i++; k++; }
+    while(j < n2) { arr[k] = R[j]; j++; k++; }
+}`,
+      pseudo: `MERGE-SORT(A, p, r)
+  1. if p < r
+  2.     q = floor((p + r) / 2)
+  3.     MERGE-SORT(A, p, q)
+  4.     MERGE-SORT(A, q + 1, r)
+  5.     MERGE(A, p, q, r)`,
     },
   },
   quick_sort: {
@@ -289,8 +373,33 @@ const algorithms = {
     question: "Sort the array.",
     hint: "Partition around a pivot x.",
     codes: {
-      java: `void quickSort(int[] A, int p, int r) { ... }`,
-      pseudo: `QUICKSORT(A, p, r)\n...`,
+      java: `public static int partition(int arr[], int p, int r){
+    int x = arr[r]; // Pivot
+    int i = p-1;
+    for(int j=p; j<r; j++){
+        if(arr[j] <= x){
+            i++;
+            int temp = arr[i]; arr[i] = arr[j]; arr[j] = temp;
+        }
+    }
+    int temp = arr[i+1]; arr[i+1] = arr[r]; arr[r] = temp;
+    return i+1; 
+}`,
+      pseudo: `QUICKSORT(A, p, r)
+  1. if p < r
+  2.     q = PARTITION(A, p, r)
+  3.     QUICKSORT(A, p, q - 1)
+  4.     QUICKSORT(A, q + 1, r)
+
+PARTITION(A, p, r)
+  1. x = A[r]
+  2. i = p - 1
+  3. for j = p to r - 1
+  4.     if A[j] <= x
+  5.         i = i + 1
+  6.         exchange A[i] with A[j]
+  7. exchange A[i + 1] with A[r]
+  8. return i + 1`,
     },
   },
   randomized_quick_sort: {
@@ -300,8 +409,15 @@ const algorithms = {
     question: "Sort the array.",
     hint: "Random pivot swap.",
     codes: {
-      java: `int randomizedPartition(int[] A, int p, int r) { ... }`,
-      pseudo: `RANDOMIZED-PARTITION(A, p, r)\n...`,
+      java: `int randomizedPartition(int[] A, int p, int r) {
+    int i = (int)(Math.random() * (r - p + 1)) + p;
+    swap(A, r, i);
+    return partition(A, p, r);
+}`,
+      pseudo: `RANDOMIZED-PARTITION(A, p, r)
+  1. i = RANDOM(p, r)
+  2. exchange A[r] with A[i]
+  3. return PARTITION(A, p, r)`,
     },
   },
 
@@ -318,12 +434,13 @@ const algorithms = {
       complexity: "Theta(sqrt(n) log n)",
     },
     codes: {
-      pseudo: `Master Theorem Analysis:
-1. a = 2, b = 4
-2. f(n) = sqrt(n) = n^{0.5}
-3. n^{log_b a} = n^{log_4 2} = n^{0.5}
-4. Case 2 applies: f(n) == n^{log_b a}
-5. Total Work = Theta(n^{0.5} log n)`,
+      pseudo: `MASTER THEOREM ANALYSIS:
+T(n) = 2T(n/4) + n^(1/2)
+1. a = 2, b = 4, f(n) = n^0.5
+2. log_b(a) = log_4(2) = 0.5
+3. f(n) = Theta(n^(log_b a))
+4. Case 2 applies.
+5. T(n) = Theta(n^0.5 * log n)`,
     },
   },
   recurrence_c: {
@@ -338,12 +455,13 @@ const algorithms = {
       complexity: "Theta(n^2)",
     },
     codes: {
-      pseudo: `Analysis:
-1. a = 4, b = 2
-2. n^{log_2 4} = n^2
-3. f(n) = n^{0.5}
-4. Case 1: n^2 > f(n)
-5. Complexity = Theta(n^2)`,
+      pseudo: `MASTER THEOREM ANALYSIS:
+T(n) = 4T(n/2) + n^(1/2)
+1. a = 4, b = 2, f(n) = n^0.5
+2. log_b(a) = log_2(4) = 2
+3. n^2 vs n^0.5
+4. Case 1 applies (Root dominates).
+5. T(n) = Theta(n^2)`,
     },
   },
   recurrence_j: {
@@ -358,12 +476,12 @@ const algorithms = {
       complexity: "Theta(n log n)",
     },
     codes: {
-      pseudo: `Analysis:
-1. Coefficients sum to 1 (1/2 + 1/3 + 1/6 = 1)
-2. This mimics QuickSort recursion behavior
-3. Total work at each level is n
-4. Height is logarithmic
-5. Complexity = Theta(n log n)`,
+      pseudo: `ANALYSIS (Tree Method):
+1. Sum of work fractions: 1/2 + 1/3 + 1/6 = 1
+2. Since sum = 1, the total work per level is constant (n).
+3. The depth of the tree is logarithmic (dominated by slowest branch log_6/5 n).
+4. Total Work = Work per level * Number of levels
+5. T(n) = Theta(n log n)`,
     },
   },
 
@@ -375,8 +493,26 @@ const algorithms = {
     question: "Push(99). Top?",
     hint: "LIFO (Last In First Out).",
     codes: {
-      java: `stack.push(99); \nint top = stack.peek();`,
-      pseudo: `PUSH(S, 99)\nreturn S.top`,
+      java: `public void push(T value) {
+    Node<T> newNode = new Node<>(value);
+    newNode.next = top;
+    top = newNode;
+}
+public T pop() {
+    if (isEmpty()) throw new EmptyStackException();
+    T data = top.data;
+    top = top.next;
+    return data;
+}`,
+      pseudo: `PUSH(S, x)
+  1. S.top = S.top + 1
+  2. S[S.top] = x
+
+POP(S)
+  1. if STACK-EMPTY(S)
+  2.     error "underflow"
+  3. else S.top = S.top - 1
+  4.     return S[S.top + 1]`,
     },
   },
   postfix_eval: {
@@ -386,8 +522,32 @@ const algorithms = {
     question: (d) => `Evaluate: ${d ? d.expr : ""}`,
     hint: "Stack: Push numbers. Op: Pop 2, Calc, Push.",
     codes: {
-      java: `public int eval(String[] tokens) { ... }`,
-      pseudo: `EVAL-POSTFIX(E)\n...`,
+      java: `public int evalPostfix(String exp) {
+    Stack<Integer> stack = new Stack<>();
+    for(char c: exp.toCharArray()) {
+        if(Character.isDigit(c)) stack.push(c - '0');
+        else {
+            int val1 = stack.pop();
+            int val2 = stack.pop();
+            switch(c) {
+                case '+': stack.push(val2+val1); break;
+                //...
+            }
+        }
+    }
+    return stack.pop();
+}`,
+      pseudo: `EVAL-POSTFIX(E)
+  1. S = empty stack
+  2. for each token t in E
+  3.     if t is operand
+  4.         PUSH(S, t)
+  5.     else (t is operator)
+  6.         y = POP(S)
+  7.         x = POP(S)
+  8.         r = APPLY(t, x, y)
+  9.         PUSH(S, r)
+ 10. return POP(S)`,
     },
   },
 
@@ -407,10 +567,31 @@ const algorithms = {
     while (queue.size() != 0) {
         s = queue.poll();
         System.out.print(s + " ");
-        // get neighbors...
+        for (int n : adj[s]) {
+            if (!visited[n]) {
+                visited[n] = true;
+                queue.add(n);
+            }
+        }
     }
 }`,
-      pseudo: `BFS(G, s)\n...`,
+      pseudo: `BFS(G, s)
+  1. for each vertex u in G.V - {s}
+  2.     u.color = WHITE
+  3.     u.d = INF
+  4.     u.pi = NIL
+  5. s.color = GRAY, s.d = 0, s.pi = NIL
+  6. Q = {}
+  7. ENQUEUE(Q, s)
+  8. while Q != {}
+  9.     u = DEQUEUE(Q)
+ 10.    for each v in G.Adj[u]
+ 11.        if v.color == WHITE
+ 12.            v.color = GRAY
+ 13.            v.d = u.d + 1
+ 14.            v.pi = u
+ 15.            ENQUEUE(Q, v)
+ 16.    u.color = BLACK`,
     },
   },
   dfs: {
@@ -428,12 +609,25 @@ const algorithms = {
     }
 }`,
       pseudo: `DFS(G)
-  for each vertex u in G.V
-    u.color = WHITE
-  time = 0
-  for each vertex u in G.V
-    if u.color == WHITE
-      DFS-VISIT(G, u)`,
+  1. for each vertex u in G.V
+  2.     u.color = WHITE
+  3.     u.pi = NIL
+  4. time = 0
+  5. for each vertex u in G.V
+  6.     if u.color == WHITE
+  7.         DFS-VISIT(G, u)
+
+DFS-VISIT(G, u)
+  1. time = time + 1
+  2. u.d = time
+  3. u.color = GRAY
+  4. for each v in G.Adj[u]
+  5.     if v.color == WHITE
+  6.         v.pi = u
+  7.         DFS-VISIT(G, v)
+  8. u.color = BLACK
+  9. time = time + 1
+ 10. u.f = time`,
     },
   },
   dijkstra: {
@@ -443,8 +637,29 @@ const algorithms = {
     question: "Distance to target?",
     hint: "Priority Queue + Relaxation.",
     codes: {
-      java: `void dijkstra(int src) { ... }`,
-      pseudo: `DIJKSTRA(G, w, s)\n...`,
+      java: `void dijkstra(int src) {
+    PriorityQueue<Node> pq = new PriorityQueue<>();
+    dist[src] = 0;
+    pq.add(new Node(src, 0));
+    while (!pq.isEmpty()) {
+        int u = pq.poll().v;
+        for (Node v : adj.get(u)) {
+            if (dist[v.v] > dist[u] + v.w) {
+                dist[v.v] = dist[u] + v.w;
+                pq.add(new Node(v.v, dist[v.v]));
+            }
+        }
+    }
+}`,
+      pseudo: `DIJKSTRA(G, w, s)
+  1. INITIALIZE-SINGLE-SOURCE(G, s)
+  2. S = {}
+  3. Q = G.V
+  4. while Q != {}
+  5.     u = EXTRACT-MIN(Q)
+  6.     S = S U {u}
+  7.     for each vertex v in G.Adj[u]
+  8.         RELAX(u, v, w)`,
     },
   },
   kruskal: {
@@ -459,15 +674,15 @@ const algorithms = {
     // 2. Iterate edges, if find(u) != find(v), union(u, v) & add to MST
 }`,
       pseudo: `MST-KRUSKAL(G, w)
-  A = {}
-  for each vertex v in G.V
-    MAKE-SET(v)
-  sort the edges of G.E into nondecreasing order by weight w
-  for each edge (u, v) in G.E, taken in nondecreasing order by weight
-    if FIND-SET(u) != FIND-SET(v)
-      A = A U {(u, v)}
-      UNION(u, v)
-  return A`,
+  1. A = {}
+  2. for each vertex v in G.V
+  3.     MAKE-SET(v)
+  4. sort the edges of G.E into nondecreasing order by weight w
+  5. for each edge (u, v) in G.E, taken in nondecreasing order by weight
+  6.     if FIND-SET(u) != FIND-SET(v)
+  7.         A = A U {(u, v)}
+  8.         UNION(u, v)
+  9. return A`,
     },
   },
 
@@ -479,8 +694,31 @@ const algorithms = {
     question: "Insert node logic.",
     hint: "Left if smaller, Right if larger.",
     codes: {
-      java: `Node insert(Node root, int key) { ... }`,
-      pseudo: `TREE-INSERT(T, z)\n...`,
+      java: `public static B insertRecursive(B root, int key) {
+    if (root == null) {
+        return new B(key);
+    }
+    if (key < root.key) {
+        root.left = insertRecursive(root.left, key);
+    } else {
+        root.right = insertRecursive(root.right, key);
+    }
+    return root;
+}`,
+      pseudo: `TREE-INSERT(T, z)
+  1. y = NIL
+  2. x = T.root
+  3. while x != NIL
+  4.     y = x
+  5.     if z.key < x.key
+  6.         x = x.left
+  7.     else x = x.right
+  8. z.p = y
+  9. if y == NIL
+ 10.    T.root = z
+ 11. elseif z.key < y.key
+ 12.    y.left = z
+ 13. else y.right = z`,
     },
   },
   rbt_ops: {
@@ -494,13 +732,31 @@ const algorithms = {
     while (k.parent.color == RED) {
         if (k.parent == k.parent.parent.right) {
             Node u = k.parent.parent.left; // uncle
-            if (u.color == RED) { ... } 
-            else { ... }
+            if (u.color == RED) { 
+                // Case 1
+            } else { 
+                // Case 2 & 3
+            }
         }
     }
     root.color = BLACK;
 }`,
-      pseudo: `RB-INSERT-FIXUP(T, z)\n...`,
+      pseudo: `RB-INSERT-FIXUP(T, z)
+  1. while z.p.color == RED
+  2.     if z.p == z.p.p.left
+  3.         y = z.p.p.right
+  4.         if y.color == RED
+  5.             z.p.color = BLACK            // Case 1
+  6.             y.color = BLACK              // Case 1
+  7.             z.p.p.color = RED            // Case 1
+  8.             z = z.p.p                    // Case 1
+  9.         else if z == z.p.right
+ 10.             z = z.p                      // Case 2
+ 11.             LEFT-ROTATE(T, z)            // Case 2
+ 12.         z.p.color = BLACK                // Case 3
+ 13.         z.p.p.color = RED                // Case 3
+ 14.         RIGHT-ROTATE(T, z.p.p)           // Case 3
+ 15. T.root.color = BLACK`,
     },
   },
   heap_ops: {
@@ -510,8 +766,28 @@ const algorithms = {
     question: "Root after Heapify?",
     hint: "Float down largest child.",
     codes: {
-      java: `void maxHeapify(int arr[], int n, int i) { ... }`,
-      pseudo: `MAX-HEAPIFY(A, i)\n...`,
+      java: `void maxHeapify(int arr[], int n, int i) {
+    int largest = i;
+    int l = 2*i + 1;
+    int r = 2*i + 2;
+    if (l < n && arr[l] > arr[largest]) largest = l;
+    if (r < n && arr[r] > arr[largest]) largest = r;
+    if (largest != i) {
+        swap(arr, i, largest);
+        maxHeapify(arr, n, largest);
+    }
+}`,
+      pseudo: `MAX-HEAPIFY(A, i)
+  1. l = LEFT(i)
+  2. r = RIGHT(i)
+  3. if l <= A.heap-size and A[l] > A[i]
+  4.     largest = l
+  5. else largest = i
+  6. if r <= A.heap-size and A[r] > A[largest]
+  7.     largest = r
+  8. if largest != i
+  9.     exchange A[i] with A[largest]
+ 10.    MAX-HEAPIFY(A, largest)`,
     },
   },
 
@@ -523,8 +799,28 @@ const algorithms = {
     question: "Insert key using Open Addressing.",
     hint: "Probe: Linear (i), Quadratic (i^2), Double (i*h2).",
     codes: {
-      java: `int hashInsert(int[] T, int k) { ... }`,
-      pseudo: `HASH-INSERT(T, k)\n...`,
+      java: `int hashInsert(Integer[] T, int k) {
+    int i = 0;
+    do {
+        int j = h(k, i);
+        if (T[j] == null) {
+            T[j] = k;
+            return j;
+        }
+        i++;
+    } while (i < m);
+    throw new Exception("Overflow");
+}`,
+      pseudo: `HASH-INSERT(T, k)
+  1. i = 0
+  2. repeat
+  3.     j = h(k, i)
+  4.     if T[j] == NIL
+  5.         T[j] = k
+  6.         return j
+  7.     i = i + 1
+  8. until i == m
+  9. error "hash table overflow"`,
     },
   },
 };
@@ -739,10 +1035,11 @@ export default function DSAExamPrep() {
     setUserAnswer("");
     setRecInputs({ height: "", size: "", work: "", complexity: "" });
     setCodeReport(null);
-    const starter =
-      currentAlgo.codes && currentAlgo.codes[codeLang]
-        ? currentAlgo.codes[codeLang]
-        : "// Code implementation...";
+
+    // START BLANK - The user has to click "Reveal Key" to see the code.
+    const starter = `// Write your ${currentAlgo.name} in ${
+      codeLang === "pseudo" ? "Pseudo-code" : codeLang
+    } here...\n\n`;
     setUserCode(starter);
 
     const cat = currentAlgo.category;
