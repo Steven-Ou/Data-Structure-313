@@ -11,9 +11,6 @@ import {
   XCircle,
   Search,
   Calculator,
-  Code,
-  Terminal,
-  Cpu,
 } from "lucide-react";
 
 // --- DATA STRUCTURE CLASSES ---
@@ -55,7 +52,6 @@ const analyzeCode = (code, algoType) => {
   )
     detectedLang = "Python";
 
-  // Simple heuristic check
   return {
     detectedLang,
     percentage: 100,
@@ -87,18 +83,6 @@ const generateGraph = (numNodes = 5, directed = false, weighted = true) => {
     matrix[source][target] = weight;
     if (!directed) matrix[target][source] = weight;
     connected.add(target);
-  }
-
-  // Add randomness
-  for (let i = 0; i < 3; i++) {
-    const s = Math.floor(Math.random() * numNodes);
-    const t = Math.floor(Math.random() * numNodes);
-    if (s !== t && matrix[s][t] === 0) {
-      const w = weighted ? Math.floor(Math.random() * 9) + 1 : 1;
-      edges.push({ source: s, target: t, weight: w });
-      matrix[s][t] = w;
-      if (!directed) matrix[t][s] = w;
-    }
   }
   return { nodes, edges, matrix };
 };
@@ -188,41 +172,23 @@ const algorithms = {
     question: (d) => `Find index of ${d ? d[Math.floor(d.length / 2)] : "x"}.`,
     hint: "Iterate from 0 to n. Return index if found.",
     codes: {
-      java: `public class Search {
-    public static int linearSearch(int[] arr, int x) {
-        for (int i = 0; i < arr.length; i++) {
-            if (arr[i] == x) return i;
-        }
-        return -1;
+      java: `public int linearSearch(int[] arr, int x) {
+    for (int i = 0; i < arr.length; i++) {
+        if (arr[i] == x) return i;
     }
-    public static void main(String[] args) {
-        int[] data = {10, 50, 30, 70, 80, 20};
-        System.out.println("Idx: " + linearSearch(data, 30));
-    }
+    return -1;
 }`,
-      cpp: `#include <iostream>
-#include <vector>
-using namespace std;
-int linearSearch(vector<int>& arr, int x) {
+      cpp: `int linearSearch(vector<int>& arr, int x) {
     for (int i = 0; i < arr.size(); i++) {
         if (arr[i] == x) return i;
     }
     return -1;
-}
-int main() {
-    vector<int> data = {10, 50, 30, 70};
-    cout << linearSearch(data, 30);
-    return 0;
 }`,
       python: `def linear_search(arr, x):
     for i in range(len(arr)):
         if arr[i] == x:
             return i
-    return -1
-
-# Main
-data = [10, 50, 30, 70]
-print(linear_search(data, 30))`,
+    return -1`,
       pseudo: `LINEAR-SEARCH(A, x)
   for i = 1 to A.length
       if A[i] == x
@@ -247,35 +213,9 @@ print(linear_search(data, 30))`,
     }
     return -1;
 }`,
-      cpp: `int binarySearch(vector<int>& arr, int x) {
-    int l = 0, r = arr.size() - 1;
-    while (l <= r) {
-        int mid = l + (r - l) / 2;
-        if (arr[mid] == x) return mid;
-        if (arr[mid] < x) l = mid + 1;
-        else r = mid - 1;
-    }
-    return -1;
-}`,
-      python: `def binary_search(arr, x):
-    l, r = 0, len(arr) - 1
-    while l <= r:
-        mid = l + (r - l) // 2
-        if arr[mid] == x:
-            return mid
-        elif arr[mid] < x:
-            l = mid + 1
-        else:
-            r = mid - 1
-    return -1`,
-      pseudo: `BINARY-SEARCH(A, x)
-  low = 1, high = A.length
-  while low <= high
-      mid = floor((low + high) / 2)
-      if A[mid] == x return mid
-      elseif A[mid] < x low = mid + 1
-      else high = mid - 1
-  return NIL`,
+      cpp: `int binarySearch(vector<int>& arr, int x) { ... }`,
+      python: `def binary_search(arr, x): ...`,
+      pseudo: `BINARY-SEARCH(A, x)\n...`,
     },
   },
 
@@ -298,34 +238,37 @@ print(linear_search(data, 30))`,
         A[i + 1] = key;
     }
 }`,
-      cpp: `void insertionSort(vector<int>& A) {
-    for (int j = 1; j < A.size(); j++) {
-        int key = A[j];
-        int i = j - 1;
-        while (i >= 0 && A[i] > key) {
-            A[i + 1] = A[i];
-            i--;
-        }
-        A[i + 1] = key;
+      cpp: `void insertionSort(vector<int>& A) { ... }`,
+      python: `def insertion_sort(A): ...`,
+      pseudo: `INSERTION-SORT(A)\n...`,
+    },
+  },
+  selection_sort: {
+    name: "Selection Sort",
+    category: "Sorting",
+    solve: (d) => (d ? [...d].sort((a, b) => a - b).join(", ") : ""),
+    question: "Sort the array.",
+    hint: "Find min element, swap with current.",
+    codes: {
+      java: `void selectionSort(int[] arr) {
+    int n = arr.length;
+    for (int i = 0; i < n-1; i++) {
+        int min_idx = i;
+        for (int j = i+1; j < n; j++)
+            if (arr[j] < arr[min_idx]) min_idx = j;
+        int temp = arr[min_idx];
+        arr[min_idx] = arr[i];
+        arr[i] = temp;
     }
 }`,
-      python: `def insertion_sort(A):
-    for j in range(1, len(A)):
-        key = A[j]
-        i = j - 1
-        while i >= 0 and A[i] > key:
-            A[i + 1] = A[i]
-            i -= 1
-        A[i + 1] = key`,
-      pseudo: `INSERTION-SORT(A)
-  for j = 2 to A.length
-      key = A[j]
-      // Insert A[j] into sorted A[1..j-1]
-      i = j - 1
-      while i > 0 and A[i] > key
-          A[i + 1] = A[i]
-          i = i - 1
-      A[i + 1] = key`,
+      pseudo: `SELECTION-SORT(A)
+  n = A.length
+  for i = 1 to n - 1
+      min = i
+      for j = i + 1 to n
+          if A[j] < A[min]
+              min = j
+      exchange A[i] with A[min]`,
     },
   },
   merge_sort: {
@@ -335,41 +278,8 @@ print(linear_search(data, 30))`,
     question: "Sort the array.",
     hint: "Divide into halves. Recursively sort. Merge.",
     codes: {
-      java: `// Main Driver
-public static void main(String[] args) {
-    int[] arr = {12, 11, 13, 5, 6, 7};
-    mergeSort(arr, 0, arr.length-1);
-}
-void mergeSort(int[] arr, int l, int r) {
-    if (l < r) {
-        int m = l + (r - l) / 2;
-        mergeSort(arr, l, m);
-        mergeSort(arr, m + 1, r);
-        merge(arr, l, m, r);
-    }
-}`,
-      cpp: `void mergeSort(vector<int>& arr, int l, int r) {
-    if (l < r) {
-        int m = l + (r - l) / 2;
-        mergeSort(arr, l, m);
-        mergeSort(arr, m + 1, r);
-        merge(arr, l, m, r);
-    }
-}`,
-      python: `def merge_sort(arr):
-    if len(arr) > 1:
-        mid = len(arr) // 2
-        L = arr[:mid]
-        R = arr[mid:]
-        merge_sort(L)
-        merge_sort(R)
-        # ...merge logic...`,
-      pseudo: `MERGE-SORT(A, p, r)
-  if p < r
-      q = floor((p + r) / 2)
-      MERGE-SORT(A, p, q)
-      MERGE-SORT(A, q + 1, r)
-      MERGE(A, p, q, r)`,
+      java: `void mergeSort(int[] arr, int l, int r) { ... }`,
+      pseudo: `MERGE-SORT(A, p, r)\n...`,
     },
   },
   quick_sort: {
@@ -379,30 +289,8 @@ void mergeSort(int[] arr, int l, int r) {
     question: "Sort the array.",
     hint: "Partition around a pivot x.",
     codes: {
-      java: `void quickSort(int[] A, int p, int r) {
-    if (p < r) {
-        int q = partition(A, p, r);
-        quickSort(A, p, q - 1);
-        quickSort(A, q + 1, r);
-    }
-}`,
-      cpp: `void quickSort(vector<int>& A, int p, int r) {
-    if (p < r) {
-        int q = partition(A, p, r);
-        quickSort(A, p, q - 1);
-        quickSort(A, q + 1, r);
-    }
-}`,
-      python: `def quick_sort(A, p, r):
-    if p < r:
-        q = partition(A, p, r)
-        quick_sort(A, p, q - 1)
-        quick_sort(A, q + 1, r)`,
-      pseudo: `QUICKSORT(A, p, r)
-  if p < r
-      q = PARTITION(A, p, r)
-      QUICKSORT(A, p, q - 1)
-      QUICKSORT(A, q + 1, r)`,
+      java: `void quickSort(int[] A, int p, int r) { ... }`,
+      pseudo: `QUICKSORT(A, p, r)\n...`,
     },
   },
   randomized_quick_sort: {
@@ -412,68 +300,70 @@ void mergeSort(int[] arr, int l, int r) {
     question: "Sort the array.",
     hint: "Random pivot swap.",
     codes: {
-      java: `int randomizedPartition(int[] A, int p, int r) {
-    int i = (int)(Math.random()*(r-p+1))+p;
-    swap(A, i, r);
-    return partition(A, p, r);
-}`,
-      cpp: `int randomizedPartition(vector<int>& A, int p, int r) {
-    int i = p + rand() % (r - p + 1);
-    swap(A[i], A[r]);
-    return partition(A, p, r);
-}`,
-      python: `import random
-def rand_partition(A, p, r):
-    i = random.randint(p, r)
-    A[i], A[r] = A[r], A[i]
-    return partition(A, p, r)`,
-      pseudo: `RANDOMIZED-PARTITION(A, p, r)
-  i = RANDOM(p, r)
-  exchange A[i] with A[r]
-  return PARTITION(A, p, r)`,
+      java: `int randomizedPartition(int[] A, int p, int r) { ... }`,
+      pseudo: `RANDOMIZED-PARTITION(A, p, r)\n...`,
     },
   },
 
-  // === RECURRENCES ===
+  // === RECURRENCES (DIVIDE & CONQUER) ===
   recurrence_a: {
     name: "Recurrence 1(a)",
     category: "Recurrences",
-    solve: (d) => "Theta(sqrt(n) log n)",
-    question: "Solve T(n) = 2T(n/4) + sqrt(n)",
-    hint: "Master Theorem Case 2.",
+    question: "Analyze T(n) = 2T(n/4) + sqrt(n)",
+    hint: "a=2, b=4. f(n) = n^0.5. Compare n^{log_b a} vs f(n).",
+    expected: {
+      height: "log_4 n",
+      size: "n / 4^i",
+      work: "sqrt(n) log n",
+      complexity: "Theta(sqrt(n) log n)",
+    },
     codes: {
-      java: "// T(n) = Theta(sqrt(n) * log n)",
-      cpp: "// T(n) = Theta(sqrt(n) * log n)",
-      python: "# T(n) = Theta(sqrt(n) * log n)",
-      pseudo:
-        "Master Theorem Case 2:\n n^{log_4 2} = n^{0.5} = f(n)\n T(n) = Theta(n^{0.5} lg n)",
+      pseudo: `Master Theorem Analysis:
+1. a = 2, b = 4
+2. f(n) = sqrt(n) = n^{0.5}
+3. n^{log_b a} = n^{log_4 2} = n^{0.5}
+4. Case 2 applies: f(n) == n^{log_b a}
+5. Total Work = Theta(n^{0.5} log n)`,
     },
   },
   recurrence_c: {
     name: "Recurrence 1(c)",
     category: "Recurrences",
-    solve: (d) => "Theta(n^2)",
-    question: "Solve T(n) = 4T(n/2) + sqrt(n)",
-    hint: "Master Theorem Case 1. Compare n^2 vs n^0.5.",
+    question: "Analyze T(n) = 4T(n/2) + sqrt(n)",
+    hint: "a=4, b=2. f(n) = n^0.5. Compare n^{log_b a}.",
+    expected: {
+      height: "log_2 n",
+      size: "n / 2^i",
+      work: "n^2",
+      complexity: "Theta(n^2)",
+    },
     codes: {
-      java: "// Theta(n^2)",
-      cpp: "// Theta(n^2)",
-      python: "# Theta(n^2)",
-      pseudo: "log_2(4) = 2. n^2 vs n^0.5.\nCase 1: T(n) = Theta(n^2)",
+      pseudo: `Analysis:
+1. a = 4, b = 2
+2. n^{log_2 4} = n^2
+3. f(n) = n^{0.5}
+4. Case 1: n^2 > f(n)
+5. Complexity = Theta(n^2)`,
     },
   },
   recurrence_j: {
     name: "Recurrence 1(j)",
     category: "Recurrences",
-    solve: (d) => "Theta(n log n)",
-    question: "Solve J(n) = J(n/2) + J(n/3) + J(n/6) + n",
-    hint: "Akra-Bazzi: 1/2 + 1/3 + 1/6 = 1.",
+    question: "Analyze J(n) = J(n/2) + J(n/3) + J(n/6) + n",
+    hint: "Akra-Bazzi or Tree Method. Sum of coeffs: 1/2+1/3+1/6=1.",
+    expected: {
+      height: "log n",
+      size: "varies",
+      work: "n log n",
+      complexity: "Theta(n log n)",
+    },
     codes: {
-      java: "// Theta(n log n)",
-      cpp: "// Theta(n log n)",
-      python: "# Theta(n log n)",
-      pseudo:
-        "Sum of coefficients = 1\nBehaves like QuickSort split\nT(n) = Theta(n log n)",
+      pseudo: `Analysis:
+1. Coefficients sum to 1 (1/2 + 1/3 + 1/6 = 1)
+2. This mimics QuickSort recursion behavior
+3. Total work at each level is n
+4. Height is logarithmic
+5. Complexity = Theta(n log n)`,
     },
   },
 
@@ -486,8 +376,6 @@ def rand_partition(A, p, r):
     hint: "LIFO (Last In First Out).",
     codes: {
       java: `stack.push(99); \nint top = stack.peek();`,
-      cpp: `stack.push(99); \nint top = stack.top();`,
-      python: `stack.append(99) \ntop = stack[-1]`,
       pseudo: `PUSH(S, 99)\nreturn S.top`,
     },
   },
@@ -498,48 +386,8 @@ def rand_partition(A, p, r):
     question: (d) => `Evaluate: ${d ? d.expr : ""}`,
     hint: "Stack: Push numbers. Op: Pop 2, Calc, Push.",
     codes: {
-      java: `public int eval(String[] tokens) {
-    Stack<Integer> s = new Stack<>();
-    for(String t : tokens) {
-        if(isNumeric(t)) s.push(Integer.parseInt(t));
-        else {
-            int b = s.pop(), a = s.pop();
-            if(t.equals("+")) s.push(a+b);
-            // ...
-        }
-    }
-    return s.pop();
-}`,
-      cpp: `int eval(vector<string> tokens) {
-    stack<int> s;
-    for(string t : tokens) {
-        if(isdigit(t[0])) s.push(stoi(t));
-        else {
-            int b = s.top(); s.pop();
-            int a = s.top(); s.pop();
-            if(t=="+") s.push(a+b);
-        }
-    }
-    return s.top();
-}`,
-      python: `def eval(tokens):
-    stack = []
-    for t in tokens:
-        if t.isdigit(): stack.append(int(t))
-        else:
-            b, a = stack.pop(), stack.pop()
-            if t == '+': stack.append(a+b)
-    return stack[0]`,
-      pseudo: `EVAL-POSTFIX(E)
-  S = empty stack
-  for each token t in E
-      if t is operand PUSH(S, t)
-      else
-          b = POP(S)
-          a = POP(S)
-          res = apply(t, a, b)
-          PUSH(S, res)
-  return POP(S)`,
+      java: `public int eval(String[] tokens) { ... }`,
+      pseudo: `EVAL-POSTFIX(E)\n...`,
     },
   },
 
@@ -562,35 +410,30 @@ def rand_partition(A, p, r):
         // get neighbors...
     }
 }`,
-      cpp: `void BFS(int s) {
-    vector<bool> visited(V, false);
-    queue<int> q;
-    visited[s] = true;
-    q.push(s);
-    while(!q.empty()) {
-        s = q.front(); q.pop();
-        cout << s << " ";
-        // neighbors...
+      pseudo: `BFS(G, s)\n...`,
+    },
+  },
+  dfs: {
+    name: "DFS",
+    category: "Graphs",
+    solve: (d) => "A, B, C...",
+    question: "DFS Traversal Order?",
+    hint: "Use Recursion or Stack.",
+    codes: {
+      java: `void DFSUtil(int v, boolean visited[]) {
+    visited[v] = true;
+    System.out.print(v + " ");
+    for (int n : adj[v]) {
+        if (!visited[n]) DFSUtil(n, visited);
     }
 }`,
-      python: `def bfs(graph, start):
-    visited = set()
-    queue = [start]
-    while queue:
-        vertex = queue.pop(0)
-        if vertex not in visited:
-            visited.add(vertex)
-            queue.extend(graph[vertex] - visited)`,
-      pseudo: `BFS(G, s)
-  for each u in G.V - {s}
-      u.color = WHITE
-  s.color = GRAY
-  Q = {}
-  ENQUEUE(Q, s)
-  while Q != {}
-      u = DEQUEUE(Q)
-      for each v in G.Adj[u]
-          if v.color == WHITE ...`,
+      pseudo: `DFS(G)
+  for each vertex u in G.V
+    u.color = WHITE
+  time = 0
+  for each vertex u in G.V
+    if u.color == WHITE
+      DFS-VISIT(G, u)`,
     },
   },
   dijkstra: {
@@ -600,57 +443,31 @@ def rand_partition(A, p, r):
     question: "Distance to target?",
     hint: "Priority Queue + Relaxation.",
     codes: {
-      java: `void dijkstra(int src) {
-    PriorityQueue<Node> pq = new PriorityQueue<>();
-    dist[src] = 0;
-    pq.add(new Node(src, 0));
-    while(!pq.isEmpty()) {
-        int u = pq.poll().u;
-        for(Node v : adj.get(u)) {
-            if(dist[v.u] > dist[u] + v.w) {
-                dist[v.u] = dist[u] + v.w;
-                pq.add(new Node(v.u, dist[v.u]));
-            }
-        }
-    }
+      java: `void dijkstra(int src) { ... }`,
+      pseudo: `DIJKSTRA(G, w, s)\n...`,
+    },
+  },
+  kruskal: {
+    name: "Kruskal's MST",
+    category: "Graphs",
+    solve: (d) => "MST Weight",
+    question: "Weight of MST?",
+    hint: "Sort edges by weight. Union-Find.",
+    codes: {
+      java: `void KruskalMST() {
+    // 1. Sort all edges
+    // 2. Iterate edges, if find(u) != find(v), union(u, v) & add to MST
 }`,
-      cpp: `void dijkstra(int src) {
-    priority_queue<pair<int,int>, ...> pq;
-    dist[src] = 0;
-    pq.push({0, src});
-    while(!pq.empty()) {
-        int u = pq.top().second; pq.pop();
-        for(auto x : adj[u]) {
-            int v = x.first;
-            int weight = x.second;
-            if(dist[v] > dist[u] + weight) {
-                dist[v] = dist[u] + weight;
-                pq.push({dist[v], v});
-            }
-        }
-    }
-}`,
-      python: `import heapq
-def dijkstra(graph, start):
-    pq = [(0, start)]
-    dist = {node: float('inf') for node in graph}
-    dist[start] = 0
-    while pq:
-        d, u = heapq.heappop(pq)
-        if d > dist[u]: continue
-        for v, weight in graph[u]:
-            if dist[u] + weight < dist[v]:
-                dist[v] = dist[u] + weight
-                heapq.heappush(pq, (dist[v], v))`,
-      pseudo: `DIJKSTRA(G, w, s)
-  INIT-SINGLE-SOURCE(G, s)
-  S = {}
-  Q = G.V
-  while Q != {}
-      u = EXTRACT-MIN(Q)
-      S = S U {u}
-      for each v in G.Adj[u]
-          RELAX(u, v, w)`,
+      pseudo: `MST-KRUSKAL(G, w)
+  A = {}
+  for each vertex v in G.V
+    MAKE-SET(v)
+  sort the edges of G.E into nondecreasing order by weight w
+  for each edge (u, v) in G.E, taken in nondecreasing order by weight
+    if FIND-SET(u) != FIND-SET(v)
+      A = A U {(u, v)}
+      UNION(u, v)
+  return A`,
     },
   },
 
@@ -662,37 +479,28 @@ def dijkstra(graph, start):
     question: "Insert node logic.",
     hint: "Left if smaller, Right if larger.",
     codes: {
-      java: `Node insert(Node root, int key) {
-    if (root == null) return new Node(key);
-    if (key < root.key) root.left = insert(root.left, key);
-    else if (key > root.key) root.right = insert(root.right, key);
-    return root;
+      java: `Node insert(Node root, int key) { ... }`,
+      pseudo: `TREE-INSERT(T, z)\n...`,
+    },
+  },
+  rbt_ops: {
+    name: "RBT Ops",
+    category: "Trees",
+    solve: (d) => "Black-Height",
+    question: "Insert/Fixup logic.",
+    hint: "Recolor and Rotate to maintain properties.",
+    codes: {
+      java: `void insertFixup(Node k) {
+    while (k.parent.color == RED) {
+        if (k.parent == k.parent.parent.right) {
+            Node u = k.parent.parent.left; // uncle
+            if (u.color == RED) { ... } 
+            else { ... }
+        }
+    }
+    root.color = BLACK;
 }`,
-      cpp: `Node* insert(Node* node, int key) {
-    if (node == NULL) return new Node(key);
-    if (key < node->key) node->left = insert(node->left, key);
-    else if (key > node->key) node->right = insert(node->right, key);
-    return node;
-}`,
-      python: `def insert(root, key):
-    if root is None:
-        return Node(key)
-    if key < root.val:
-        root.left = insert(root.left, key)
-    else:
-        root.right = insert(root.right, key)
-    return root`,
-      pseudo: `TREE-INSERT(T, z)
-  y = NIL
-  x = T.root
-  while x != NIL
-      y = x
-      if z.key < x.key x = x.left
-      else x = x.right
-  z.p = y
-  if y == NIL T.root = z
-  else if z.key < y.key y.left = z
-  else y.right = z`,
+      pseudo: `RB-INSERT-FIXUP(T, z)\n...`,
     },
   },
   heap_ops: {
@@ -702,48 +510,8 @@ def dijkstra(graph, start):
     question: "Root after Heapify?",
     hint: "Float down largest child.",
     codes: {
-      java: `void maxHeapify(int arr[], int n, int i) {
-    int largest = i;
-    int l = 2*i + 1;
-    int r = 2*i + 2;
-    if (l < n && arr[l] > arr[largest]) largest = l;
-    if (r < n && arr[r] > arr[largest]) largest = r;
-    if (largest != i) {
-        swap(arr, i, largest);
-        maxHeapify(arr, n, largest);
-    }
-}`,
-      cpp: `void maxHeapify(vector<int>& arr, int n, int i) {
-    int largest = i;
-    int l = 2*i + 1;
-    int r = 2*i + 2;
-    if (l < n && arr[l] > arr[largest]) largest = l;
-    if (r < n && arr[r] > arr[largest]) largest = r;
-    if (largest != i) {
-        swap(arr[i], arr[largest]);
-        maxHeapify(arr, n, largest);
-    }
-}`,
-      python: `def max_heapify(arr, n, i):
-    largest = i
-    l = 2 * i + 1
-    r = 2 * i + 2
-    if l < n and arr[l] > arr[largest]: largest = l
-    if r < n and arr[r] > arr[largest]: largest = r
-    if largest != i:
-        arr[i], arr[largest] = arr[largest], arr[i]
-        max_heapify(arr, n, largest)`,
-      pseudo: `MAX-HEAPIFY(A, i)
-  l = LEFT(i)
-  r = RIGHT(i)
-  if l <= A.heap-size and A[l] > A[i]
-      largest = l
-  else largest = i
-  if r <= A.heap-size and A[r] > A[largest]
-      largest = r
-  if largest != i
-      exchange A[i] with A[largest]
-      MAX-HEAPIFY(A, largest)`,
+      java: `void maxHeapify(int arr[], int n, int i) { ... }`,
+      pseudo: `MAX-HEAPIFY(A, i)\n...`,
     },
   },
 
@@ -755,49 +523,8 @@ def dijkstra(graph, start):
     question: "Insert key using Open Addressing.",
     hint: "Probe: Linear (i), Quadratic (i^2), Double (i*h2).",
     codes: {
-      java: `int hashInsert(int[] T, int k) {
-    int i = 0;
-    do {
-        int j = h(k, i);
-        if (T[j] == NIL) {
-            T[j] = k;
-            return j;
-        }
-        i++;
-    } while (i < m);
-    throw new Exception("Overflow");
-}`,
-      cpp: `int hashInsert(vector<int>& T, int k) {
-    int i = 0;
-    do {
-        int j = h(k, i);
-        if (T[j] == NIL) {
-            T[j] = k;
-            return j;
-        }
-        i++;
-    } while (i < m);
-    return -1; // Overflow
-}`,
-      python: `def hash_insert(T, k):
-    i = 0
-    while i < m:
-        j = h(k, i)
-        if T[j] is None:
-            T[j] = k
-            return j
-        i += 1
-    raise Exception("Overflow")`,
-      pseudo: `HASH-INSERT(T, k)
-  i = 0
-  repeat
-      j = h(k, i)
-      if T[j] == NIL
-          T[j] = k
-          return j
-      else i = i + 1
-  until i == m
-  error "hash table overflow"`,
+      java: `int hashInsert(int[] T, int k) { ... }`,
+      pseudo: `HASH-INSERT(T, k)\n...`,
     },
   },
 };
@@ -981,13 +708,24 @@ const HashVisualizer = ({ data }) => {
 
 export default function DSAExamPrep() {
   const [activeAlgo, setActiveAlgo] = useState("linear_search");
-  const [codeLang, setCodeLang] = useState("java"); // State for Language Switcher
+  const [codeLang, setCodeLang] = useState("java");
   const [problemData, setProblemData] = useState(null);
+
+  // Generic single-input answer state
   const [userAnswer, setUserAnswer] = useState("");
+
+  // Specific multi-field state for Recurrences
+  const [recInputs, setRecInputs] = useState({
+    height: "",
+    size: "",
+    work: "",
+    complexity: "",
+  });
+
   const [feedback, setFeedback] = useState(null);
   const [showSolution, setShowSolution] = useState(false);
   const [showHint, setShowHint] = useState(false);
-  const [showTrace, setShowTrace] = useState(false); // Reveal Answer
+  const [showTrace, setShowTrace] = useState(false);
   const [userCode, setUserCode] = useState("");
   const [codeReport, setCodeReport] = useState(null);
 
@@ -999,6 +737,7 @@ export default function DSAExamPrep() {
     setShowHint(false);
     setShowTrace(false);
     setUserAnswer("");
+    setRecInputs({ height: "", size: "", work: "", complexity: "" });
     setCodeReport(null);
     const starter =
       currentAlgo.codes && currentAlgo.codes[codeLang]
@@ -1032,26 +771,49 @@ export default function DSAExamPrep() {
   }, [activeAlgo, codeLang]);
 
   const checkAnswer = () => {
-    const correct = String(currentAlgo.solve(problemData));
-    const userClean = userAnswer.toLowerCase().replace(/[^a-z0-9]/g, "");
-    const correctClean = correct.toLowerCase().replace(/[^a-z0-9]/g, "");
     if (currentAlgo.category === "Recurrences") {
-      setFeedback(
-        userClean.includes(correctClean.replace("theta", ""))
-          ? "correct"
-          : "incorrect"
+      // Validate all 4 fields for Recurrences
+      const expected = currentAlgo.expected || {};
+
+      const clean = (str) => str.toLowerCase().replace(/[^a-z0-9]/g, "");
+
+      const isHeightCorrect = clean(recInputs.height).includes(
+        clean(expected.height)
       );
+      const isSizeCorrect =
+        clean(recInputs.size).includes(clean(expected.size)) ||
+        clean(expected.size) === "varies";
+      const isWorkCorrect = clean(recInputs.work).includes(
+        clean(expected.work)
+      );
+      const isComplexCorrect = clean(recInputs.complexity).includes(
+        clean(expected.complexity)
+      );
+
+      if (
+        isHeightCorrect &&
+        isSizeCorrect &&
+        isWorkCorrect &&
+        isComplexCorrect
+      ) {
+        setFeedback("correct");
+      } else {
+        setFeedback("incorrect");
+      }
     } else {
+      // Standard single-field check
+      const correct = String(currentAlgo.solve(problemData));
+      const userClean = userAnswer.toLowerCase().replace(/[^a-z0-9]/g, "");
+      const correctClean = correct.toLowerCase().replace(/[^a-z0-9]/g, "");
       setFeedback(userClean === correctClean ? "correct" : "incorrect");
-    }
-    if (currentAlgo.category !== "Recurrences")
       setCodeReport(analyzeCode(userCode, activeAlgo));
+    }
   };
 
   const renderVisualizer = () => {
     if (!problemData) return <div>Loading...</div>;
     const cat = currentAlgo.category;
-    if (cat === "Graphs") return <div>Graph Viz</div>; // Simplified
+    if (cat === "Graphs") return <div>Graph Viz (Nodes & Edges)</div>;
     if (cat === "Trees")
       return activeAlgo.includes("heap") ? (
         <ArrayVisualizer data={problemData} />
@@ -1118,7 +880,7 @@ export default function DSAExamPrep() {
           />
           <SidebarSection
             title="Trees/Heaps"
-            items={["bst_ops", "heap_ops"]}
+            items={["bst_ops", "rbt_ops", "heap_ops"]}
             active={activeAlgo}
             set={setActiveAlgo}
             icon={<Database size={16} />}
@@ -1170,33 +932,126 @@ export default function DSAExamPrep() {
                   </div>
                 )}
 
+                {/* Conditional Inputs based on Category */}
+                {currentAlgo.category === "Recurrences" ? (
+                  <div className="grid grid-cols-1 gap-3 mb-4">
+                    <div>
+                      <label className="text-xs font-bold text-slate-500 uppercase">
+                        Height of Tree
+                      </label>
+                      <input
+                        type="text"
+                        value={recInputs.height}
+                        onChange={(e) =>
+                          setRecInputs({ ...recInputs, height: e.target.value })
+                        }
+                        className="w-full border p-2 rounded mt-1"
+                        placeholder="e.g. log_b n"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-bold text-slate-500 uppercase">
+                        Size of ith Subproblem
+                      </label>
+                      <input
+                        type="text"
+                        value={recInputs.size}
+                        onChange={(e) =>
+                          setRecInputs({ ...recInputs, size: e.target.value })
+                        }
+                        className="w-full border p-2 rounded mt-1"
+                        placeholder="e.g. n / b^i"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-bold text-slate-500 uppercase">
+                        Total Work Done
+                      </label>
+                      <input
+                        type="text"
+                        value={recInputs.work}
+                        onChange={(e) =>
+                          setRecInputs({ ...recInputs, work: e.target.value })
+                        }
+                        className="w-full border p-2 rounded mt-1"
+                        placeholder="Summation or expression"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-bold text-slate-500 uppercase">
+                        Time Complexity
+                      </label>
+                      <input
+                        type="text"
+                        value={recInputs.complexity}
+                        onChange={(e) =>
+                          setRecInputs({
+                            ...recInputs,
+                            complexity: e.target.value,
+                          })
+                        }
+                        className="w-full border p-2 rounded mt-1"
+                        placeholder="Theta(...)"
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex gap-3 items-center mb-4">
+                    <input
+                      type="text"
+                      value={userAnswer}
+                      onChange={(e) => {
+                        setUserAnswer(e.target.value);
+                        setFeedback(null);
+                      }}
+                      onKeyDown={(e) => e.key === "Enter" && checkAnswer()}
+                      className="border p-2 rounded flex-1"
+                      placeholder="Enter answer..."
+                    />
+                  </div>
+                )}
+
                 {/* Reveal Answer Section */}
-                {showTrace && (
+                {showTrace && currentAlgo.category !== "Recurrences" && (
                   <div className="mb-4 p-3 bg-slate-100 text-slate-700 text-sm rounded border border-slate-200 font-mono">
                     <span className="font-bold">Answer: </span>
                     {String(currentAlgo.solve(problemData))}
                   </div>
                 )}
 
+                {showTrace && currentAlgo.category === "Recurrences" && (
+                  <div className="mb-4 p-3 bg-slate-100 text-slate-700 text-sm rounded border border-slate-200 font-mono">
+                    <div className="font-bold border-b border-slate-300 pb-1 mb-1">
+                      Expected:
+                    </div>
+                    <div>Height: {currentAlgo.expected.height}</div>
+                    <div>Size: {currentAlgo.expected.size}</div>
+                    <div>Work: {currentAlgo.expected.work}</div>
+                    <div>Complexity: {currentAlgo.expected.complexity}</div>
+                  </div>
+                )}
+
                 <div className="flex gap-3 items-center">
-                  <input
-                    type="text"
-                    value={userAnswer}
-                    onChange={(e) => {
-                      setUserAnswer(e.target.value);
-                      setFeedback(null);
-                    }}
-                    onKeyDown={(e) => e.key === "Enter" && checkAnswer()}
-                    className="border p-2 rounded flex-1"
-                    placeholder="Enter answer..."
-                  />
                   <button
                     onClick={checkAnswer}
                     className="bg-indigo-600 text-white px-4 py-2 rounded"
                   >
                     Check
                   </button>
+                  <button
+                    onClick={() => setShowHint(!showHint)}
+                    className="text-xs text-slate-500 hover:text-indigo-600"
+                  >
+                    Show Hint
+                  </button>
+                  <button
+                    onClick={() => setShowTrace(!showTrace)}
+                    className="text-xs text-slate-500 hover:text-indigo-600"
+                  >
+                    {showTrace ? "Hide Answer" : "Reveal Answer"}
+                  </button>
                 </div>
+
                 {feedback && (
                   <div
                     className={`mt-2 flex items-center gap-2 font-bold ${
@@ -1211,20 +1066,6 @@ export default function DSAExamPrep() {
                     {feedback === "correct" ? "Correct!" : "Incorrect"}
                   </div>
                 )}
-                <div className="flex gap-3 mt-4">
-                  <button
-                    onClick={() => setShowHint(!showHint)}
-                    className="text-xs text-slate-500 hover:text-indigo-600"
-                  >
-                    Show Hint
-                  </button>
-                  <button
-                    onClick={() => setShowTrace(!showTrace)}
-                    className="text-xs text-slate-500 hover:text-indigo-600"
-                  >
-                    {showTrace ? "Hide Answer" : "Reveal Answer"}
-                  </button>
-                </div>
               </div>
             </div>
 
@@ -1270,7 +1111,7 @@ export default function DSAExamPrep() {
                   )}
                 </div>
               </div>
-              {codeReport && (
+              {codeReport && currentAlgo.category !== "Recurrences" && (
                 <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 shrink-0 max-h-[30%] overflow-y-auto">
                   <h3 className="font-bold text-slate-800 flex items-center gap-2">
                     <Search size={16} /> Analysis: {codeReport.detectedLang}
