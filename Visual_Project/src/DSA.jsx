@@ -248,7 +248,7 @@ const algorithms = {
   4.     mid = floor((low + high) / 2)
   5.     if A[mid] == v
   6.         return mid
-  7.     elseif A[mid] < v
+  7.     else if A[mid] < v
   8.         low = mid + 1
   9.     else
  10.         high = mid - 1
