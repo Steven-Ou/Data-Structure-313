@@ -192,7 +192,7 @@ const algorithms = {
             return i
     return -1`,
       pseudo: `LINEAR-SEARCH(A, x)
-  1. for i = 1 to A.length
+  1. for i = 0 to A.length
   2.     if A[i] == x
   3.         return i
   4. return NIL`,
