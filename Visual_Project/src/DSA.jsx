@@ -1557,7 +1557,7 @@ export default function DSAExamPrep() {
                     </button>
                   ))}
                 </div>
-                <button
+                <button //To reveal the solution
                   onClick={() => setShowSolution(!showSolution)}
                   className="text-xs text-slate-400 hover:text-white"
                 >
