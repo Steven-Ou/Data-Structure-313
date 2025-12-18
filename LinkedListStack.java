@@ -182,7 +182,7 @@ public class LinkedListStack<T> {
         }
         return current;
     }
-
+    // inorder
     public static void inorder(B root) {
         if (root != null) {
             inorder(root.left);
