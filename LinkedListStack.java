@@ -168,7 +168,7 @@ public class LinkedListStack<T> {
     public static B insertRecursive(B root, int key) {
         return insertRecHelper(root, null, key);
     }
-
+//Helper
     private static B insertRecHelper(B current, B p, int key) {
         if (current == null) {
             B newNode = new B(key);
