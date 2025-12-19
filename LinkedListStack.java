@@ -164,7 +164,7 @@ public class LinkedListStack<T> {
         }
         return y;
     }
-
+    //Recursive function
     public static B insertRecursive(B root, int key) {
         return insertRecHelper(root, null, key);
     }
