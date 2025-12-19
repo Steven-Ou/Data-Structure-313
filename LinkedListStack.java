@@ -287,7 +287,7 @@ public class LinkedListStack<T> {
                 }
             }
         }
-
+        //Delete 
         public void delete(int key) {
             SuccNode z = search(key);
             if (z == null)
