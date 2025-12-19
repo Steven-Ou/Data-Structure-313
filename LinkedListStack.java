@@ -292,6 +292,7 @@ public class LinkedListStack<T> {
             SuccNode z = search(key);
             if (z == null)
                 return;
+            //Get predecessor
             SuccNode pred = getPredecessor(z);
             SuccNode y = (z.left == null || z.right == null) ? z : z.succ;
             SuccNode x = (y.left != null) ? y.left : y.right;
