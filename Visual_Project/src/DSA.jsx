@@ -1539,11 +1539,11 @@ export default function DSAExamPrep() {
                 )}
               </div>
             </div>
-            //This is a container for the language
+            /
             <div className="flex flex-col flex-1 bg-[#1e1e1e] rounded-xl shadow-lg overflow-hidden border border-slate-700">
               <div className="bg-[#252526] p-2 border-b border-[#333] flex justify-between items-center">
                 <div className="flex gap-1">
-                  {["java", "cpp", "python", "pseudo"].map((lang) => (
+                  {["java", "cpp", "python", "pseudo"].map((lang) => (//The container holding all the language
                     <button
                       key={lang}
                       onClick={() => setCodeLang(lang)}
