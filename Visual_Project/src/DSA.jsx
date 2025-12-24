@@ -118,7 +118,7 @@ const generateGraph = (numNodes = 5, directed = false, weighted = true) => {
 
   return { nodes, edges, directed, weighted };
 };
-
+//BST DATA
 const generateBSTData = (count = 7) => {
   const rootVal = Math.floor(Math.random() * 40) + 30;
   const root = new TreeNode(rootVal, "black");
