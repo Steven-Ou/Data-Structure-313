@@ -490,6 +490,8 @@ const algorithms = {
     }
     return -1;
 }`,
+      cpp:``,
+      python:``;
       pseudo: `LINEAR-SEARCH(A, x)
     for i = 0 to A.length - 1 do
         if A[i] == x then return i
