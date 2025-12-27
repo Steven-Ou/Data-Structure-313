@@ -977,7 +977,7 @@ DFS-VISIT(G, u)
     question: "Perform Left-Rotate on the Root. What is the new Root?",
     hint: "x.right becomes new root. x becomes left child of new root.",
     codes: {
-      java: `void leftRotate(Node x) {
+    java: `void leftRotate(Node x) {
     Node y = x.right;
     x.right = y.left;
     if (y.left != null) y.left.parent = x;
@@ -988,7 +988,7 @@ DFS-VISIT(G, u)
     y.left = x;
     x.parent = y;
 }`,
-      pseudo: `LEFT-ROTATE(T, x)
+    pseudo: `LEFT-ROTATE(T, x)
     y = x.right
     x.right = y.left
     if y.left != NIL then y.left.p = x
@@ -999,6 +999,27 @@ DFS-VISIT(G, u)
     y.left = x
     x.p = y`,
     },
+    cpp: `void leftRotate(Node* &root, Node* x) {
+    Node* y = x->right;
+    x->right = y->left;
+    if (y->left != nullptr) y->left->parent = x;
+    y->parent = x->parent;
+    if (x->parent == nullptr) root = y;
+    else if (x == x->parent->left) x->parent->left = y;
+    else x->parent->right = y;
+    y->left = x;
+    x->parent = y;
+}`,
+  python: `def left_rotate(self, x):
+    y = x.right
+    x.right = y.left
+    if y.left: y.left.parent = x
+    y.parent = x.parent
+    if not x.parent: self.root = y
+    elif x == x.parent.left: x.parent.left = y
+    else: x.parent.right = y
+    y.left = x
+    x.parent = y`
   },
   right_rotate: {
     name: "Right Rotate",
