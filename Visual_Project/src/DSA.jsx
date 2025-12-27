@@ -489,9 +489,18 @@ const algorithms = {
         if (arr[i] == target) return i;
     }
     return -1;
-}`,
-      cpp:``,
-      python:``;
+    }`,
+      cpp:`int linearSearch(int arr[], int n, int target) {
+    for (int i = 0; i < n; i++) {
+        if (arr[i] == target) return i;
+    }
+    return -1;
+    }`,
+      python:`def linear_search(arr, target):
+    for i in range(len(arr)):
+        if arr[i] == target:
+            return i
+    return -1`,
       pseudo: `LINEAR-SEARCH(A, x)
     for i = 0 to A.length - 1 do
         if A[i] == x then return i
