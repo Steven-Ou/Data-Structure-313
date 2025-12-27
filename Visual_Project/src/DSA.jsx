@@ -737,7 +737,7 @@ const algorithms = {
     question: "Order of BFS starting from node A (0)?",
     hint: "Queue: A -> Neighbors -> Neighbors of neighbors.",
     codes: {
-      java: `void BFS(int s) {
+    java: `void BFS(int s) {
     boolean visited[] = new boolean[V];
     Queue<Integer> queue = new LinkedList<>();
     visited[s] = true;
@@ -752,7 +752,7 @@ const algorithms = {
         }
     }
 }`,
-      pseudo: `BFS(G, s)
+    pseudo: `BFS(G, s)
     for each u in G.V - {s} do u.color = WHITE
     s.color = GRAY
     Q = {s}
@@ -766,6 +766,29 @@ const algorithms = {
         end for
         u.color = BLACK
     end while`,
+    cpp: `void BFS(int s, vector<int> adj[], int V) {
+    vector<bool> visited(V, false);
+    queue<int> q;
+    visited[s] = true;
+    q.push(s);
+    while (!q.empty()) {
+        int u = q.front(); q.pop();
+        for (int v : adj[u]) {
+            if (!visited[v]) {
+                visited[v] = true;
+                q.push(v);
+            }
+        }
+    }
+}`,
+  python: `def bfs(adj, s):
+    visited, q = {s}, [s]
+    while q:
+        u = q.pop(0)
+        for v in adj[u]:
+            if v not in visited:
+                visited.add(v)
+                q.append(v)`
     },
   },
   dfs: {
