@@ -533,8 +533,25 @@ const algorithms = {
         else high = mid - 1;
     }
     return -1;
-}`,
-      pseudo: `BINARY-SEARCH(A, v)
+    }`,
+    cpp: `int binarySearch(int arr[], int low, int high, int target) {
+    while (low <= high) {
+        int mid = low + (high - low) / 2;
+        if (arr[mid] == target) return mid;
+        if (arr[mid] < target) low = mid + 1;
+        else high = mid - 1;
+    }
+    return -1;
+    }`,
+    python: `def binary_search(arr, target):
+      low, high = 0, len(arr) - 1
+    while low <= high:
+      mid = (low + high) // 2
+      if arr[mid] == target: return mid
+      elif arr[mid] < target: low = mid + 1
+      else: high = mid - 1
+    return -1`,
+    pseudo: `BINARY-SEARCH(A, v)
     low = 0, high = A.length - 1
     while low <= high do
         mid = floor((low + high) / 2)
