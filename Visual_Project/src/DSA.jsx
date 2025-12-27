@@ -616,7 +616,7 @@ const algorithms = {
     question: "Result after sorting?",
     hint: "Find min, swap with current index.",
     codes: {
-      java: `void selectionSort(int[] arr) {
+    java: `void selectionSort(int[] arr) {
     for (int i = 0; i < n-1; i++) {
         int min = i;
         for (int j = i+1; j < n; j++)
@@ -624,7 +624,7 @@ const algorithms = {
         swap(arr, i, min);
     }
 }`,
-      pseudo: `SELECTION-SORT(A)
+    pseudo: `SELECTION-SORT(A)
     n = A.length
     for i = 0 to n - 2 do
         min = i
@@ -633,6 +633,20 @@ const algorithms = {
         end for
         exchange A[i] with A[min]
     end for`,
+    cpp: `void selectionSort(int arr[], int n) {
+    for (int i = 0; i < n - 1; i++) {
+        int min_idx = i;
+        for (int j = i + 1; j < n; j++)
+            if (arr[j] < arr[min_idx]) min_idx = j;
+        swap(arr[i], arr[min_idx]);
+    }
+    }`,
+    python: `def selection_sort(arr):
+    for i in range(len(arr)):
+        min_idx = i
+        for j in range(i + 1, len(arr)):
+            if arr[j] < arr[min_idx]: min_idx = j
+        arr[i], arr[min_idx] = arr[min_idx], arr[i]`
     },
   },
   merge_sort: {
