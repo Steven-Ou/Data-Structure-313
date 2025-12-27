@@ -812,14 +812,14 @@ const algorithms = {
     question: "Order of DFS starting from node A (0)?",
     hint: "Go deep before going wide. Recursive.",
     codes: {
-      java: `void DFS(int v, boolean[] visited) {
+    java: `void DFS(int v, boolean[] visited) {
     visited[v] = true;
     System.out.print(v + " ");
     for (int n : adj[v]) {
         if (!visited[n]) DFS(n, visited);
     }
 }`,
-      pseudo: `DFS(G)
+    pseudo: `DFS(G)
     for each u in G.V do u.color = WHITE
     time = 0
     for each u in G.V do
@@ -895,6 +895,32 @@ DFS-VISIT(G, u)
         end for
     end while`,
     },
+    cpp: `void dijkstra(int src, vector<pair<int, int>> adj[], int V) {
+    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
+    vector<int> dist(V, INT_MAX);
+    dist[src] = 0;
+    pq.push({0, src});
+    while (!pq.empty()) {
+        int u = pq.top().second; pq.pop();
+        for (auto& edge : adj[u]) {
+            int v = edge.first, w = edge.second;
+            if (dist[v] > dist[u] + w) {
+                dist[v] = dist[u] + w;
+                pq.push({dist[v], v});
+            }
+        }
+    }
+}`,
+  python: `def dijkstra(adj, src):
+    dist = {node: float('inf') for node in adj}
+    dist[src], pq = 0, [(0, src)]
+    while pq:
+        d, u = heapq.heappop(pq)
+        if d > dist[u]: continue
+        for v, w in adj[u]:
+            if dist[u] + w < dist[v]:
+                dist[v] = dist[u] + w
+                heapq.heappush(pq, (dist[v], v))`
   },
   kruskal: {
     name: "Kruskal's MST",
