@@ -570,7 +570,7 @@ const algorithms = {
     hint: "Build sorted array one item at a time.",
     codes: {
       java: `public void insertionSort(int[] a) {
-    for (int i = 1; i < a.length; i++) {
+      for (int i = 1; i < a.length; i++) {
         int key = a[i];
         int j = i - 1;
         while (j >= 0 && a[j] > key) {
@@ -578,9 +578,9 @@ const algorithms = {
             j--;
         }
         a[j + 1] = key;
-    }
-}`,
-      pseudo: `INSERTION-SORT(A)
+      }
+    }`,
+    pseudo: `INSERTION-SORT(A)
     for j = 1 to A.length - 1 do
         key = A[j]
         i = j - 1
@@ -590,6 +590,23 @@ const algorithms = {
         end while
         A[i + 1] = key
     end for`,
+    cpp: `void insertionSort(int a[], int n) {
+    for (int i = 1; i < n; i++) {
+        int key = a[i], j = i - 1;
+        while (j >= 0 && a[j] > key) {
+            a[j + 1] = a[j];
+            j--;
+        }
+        a[j + 1] = key;
+    }
+    }`,
+    python: `def insertion_sort(a):
+      for i in range(1, len(a)):
+        key, j = a[i], i - 1
+        while j >= 0 and a[j] > key:
+            a[j + 1] = a[j]
+            j -= 1
+        a[j + 1] = key`
     },
   },
   selection_sort: {
