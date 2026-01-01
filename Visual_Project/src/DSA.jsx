@@ -718,6 +718,12 @@ void mergeSort(int arr[], int l, int r) {
         quickSort(arr, p, q - 1);
         quickSort(arr, q + 1, r);
     }
+}`, cpp:`void quickSort(int arr[], int p, int r) {
+    if (p < r) {
+        int q = partition(arr, p, r); // Partition the array
+        quickSort(arr, p, q - 1);    // Sort the left subarray
+        quickSort(arr, q + 1, r);    // Sort the right subarray
+    }
 }`,
       pseudo: `QUICKSORT(A, p, r)
     if p < r then
