@@ -750,7 +750,11 @@ void mergeSort(int arr[], int l, int r) {
     exchange A[r] with A[i]
     return PARTITION(A, p, r)`,
     },
-    cpp:``,
+    cpp:`int randomizedPartition(int arr[], int p, int r) {
+    int i = p + rand() % (r - p + 1);
+    swap(arr[r], arr[i]);
+    return partition(arr, p, r);
+}`,
 
   },
   bfs: {
