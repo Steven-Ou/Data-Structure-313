@@ -724,7 +724,17 @@ void mergeSort(int arr[], int l, int r) {
         quickSort(arr, p, q - 1);    // Sort the left subarray
         quickSort(arr, q + 1, r);    // Sort the right subarray
     }
-}`,python:`def quick_sort(arr, p, r):
+}`,python:`def partition(arr, p, r):
+    pivot = arr[r]
+    i = p - 1
+    for j in range(p, r):
+        if arr[j] <= pivot:
+            i += 1
+            arr[i], arr[j] = arr[j], arr[i]
+    arr[i + 1], arr[r] = arr[r], arr[i + 1]
+    return i + 1
+
+def quick_sort(arr, p, r):
     if p < r:
         q = partition(arr, p, r)
         quick_sort(arr, p, q - 1)
