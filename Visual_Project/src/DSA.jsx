@@ -724,7 +724,7 @@ void mergeSort(int arr[], int l, int r) {
         quickSort(arr, p, q - 1);    // Sort the left subarray
         quickSort(arr, q + 1, r);    // Sort the right subarray
     }
-}`,
+}`,python:``,
       pseudo: `QUICKSORT(A, p, r)
     if p < r then
         q = PARTITION(A, p, r)
@@ -750,6 +750,8 @@ void mergeSort(int arr[], int l, int r) {
     exchange A[r] with A[i]
     return PARTITION(A, p, r)`,
     },
+    cpp:``,
+
   },
   bfs: {
     name: "BFS Traversal",
