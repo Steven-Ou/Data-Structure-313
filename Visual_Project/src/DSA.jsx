@@ -768,6 +768,14 @@ def quick_sort(arr, p, r):
     int i = p + rand() % (r - p + 1);
     swap(arr[r], arr[i]);
     return partition(arr, p, r);
+}
+void randomizedQuickSort(int arr[], int p, int r) {
+    if (p < r) {
+        int q = randomizedPartition(arr, p, r);
+        randomizedQuickSort(arr, p, q - 1);
+        randomizedQuickSort(arr, q + 1, r);
+    }
+}
 }`,
 
   },
