@@ -764,6 +764,7 @@ def quick_sort(arr, p, r):
     exchange A[r] with A[i]
     return PARTITION(A, p, r)`,
     },
+
     cpp:`int randomizedPartition(int arr[], int p, int r) {
     int i = p + rand() % (r - p + 1);
     swap(arr[r], arr[i]);
@@ -777,6 +778,16 @@ void randomizedQuickSort(int arr[], int p, int r) {
     }
 }
 }`,
+    python:`import random
+def randomized_partition(arr, p, r):
+    i = random.randint(p, r)
+    arr[r], arr[i] = arr[i], arr[r]
+    return partition(arr, p, r)
+def randomized_quick_sort(arr, p, r):
+    if p < r:
+        q = randomized_partition(arr, p, r)
+        randomized_quick_sort(arr, p, q - 1)
+        randomized_quick_sort(arr, q + 1, r)`,
 
   },
   bfs: {
