@@ -895,6 +895,11 @@ def randomized_quick_sort(arr, p, r):
     for (int n : adj[v]) {
         if (!visited[n]) DFS(n, visited);
     }
+}`,cpp:`void DFS(int v, vector<int> adj[], vector<bool>& visited) {
+    visited[v] = true;
+    for (int n : adj[v]) {
+        if (!visited[n]) DFS(n, adj, visited);
+    }
 }`,
     pseudo: `DFS(G)
     for each u in G.V do u.color = WHITE
