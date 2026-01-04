@@ -900,7 +900,12 @@ def randomized_quick_sort(arr, p, r):
     for (int n : adj[v]) {
         if (!visited[n]) DFS(n, adj, visited);
     }
-}`,
+}`,python:`def dfs(adj, v, visited=None):
+    if visited is None: visited = set()
+    visited.add(v)
+    for neighbor in adj[v]:
+        if neighbor not in visited:
+            dfs(adj, neighbor, visited)`,
     pseudo: `DFS(G)
     for each u in G.V do u.color = WHITE
     time = 0
