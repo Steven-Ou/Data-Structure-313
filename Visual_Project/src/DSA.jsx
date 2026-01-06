@@ -1039,7 +1039,31 @@ DFS-VISIT(G, u)
             union(e.src, e.dest);
         }
     }
-}`,cpp:`void kruskal(vector<Edge>& edges, int V) {
+}`,cpp:`struct Edge { 
+    int u, v, w; 
+};
+
+bool compare(Edge a, Edge b) { 
+    return a.w < b.w; 
+}
+
+// Find function with path compression
+int find(vector<int>& parent, int i) {
+    if (parent[i] == i)
+        return i;
+    return parent[i] = find(parent, parent[i]);
+}
+
+// Union function to combine two sets
+void unite(vector<int>& parent, int i, int j) {
+    int root_i = find(parent, i);
+    int root_j = find(parent, j);
+    if (root_i != root_j) {
+        parent[root_i] = root_j;
+    }
+}
+
+void kruskal(vector<Edge>& edges, int V) {
     sort(edges.begin(), edges.end(), compare); // Sort edges by weight
     
     vector<int> parent(V);
@@ -1060,6 +1084,7 @@ DFS-VISIT(G, u)
     }
     
     // mst now contains the edges of the Minimum Spanning Tree
+}
 }`,
       python:`
       class Edge:
