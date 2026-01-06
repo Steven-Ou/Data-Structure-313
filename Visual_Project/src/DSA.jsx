@@ -1039,7 +1039,28 @@ DFS-VISIT(G, u)
             union(e.src, e.dest);
         }
     }
-}`,cpp:``,
+}`,cpp:`void kruskal(vector<Edge>& edges, int V) {
+    sort(edges.begin(), edges.end(), compare); // Sort edges by weight
+    
+    vector<int> parent(V);
+    for(int i = 0; i < V; i++) {
+        parent[i] = i; // Initialize Disjoint Set
+    }
+
+    vector<Edge> mst;
+    int mstWeight = 0;
+
+    for (Edge& e : edges) {
+        // If the nodes are in different sets, no cycle is formed
+        if (find(parent, e.u) != find(parent, e.v)) {
+            mst.push_back(e);
+            mstWeight += e.w;
+            unite(parent, e.u, e.v);
+        }
+    }
+    
+    // mst now contains the edges of the Minimum Spanning Tree
+}`,
       python:``,
       pseudo: `MST-KRUSKAL(G, w)
     A = {}
