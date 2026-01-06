@@ -1039,7 +1039,8 @@ DFS-VISIT(G, u)
             union(e.src, e.dest);
         }
     }
-}`,
+}`,cpp:``,
+      python:``,
       pseudo: `MST-KRUSKAL(G, w)
     A = {}
     for each v in G.V do MAKE-SET(v)
