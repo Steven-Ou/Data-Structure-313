@@ -1061,7 +1061,45 @@ DFS-VISIT(G, u)
     
     // mst now contains the edges of the Minimum Spanning Tree
 }`,
-      python:``,
+      python:`
+      class Edge:
+    def __init__(self, u, v, w):
+        self.u = u
+        self.v = v
+        self.w = w
+
+def find(parent, i):
+    """Find function with path compression."""
+    if parent[i] == i:
+        return i
+    parent[i] = find(parent, parent[i])
+    return parent[i]
+
+def unite(parent, i, j):
+    """Unite function to combine two sets."""
+    root_i = find(parent, i)
+    root_j = find(parent, j)
+    if root_i != root_j:
+        parent[root_i] = root_j
+
+def kruskal(edges, V):
+    # Sort edges by weight (equivalent to sort with compare)
+    edges.sort(key=lambda x: x.w)
+    
+    # Initialize Disjoint Set: each node is its own parent
+    parent = list(range(V))
+    
+    mst = []
+    mst_weight = 0
+
+    for e in edges:
+        # If the nodes are in different sets, no cycle is formed
+        if find(parent, e.u) != find(parent, e.v):
+            mst.append(e)
+            mst_weight += e.w
+            unite(parent, e.u, e.v)
+            
+    return mst, mst_weight`,
       pseudo: `MST-KRUSKAL(G, w)
     A = {}
     for each v in G.V do MAKE-SET(v)
