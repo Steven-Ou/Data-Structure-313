@@ -1213,7 +1213,7 @@ def kruskal(edges, V):
     else y.parent.left = x;
     x.right = y;
     y.parent = x;
-}`,
+}`,cpp:``,
       pseudo: `RIGHT-ROTATE(T, y)
     x = y.left
     y.left = x.right
