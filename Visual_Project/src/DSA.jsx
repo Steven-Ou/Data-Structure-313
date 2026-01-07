@@ -1213,7 +1213,17 @@ def kruskal(edges, V):
     else y.parent.left = x;
     x.right = y;
     y.parent = x;
-}`,cpp:``,
+}`,cpp:`void rightRotate(Node* &root, Node* y) {
+    Node* x = y->left;
+    y->left = x->right;
+    if (x->right != nullptr) x->right->parent = y;
+    x->parent = y->parent;
+    if (y->parent == nullptr) root = x;
+    else if (y == y->parent->right) y->parent->right = x;
+    else y->parent->left = x;
+    x->right = y;
+    y->parent = x;
+}`,
       pseudo: `RIGHT-ROTATE(T, y)
     x = y.left
     y.left = x.right
