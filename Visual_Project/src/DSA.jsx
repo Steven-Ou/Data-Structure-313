@@ -490,13 +490,13 @@ const algorithms = {
     }
     return -1;
     }`,
-      cpp:`int linearSearch(int arr[], int n, int target) {
+      cpp: `int linearSearch(int arr[], int n, int target) {
     for (int i = 0; i < n; i++) {
         if (arr[i] == target) return i;
     }
     return -1;
     }`,
-      python:`def linear_search(arr, target):
+      python: `def linear_search(arr, target):
     for i in range(len(arr)):
         if arr[i] == target:
             return i
@@ -534,7 +534,7 @@ const algorithms = {
     }
     return -1;
     }`,
-    cpp: `int binarySearch(int arr[], int low, int high, int target) {
+      cpp: `int binarySearch(int arr[], int low, int high, int target) {
     while (low <= high) {
         int mid = low + (high - low) / 2;
         if (arr[mid] == target) return mid;
@@ -543,7 +543,7 @@ const algorithms = {
     }
     return -1;
     }`,
-    python: `def binary_search(arr, target):
+      python: `def binary_search(arr, target):
       low, high = 0, len(arr) - 1
     while low <= high:
       mid = (low + high) // 2
@@ -551,7 +551,7 @@ const algorithms = {
       elif arr[mid] < target: low = mid + 1
       else: high = mid - 1
     return -1`,
-    pseudo: `BINARY-SEARCH(A, v)
+      pseudo: `BINARY-SEARCH(A, v)
     low = 0, high = A.length - 1
     while low <= high do
         mid = floor((low + high) / 2)
@@ -580,7 +580,7 @@ const algorithms = {
         a[j + 1] = key;
       }
     }`,
-    pseudo: `INSERTION-SORT(A)
+      pseudo: `INSERTION-SORT(A)
     for j = 1 to A.length - 1 do
         key = A[j]
         i = j - 1
@@ -590,7 +590,7 @@ const algorithms = {
         end while
         A[i + 1] = key
     end for`,
-    cpp: `void insertionSort(int a[], int n) {
+      cpp: `void insertionSort(int a[], int n) {
     for (int i = 1; i < n; i++) {
         int key = a[i], j = i - 1;
         while (j >= 0 && a[j] > key) {
@@ -600,13 +600,13 @@ const algorithms = {
         a[j + 1] = key;
     }
     }`,
-    python: `def insertion_sort(a):
+      python: `def insertion_sort(a):
       for i in range(1, len(a)):
         key, j = a[i], i - 1
         while j >= 0 and a[j] > key:
             a[j + 1] = a[j]
             j -= 1
-        a[j + 1] = key`
+        a[j + 1] = key`,
     },
   },
   selection_sort: {
@@ -616,7 +616,7 @@ const algorithms = {
     question: "Result after sorting?",
     hint: "Find min, swap with current index.",
     codes: {
-    java: `void selectionSort(int[] arr) {
+      java: `void selectionSort(int[] arr) {
     for (int i = 0; i < n-1; i++) {
         int min = i;
         for (int j = i+1; j < n; j++)
@@ -624,7 +624,7 @@ const algorithms = {
         swap(arr, i, min);
     }
 }`,
-    pseudo: `SELECTION-SORT(A)
+      pseudo: `SELECTION-SORT(A)
     n = A.length
     for i = 0 to n - 2 do
         min = i
@@ -633,7 +633,7 @@ const algorithms = {
         end for
         exchange A[i] with A[min]
     end for`,
-    cpp: `void selectionSort(int arr[], int n) {
+      cpp: `void selectionSort(int arr[], int n) {
     for (int i = 0; i < n - 1; i++) {
         int min_idx = i;
         for (int j = i + 1; j < n; j++)
@@ -641,12 +641,12 @@ const algorithms = {
         swap(arr[i], arr[min_idx]);
     }
     }`,
-    python: `def selection_sort(arr):
+      python: `def selection_sort(arr):
     for i in range(len(arr)):
         min_idx = i
         for j in range(i + 1, len(arr)):
             if arr[j] < arr[min_idx]: min_idx = j
-        arr[i], arr[min_idx] = arr[min_idx], arr[i]`
+        arr[i], arr[min_idx] = arr[min_idx], arr[i]`,
     },
   },
   merge_sort: {
@@ -664,7 +664,7 @@ const algorithms = {
         merge(arr, l, m, r);
     }
 }`,
-      cpp:`void merge(int arr[], int l, int m, int r) {
+      cpp: `void merge(int arr[], int l, int m, int r) {
     int n1 = m - l + 1, n2 = r - m;
     int L[n1], R[n2];
     for (int i = 0; i < n1; i++) L[i] = arr[l + i];
@@ -681,9 +681,8 @@ void mergeSort(int arr[], int l, int r) {
         mergeSort(arr, m + 1, r);
         merge(arr, l, m, r);
     }
-}`
-      ,
-      python:`def merge_sort(arr):
+}`,
+      python: `def merge_sort(arr):
     if len(arr) > 1:
         mid = len(arr) // 2
         L, R = arr[:mid], arr[mid:]
@@ -718,13 +717,15 @@ void mergeSort(int arr[], int l, int r) {
         quickSort(arr, p, q - 1);
         quickSort(arr, q + 1, r);
     }
-}`, cpp:`void quickSort(int arr[], int p, int r) {
+}`,
+      cpp: `void quickSort(int arr[], int p, int r) {
     if (p < r) {
         int q = partition(arr, p, r); // Partition the array
         quickSort(arr, p, q - 1);    // Sort the left subarray
         quickSort(arr, q + 1, r);    // Sort the right subarray
     }
-}`,python:`def partition(arr, p, r):
+}`,
+      python: `def partition(arr, p, r):
     pivot = arr[r]
     i = p - 1
     for j in range(p, r):
@@ -765,7 +766,7 @@ def quick_sort(arr, p, r):
     return PARTITION(A, p, r)`,
     },
 
-    cpp:`int randomizedPartition(int arr[], int p, int r) {
+    cpp: `int randomizedPartition(int arr[], int p, int r) {
     int i = p + rand() % (r - p + 1);
     swap(arr[r], arr[i]);
     return partition(arr, p, r);
@@ -778,7 +779,7 @@ void randomizedQuickSort(int arr[], int p, int r) {
     }
 }
 }`,
-    python:`import random
+    python: `import random
 def randomized_partition(arr, p, r):
     i = random.randint(p, r)
     arr[r], arr[i] = arr[i], arr[r]
@@ -788,7 +789,6 @@ def randomized_quick_sort(arr, p, r):
         q = randomized_partition(arr, p, r)
         randomized_quick_sort(arr, p, q - 1)
         randomized_quick_sort(arr, q + 1, r)`,
-
   },
   bfs: {
     name: "BFS Traversal",
@@ -814,7 +814,7 @@ def randomized_quick_sort(arr, p, r):
     question: "Order of BFS starting from node A (0)?",
     hint: "Queue: A -> Neighbors -> Neighbors of neighbors.",
     codes: {
-    java: `void BFS(int s) {
+      java: `void BFS(int s) {
     boolean visited[] = new boolean[V];
     Queue<Integer> queue = new LinkedList<>();
     visited[s] = true;
@@ -829,7 +829,7 @@ def randomized_quick_sort(arr, p, r):
         }
     }
 }`,
-    pseudo: `BFS(G, s)
+      pseudo: `BFS(G, s)
     for each u in G.V - {s} do u.color = WHITE
     s.color = GRAY
     Q = {s}
@@ -843,7 +843,7 @@ def randomized_quick_sort(arr, p, r):
         end for
         u.color = BLACK
     end while`,
-    cpp: `void BFS(int s, vector<int> adj[], int V) {
+      cpp: `void BFS(int s, vector<int> adj[], int V) {
     vector<bool> visited(V, false);
     queue<int> q;
     visited[s] = true;
@@ -858,14 +858,14 @@ def randomized_quick_sort(arr, p, r):
         }
     }
 }`,
-  python: `def bfs(adj, s):
+      python: `def bfs(adj, s):
     visited, q = {s}, [s]
     while q:
         u = q.pop(0)
         for v in adj[u]:
             if v not in visited:
                 visited.add(v)
-                q.append(v)`
+                q.append(v)`,
     },
   },
   dfs: {
@@ -889,24 +889,26 @@ def randomized_quick_sort(arr, p, r):
     question: "Order of DFS starting from node A (0)?",
     hint: "Go deep before going wide. Recursive.",
     codes: {
-    java: `void DFS(int v, boolean[] visited) {
+      java: `void DFS(int v, boolean[] visited) {
     visited[v] = true;
     System.out.print(v + " ");
     for (int n : adj[v]) {
         if (!visited[n]) DFS(n, visited);
     }
-}`,cpp:`void DFS(int v, vector<int> adj[], vector<bool>& visited) {
+}`,
+      cpp: `void DFS(int v, vector<int> adj[], vector<bool>& visited) {
     visited[v] = true;
     for (int n : adj[v]) {
         if (!visited[n]) DFS(n, adj, visited);
     }
-}`,python:`def dfs(adj, v, visited=None):
+}`,
+      python: `def dfs(adj, v, visited=None):
     if visited is None: visited = set()
     visited.add(v)
     for neighbor in adj[v]:
         if neighbor not in visited:
             dfs(adj, neighbor, visited)`,
-    pseudo: `DFS(G)
+      pseudo: `DFS(G)
     for each u in G.V do u.color = WHITE
     time = 0
     for each u in G.V do
@@ -998,7 +1000,7 @@ DFS-VISIT(G, u)
         }
     }
 }`,
-  python: `def dijkstra(adj, src):
+    python: `def dijkstra(adj, src):
     dist = {node: float('inf') for node in adj}
     dist[src], pq = 0, [(0, src)]
     while pq:
@@ -1007,7 +1009,7 @@ DFS-VISIT(G, u)
         for v, w in adj[u]:
             if dist[u] + w < dist[v]:
                 dist[v] = dist[u] + w
-                heapq.heappush(pq, (dist[v], v))`
+                heapq.heappush(pq, (dist[v], v))`,
   },
   kruskal: {
     name: "Kruskal's MST",
@@ -1039,7 +1041,8 @@ DFS-VISIT(G, u)
             union(e.src, e.dest);
         }
     }
-}`,cpp:`struct Edge { 
+}`,
+      cpp: `struct Edge { 
     int u, v, w; 
 };
 
@@ -1086,7 +1089,7 @@ void kruskal(vector<Edge>& edges, int V) {
     // mst now contains the edges of the Minimum Spanning Tree
 }
 }`,
-      python:`
+      python: `
       class Edge:
     def __init__(self, u, v, w):
         self.u = u
@@ -1149,7 +1152,7 @@ def kruskal(edges, V):
     question: "Perform Left-Rotate on the Root. What is the new Root?",
     hint: "x.right becomes new root. x becomes left child of new root.",
     codes: {
-    java: `void leftRotate(Node x) {
+      java: `void leftRotate(Node x) {
     Node y = x.right;
     x.right = y.left;
     if (y.left != null) y.left.parent = x;
@@ -1160,7 +1163,7 @@ def kruskal(edges, V):
     y.left = x;
     x.parent = y;
 }`,
-    pseudo: `LEFT-ROTATE(T, x)
+      pseudo: `LEFT-ROTATE(T, x)
     y = x.right
     x.right = y.left
     if y.left != NIL then y.left.p = x
@@ -1182,7 +1185,7 @@ def kruskal(edges, V):
     y->left = x;
     x->parent = y;
 }`,
-  python: `def left_rotate(self, x):
+    python: `def left_rotate(self, x):
     y = x.right
     x.right = y.left
     if y.left: y.left.parent = x
@@ -1191,7 +1194,7 @@ def kruskal(edges, V):
     elif x == x.parent.left: x.parent.left = y
     else: x.parent.right = y
     y.left = x
-    x.parent = y`
+    x.parent = y`,
   },
   right_rotate: {
     name: "Right Rotate",
@@ -1213,7 +1216,8 @@ def kruskal(edges, V):
     else y.parent.left = x;
     x.right = y;
     y.parent = x;
-}`,cpp:`void rightRotate(Node* &root, Node* y) {
+}`,
+      cpp: `void rightRotate(Node* &root, Node* y) {
     Node* x = y->left;
     y->left = x->right;
     if (x->right != nullptr) x->right->parent = y;
@@ -1223,7 +1227,8 @@ def kruskal(edges, V):
     else y->parent->left = x;
     x->right = y;
     y->parent = x;
-}`,python:`def right_rotate(self, y):
+}`,
+      python: `def right_rotate(self, y):
     x = y.left
     y.left = x.right
     if x.right: x.right.parent = y
@@ -1859,23 +1864,27 @@ export default function DSAExamPrep() {
                 )}
               </div>
             </div>
-            
+
             <div className="flex flex-col flex-1 bg-[#1e1e1e] rounded-xl shadow-lg overflow-hidden border border-slate-700">
               <div className="bg-[#252526] p-2 border-b border-[#333] flex justify-between items-center">
                 <div className="flex gap-1">
-                  {["java", "cpp", "python", "pseudo"].map((lang) => (//The container holding all the language
-                    <button
-                      key={lang}
-                      onClick={() => setCodeLang(lang)}
-                      className={`px-3 py-1 text-xs rounded uppercase font-bold transition-colors ${
-                        codeLang === lang
-                          ? "bg-indigo-600 text-white"
-                          : "text-slate-400 hover:text-white hover:bg-[#333]"
-                      }`}
-                    >
-                      {lang}
-                    </button>
-                  ))}
+                  {["java", "cpp", "python", "pseudo"].map(
+                    (
+                      lang //The container holding all the language
+                    ) => (
+                      <button
+                        key={lang}
+                        onClick={() => setCodeLang(lang)}
+                        className={`px-3 py-1 text-xs rounded uppercase font-bold transition-colors ${
+                          codeLang === lang
+                            ? "bg-indigo-600 text-white"
+                            : "text-slate-400 hover:text-white hover:bg-[#333]"
+                        }`}
+                      >
+                        {lang}
+                      </button>
+                    )
+                  )}
                 </div>
                 <button //To reveal the solution
                   onClick={() => setShowSolution(!showSolution)}
