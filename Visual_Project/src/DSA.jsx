@@ -1345,6 +1345,7 @@ def kruskal(edges, V):
     if largest != i:
         arr[i], arr[largest] = arr[largest], arr[i]
         max_heapify(arr, n, largest)`,
+        cpp:``,
       pseudo: `MAX-HEAPIFY(A, i)
     l = LEFT(i)
     r = RIGHT(i)
