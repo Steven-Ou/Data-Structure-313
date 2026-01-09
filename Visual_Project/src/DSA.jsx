@@ -1345,7 +1345,24 @@ def kruskal(edges, V):
     if largest != i:
         arr[i], arr[largest] = arr[largest], arr[i]
         max_heapify(arr, n, largest)`,
-        cpp:``,
+        cpp:`void maxHeapify(int arr[], int n, int i) {
+    int largest = i;
+    int l = 2 * i + 1;
+    int r = 2 * i + 2;
+
+   if (l < n && arr[l] > arr[largest])
+        largest = l;
+
+    if (r < n && arr[r] > arr[largest])
+        largest = r;
+
+    if (largest != i) {
+        swap(arr[i], arr[largest]);
+
+        // Recursively heapify the affected sub-tree
+        maxHeapify(arr, n, largest);
+    }
+}`,
       pseudo: `MAX-HEAPIFY(A, i)
     l = LEFT(i)
     r = RIGHT(i)
