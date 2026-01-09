@@ -1338,14 +1338,15 @@ def kruskal(edges, V):
         swap(arr, i, largest);
         maxHeapify(arr, n, largest);
     }
-}`,     python:`def max_heapify(arr, n, i):
+}`,
+      python: `def max_heapify(arr, n, i):
     largest, l, r = i, 2*i + 1, 2*i + 2
     if l < n and arr[l] > arr[largest]: largest = l
     if r < n and arr[r] > arr[largest]: largest = r
     if largest != i:
         arr[i], arr[largest] = arr[largest], arr[i]
         max_heapify(arr, n, largest)`,
-        cpp:`void maxHeapify(int arr[], int n, int i) {
+      cpp: `void maxHeapify(int arr[], int n, int i) {
     int largest = i;
     int l = 2 * i + 1;
     int r = 2 * i + 2;
