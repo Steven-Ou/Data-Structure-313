@@ -1498,7 +1498,25 @@ POP(S)
         }
     }
     return s.top();
-}`,python:``,
+}`,python:`def eval_postfix(exp):
+    stack = []
+    tokens = exp.split() if ' ' in exp else list(exp)
+    
+    for t in tokens:
+        if t.isdigit():
+            stack.append(int(t))
+        else:
+            b = stack.pop()
+            a = stack.pop()
+            if t == '+':
+                stack.append(a + b)
+            elif t == '-':
+                stack.append(a - b)
+            elif t == '*':
+                stack.append(a * b)
+            elif t == '/':
+                stack.append(a // b)
+    return stack[0]`,
       pseudo: `EVAL-POSTFIX(E)
     S = empty stack
     for each token t in E do
