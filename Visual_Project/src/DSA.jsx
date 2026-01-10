@@ -1487,7 +1487,7 @@ POP(S)
         }
     }
     return stack.pop();
-}`,
+}`,cpp:`,`
       pseudo: `EVAL-POSTFIX(E)
     S = empty stack
     for each token t in E do
