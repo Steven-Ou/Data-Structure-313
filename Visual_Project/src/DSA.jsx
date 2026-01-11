@@ -1549,7 +1549,15 @@ POP(S)
         i++;
     } while (i < m);
     throw new Exception("Overflow");
-}`,cpp:``,
+}`,cpp:`int hashInsert(int T[], int k, int m) {
+    int i = 0;
+    do {
+        int j = (h(k) + i) % m;
+        if (T[j] == EMPTY) { T[j] = k; return j; }
+        i++;
+    } while (i < m);
+    return -1;
+}`,
         python:``,
       pseudo: `HASH-INSERT(T, k)
     i = 0
