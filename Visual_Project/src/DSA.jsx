@@ -1549,7 +1549,8 @@ POP(S)
         i++;
     } while (i < m);
     throw new Exception("Overflow");
-}`,
+}`,cpp:``,
+        python:``,
       pseudo: `HASH-INSERT(T, k)
     i = 0
     repeat
