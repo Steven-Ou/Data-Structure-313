@@ -1558,7 +1558,18 @@ POP(S)
     } while (i < m);
     return -1;
 }`,
-        python:``,
+        python:`def hash_insert(T, k, m):
+    i = 0
+    while True:
+        j = (h(k) + i) % m
+        # Check if the slot is empty (using None to represent EMPTY)
+        if T[j] is None:
+            T[j] = k
+            return j 
+        i += 1
+        if i >= m:
+            break    
+    return -1`,
       pseudo: `HASH-INSERT(T, k)
     i = 0
     repeat
