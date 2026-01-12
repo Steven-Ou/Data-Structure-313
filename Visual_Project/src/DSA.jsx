@@ -1559,16 +1559,27 @@ POP(S)
     return -1;
 }`,
         python:`def hash_insert(T, k, m):
+    """
+    Inserts key k into hash table T of size m using linear probing.
+    Matches the logic of the provided C++ snippet.
+    """
     i = 0
     while True:
+        # Calculate index using the hash function h(k) and linear probe i
+        # In Python, you can define h(k) as k % m or use a custom function
         j = (h(k) + i) % m
+        
         # Check if the slot is empty (using None to represent EMPTY)
         if T[j] is None:
             T[j] = k
-            return j 
+            return j
+            
         i += 1
+        
+        # Stop if we have probed all m slots (Table is full)
         if i >= m:
-            break    
+            break
+            
     return -1`,
       pseudo: `HASH-INSERT(T, k)
     i = 0
