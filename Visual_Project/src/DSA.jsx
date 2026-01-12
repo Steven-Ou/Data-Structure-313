@@ -1487,7 +1487,8 @@ POP(S)
         }
     }
     return stack.pop();
-}`,cpp:`int evalPostfix(string exp) {
+}`,
+      cpp: `int evalPostfix(string exp) {
     stack<int> s;
     for (char c : exp) {
         if (isdigit(c)) s.push(c - '0');
@@ -1498,7 +1499,8 @@ POP(S)
         }
     }
     return s.top();
-}`,python:`def eval_postfix(exp):
+}`,
+      python: `def eval_postfix(exp):
     stack = []
     tokens = exp.split() if ' ' in exp else list(exp)
     
@@ -1549,7 +1551,8 @@ POP(S)
         i++;
     } while (i < m);
     throw new Exception("Overflow");
-}`,cpp:`int hashInsert(int T[], int k, int m) {
+}`,
+      cpp: `int hashInsert(int T[], int k, int m) {
     int i = 0;
     do {
         int j = (h(k) + i) % m;
@@ -1558,7 +1561,7 @@ POP(S)
     } while (i < m);
     return -1;
 }`,
-        python:`def hash_insert(T, k, m):
+      python: `def hash_insert(T, k, m):
     """
     Inserts key k into hash table T of size m using linear probing.
     Matches the logic of the provided C++ snippet.
