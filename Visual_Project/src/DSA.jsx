@@ -706,6 +706,7 @@ void mergeSort(int arr[], int l, int r) {
   },
   bubble_sort: {
     name: "Bubble Sort",
+    category:"Sorting",
   },
   quick_sort: {
     name: "Quick Sort",
