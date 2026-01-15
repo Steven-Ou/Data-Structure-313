@@ -709,6 +709,7 @@ void mergeSort(int arr[], int l, int r) {
     category:"Sorting",
     solve: (d) => (d ? [...d].sort((a, b) => a - b).join(", ") : ""),
     question: (d) => d && d.length
+    ? `Given the array [${d.join(", ")}], what is the result after one full pass (largest element bubbled to the end)?`
   },
   quick_sort: {
     name: "Quick Sort",
