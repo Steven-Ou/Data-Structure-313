@@ -708,6 +708,7 @@ void mergeSort(int arr[], int l, int r) {
     name: "Bubble Sort",
     category:"Sorting",
     solve: (d) => (d ? [...d].sort((a, b) => a - b).join(", ") : ""),
+    question: (d) => d && d.length
   },
   quick_sort: {
     name: "Quick Sort",
