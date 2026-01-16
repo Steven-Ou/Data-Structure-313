@@ -706,11 +706,15 @@ void mergeSort(int arr[], int l, int r) {
   },
   bubble_sort: {
     name: "Bubble Sort",
-    category:"Sorting",
+    category: "Sorting",
     solve: (d) => (d ? [...d].sort((a, b) => a - b).join(", ") : ""),
-    question: (d) => d && d.length
-    ? `Given the array [${d.join(", ")}], what is the result after one full pass (largest element bubbled to the end)?`
-    : "Loading...",
+    question: (d) =>
+      d && d.length
+        ? `Given the array [${d.join(
+            ", "
+          )}], what is the result after one full pass (largest element bubbled to the end)?`
+        : "Loading...",
+    hint: "Compare adjacent elements (arr[j], arr[j+1]) and swap if the first is greater than the second.",
   },
   quick_sort: {
     name: "Quick Sort",
