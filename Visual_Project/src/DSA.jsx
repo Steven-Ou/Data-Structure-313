@@ -711,7 +711,7 @@ void mergeSort(int arr[], int l, int r) {
     question: (d) =>
       d && d.length
         ? `Given the array [${d.join(
-            ", "
+            ", ",
           )}], what is the result after one full pass (largest element bubbled to the end)?`
         : "Loading...",
     hint: "Compare adjacent elements (arr[j], arr[j+1]) and swap if the first is greater than the second.",
@@ -738,6 +738,11 @@ void mergeSort(int arr[], int l, int r) {
         for j in range(0, n - i - 1):
             if arr[j] > arr[j + 1]:
                 arr[j], arr[j + 1] = arr[j + 1], arr[j]`,
+      pseudo: `BUBBLE-SORT(A)
+    for i = 0 to A.length - 2
+        for j = A.length - 1 downto i + 1
+            if A[j] < A[j - 1]
+                exchange A[j] with A[j - 1]`,
     },
   },
   quick_sort: {
@@ -1670,7 +1675,7 @@ export default function DSAExamPrep() {
     const cat = currentAlgo.category;
     if (cat === "Graphs")
       setProblemData(
-        generateGraph(5, activeAlgo !== "kruskal", activeAlgo !== "bfs")
+        generateGraph(5, activeAlgo !== "kruskal", activeAlgo !== "bfs"),
       );
     else if (cat === "Trees") {
       if (activeAlgo === "heap_ops") setProblemData(generateHeapData());
@@ -1696,22 +1701,22 @@ export default function DSAExamPrep() {
       const expected = currentAlgo.expected || {};
       const clean = (str) => str.toLowerCase().replace(/[^a-z0-9]/g, "");
       const isHeightCorrect = clean(recInputs.height).includes(
-        clean(expected.height)
+        clean(expected.height),
       );
       const isSizeCorrect =
         clean(recInputs.size).includes(clean(expected.size)) ||
         clean(expected.size) === "varies";
       const isWorkCorrect = clean(recInputs.work).includes(
-        clean(expected.work)
+        clean(expected.work),
       );
       const isComplexCorrect = clean(recInputs.complexity).includes(
-        clean(expected.complexity)
+        clean(expected.complexity),
       );
 
       setFeedback(
         isHeightCorrect && isSizeCorrect && isWorkCorrect && isComplexCorrect
           ? "correct"
-          : "incorrect"
+          : "incorrect",
       );
     } else {
       const correct = String(currentAlgo.solve(problemData));
@@ -1994,7 +1999,7 @@ export default function DSAExamPrep() {
                 <div className="flex gap-1">
                   {["java", "cpp", "python", "pseudo"].map(
                     (
-                      lang //The container holding all the language
+                      lang, //The container holding all the language
                     ) => (
                       <button
                         key={lang}
@@ -2007,7 +2012,7 @@ export default function DSAExamPrep() {
                       >
                         {lang}
                       </button>
-                    )
+                    ),
                   )}
                 </div>
                 <button //To reveal the solution
