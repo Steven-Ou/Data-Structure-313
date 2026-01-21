@@ -1769,6 +1769,7 @@ export default function DSAExamPrep() {
           <SidebarSection
             title="Sorting"
             items={[
+              "bubble_sort",
               "insertion_sort",
               "selection_sort",
               "merge_sort",
