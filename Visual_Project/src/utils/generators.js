@@ -1,3 +1,5 @@
+import { TreeNode } from "../models/TreeNode"; 
+
 const generateGraph = (numNodes = 5, directed = false, weighted = true) => {
   const nodes = Array.from({ length: numNodes }, (_, i) => ({
     id: i,
