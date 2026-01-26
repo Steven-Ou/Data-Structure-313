@@ -62,3 +62,61 @@ const generateBSTData = (count = 7) => {
   }
   return { root, values };
 };
+
+const generateRBTData = () => {
+  const root = new TreeNode(50, "black");
+  root.left = new TreeNode(25, "red");
+  root.right = new TreeNode(75, "red");
+  root.left.parent = root;
+  root.right.parent = root;
+  return { root };
+};
+
+const generateHeapData = () =>
+  Array.from({ length: 7 }, () => Math.floor(Math.random() * 50) + 10);
+
+const generateSortData = (size = 6) =>
+  Array.from({ length: size }, () => Math.floor(Math.random() * 50) + 1);
+
+const generateStackData = () => {
+  const ops = [];
+  const values = [];
+  for (let i = 0; i < 5; i++) {
+    if (Math.random() > 0.4 || values.length === 0) {
+      const val = Math.floor(Math.random() * 99);
+      ops.push({ type: "push", val });
+      values.push(val);
+    } else {
+      ops.push({ type: "pop" });
+      values.pop();
+    }
+  }
+  return { ops, result: values };
+};
+
+const generateHashData = (size = 7) => {
+  const table = Array(size).fill(null);
+  for (let i = 0; i < 3; i++) {
+    let idx = Math.floor(Math.random() * size);
+    while (table[idx] !== null) idx = (idx + 1) % size;
+    table[idx] = Math.floor(Math.random() * 50) + 1;
+  }
+  return {
+    table,
+    key: Math.floor(Math.random() * 50) + 1,
+    size,
+    strategy: "Linear",
+  };
+};
+
+const generatePostfixData = () => {
+  const ops = ["+", "-", "*"];
+  const a = Math.floor(Math.random() * 9) + 1;
+  const b = Math.floor(Math.random() * 9) + 1;
+  const c = Math.floor(Math.random() * 9) + 1;
+  return {
+    expr: `${a} ${b} ${c} ${ops[Math.floor(Math.random() * 3)]} ${
+      ops[Math.floor(Math.random() * 3)]
+    }`,
+  };
+};
