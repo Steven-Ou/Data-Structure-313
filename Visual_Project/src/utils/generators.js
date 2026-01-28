@@ -1,6 +1,6 @@
 import { TreeNode } from "../DSA"; 
 
-const generateGraph = (numNodes = 5, directed = false, weighted = true) => {
+export const generateGraph = (numNodes = 5, directed = false, weighted = true) => {
   const nodes = Array.from({ length: numNodes }, (_, i) => ({
     id: i,
     label: String.fromCharCode(65 + i),
@@ -34,7 +34,7 @@ const generateGraph = (numNodes = 5, directed = false, weighted = true) => {
   return { nodes, edges, directed, weighted };
 };
 //BST DATA
-const generateBSTData = (count = 7) => {
+export const generateBSTData = (count = 7) => {
   const rootVal = Math.floor(Math.random() * 40) + 30;
   const root = new TreeNode(rootVal, "black");
   const values = [rootVal];
@@ -65,7 +65,7 @@ const generateBSTData = (count = 7) => {
   return { root, values };
 };
 
-const generateRBTData = () => {
+export const generateRBTData = () => {
   const root = new TreeNode(50, "black");
   root.left = new TreeNode(25, "red");
   root.right = new TreeNode(75, "red");
@@ -74,7 +74,7 @@ const generateRBTData = () => {
   return { root };
 };
 
-const generateHeapData = () =>
+export const generateHeapData = () =>
   Array.from({ length: 7 }, () => Math.floor(Math.random() * 50) + 10);
 
 const generateSortData = (size = 6) =>
