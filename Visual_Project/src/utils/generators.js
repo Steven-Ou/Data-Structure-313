@@ -80,7 +80,7 @@ export const generateHeapData = () =>
 const generateSortData = (size = 6) =>
   Array.from({ length: size }, () => Math.floor(Math.random() * 50) + 1);
 
-const generateStackData = () => {
+export const generateStackData = () => {
   const ops = [];
   const values = [];
   for (let i = 0; i < 5; i++) {
@@ -96,7 +96,7 @@ const generateStackData = () => {
   return { ops, result: values };
 };
 
-const generateHashData = (size = 7) => {
+export const generateHashData = (size = 7) => {
   const table = Array(size).fill(null);
   for (let i = 0; i < 3; i++) {
     let idx = Math.floor(Math.random() * size);
@@ -111,7 +111,7 @@ const generateHashData = (size = 7) => {
   };
 };
 
-const generatePostfixData = () => {
+export const generatePostfixData = () => {
   const ops = ["+", "-", "*"];
   const a = Math.floor(Math.random() * 9) + 1;
   const b = Math.floor(Math.random() * 9) + 1;
