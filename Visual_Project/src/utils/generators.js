@@ -1,4 +1,4 @@
-import { TreeNode } from "../models/TreeNode"; 
+import { TreeNode } from "../DSA"; 
 
 const generateGraph = (numNodes = 5, directed = false, weighted = true) => {
   const nodes = Array.from({ length: numNodes }, (_, i) => ({
