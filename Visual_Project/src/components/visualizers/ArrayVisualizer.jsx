@@ -92,7 +92,7 @@ export const GraphVisualizer = ({ data }) => {
   );
 };
 
-const TreeVisualizer = ({ root }) => {
+export const TreeVisualizer = ({ root }) => {
   if (!root)
     return <div className="text-slate-400 p-8 text-center">No Tree Data</div>;
   const levels = [];
@@ -171,7 +171,7 @@ const TreeVisualizer = ({ root }) => {
   );
 };
 
-const ArrayVisualizer = ({ data }) => {
+export const ArrayVisualizer = ({ data }) => {
   if (!data || !Array.isArray(data))
     return <div className="text-slate-400 p-8 text-center">No Data</div>;
   const maxVal = 50;
