@@ -1,7 +1,7 @@
 import React from 'react';
 
 
-const GraphVisualizer = ({ data }) => {
+export const GraphVisualizer = ({ data }) => {
   if (!data || !data.nodes) return <div>No Graph Data</div>;
   const { nodes, edges } = data;
   const width = 400;
