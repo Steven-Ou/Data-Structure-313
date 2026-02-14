@@ -1,6 +1,6 @@
 import { TreeNode } from "../DSA";
 
-const generateGraph = (numNodes = 5, directed = false, weighted = true) => {
+export const generateGraph = (numNodes = 5, directed = false, weighted = true) => {
   const nodes = Array.from({ length: numNodes }, (_, i) => ({
     id: i,
     label: String.fromCharCode(65 + i),
@@ -34,7 +34,7 @@ const generateGraph = (numNodes = 5, directed = false, weighted = true) => {
   return { nodes, edges, directed, weighted };
 };
 //BST DATA
-const generateBSTData = (count = 7) => {
+export const generateBSTData = (count = 7) => {
   const rootVal = Math.floor(Math.random() * 40) + 30;
   const root = new TreeNode(rootVal, "black");
   const values = [rootVal];
@@ -65,7 +65,7 @@ const generateBSTData = (count = 7) => {
   return { root, values };
 };
 
-const generateRBTData = () => {
+export const generateRBTData = () => {
   const root = new TreeNode(50, "black");
   root.left = new TreeNode(25, "red");
   root.right = new TreeNode(75, "red");
@@ -74,13 +74,13 @@ const generateRBTData = () => {
   return { root };
 };
 
-const generateHeapData = () =>
+export const generateHeapData = () =>
   Array.from({ length: 7 }, () => Math.floor(Math.random() * 50) + 10);
 
-const generateSortData = (size = 6) =>
+export const generateSortData = (size = 6) =>
   Array.from({ length: size }, () => Math.floor(Math.random() * 50) + 1);
 
-const generateStackData = () => {
+export const generateStackData = () => {
   const ops = [];
   const values = [];
   for (let i = 0; i < 5; i++) {
@@ -96,7 +96,7 @@ const generateStackData = () => {
   return { ops, result: values };
 };
 
-const generateHashData = (size = 7) => {
+export const generateHashData = (size = 7) => {
   const table = Array(size).fill(null);
   for (let i = 0; i < 3; i++) {
     let idx = Math.floor(Math.random() * size);
@@ -111,7 +111,7 @@ const generateHashData = (size = 7) => {
   };
 };
 
-const generatePostfixData = () => {
+export const generatePostfixData = () => {
   const ops = ["+", "-", "*"];
   const a = Math.floor(Math.random() * 9) + 1;
   const b = Math.floor(Math.random() * 9) + 1;
