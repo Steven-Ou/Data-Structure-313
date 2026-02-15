@@ -1,4 +1,4 @@
-const buildAdjList = (nodes, edges, directed) => {
+export const buildAdjList = (nodes, edges, directed) => {
   const adj = {};
   nodes.forEach((n) => (adj[n.id] = []));
   edges.forEach((e) => {
@@ -12,7 +12,7 @@ const buildAdjList = (nodes, edges, directed) => {
   return adj;
 };
 
-const analyzeCode = (code, algoType) => {
+export const analyzeCode = (code, algoType) => {
   if (!code) return { detectedLang: "None", percentage: 0, feedback: [] };
   const codeLower = code.toLowerCase();
   let detectedLang = "Pseudo-code";
@@ -34,7 +34,7 @@ const analyzeCode = (code, algoType) => {
   };
 };
 
-const evalPostfixHelper = (expr) => {
+export const evalPostfixHelper = (expr) => {
   if (!expr) return 0;
   const tokens = expr.split(" ");
   const stack = [];
