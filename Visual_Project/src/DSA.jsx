@@ -13,29 +13,36 @@ import {
   Calculator,
 } from "lucide-react";
 
-import { 
-  generateGraph, generateBSTData, generateHeapData, 
-  generateSortData, generateStackData, generateHashData, generatePostfixData 
+import { algorithms } from "./data/algorithms";
+import {
+  generateGraph,
+  generateBSTData,
+  generateHeapData,
+  generateSortData,
+  generateStackData,
+  generateHashData,
+  generatePostfixData,
 } from "./utils/generators";
-import { 
-  GraphVisualizer, TreeVisualizer, ArrayVisualizer, 
-  StackVisualizer, PostfixVisualizer, RecurrenceVisualizer, HashVisualizer 
+import {
+  GraphVisualizer,
+  TreeVisualizer,
+  ArrayVisualizer,
+  StackVisualizer,
+  PostfixVisualizer,
+  RecurrenceVisualizer,
+  HashVisualizer,
 } from "./components/visualizers/ArrayVisualizer";
 // --- DATA STRUCTURE CLASSES ---
 
-
 // --- HELPER FUNCTIONS ---
 
-
 // --- STATIC CODE ANALYZER ENGINE ---
-
 
 // --- GENERATORS ---
 
 // --- VISUALIZERS (Defined before use) ---
 
 // --- ALGORITHMS ENGINE ---
-
 
 // --- MAIN COMPONENT ---
 
