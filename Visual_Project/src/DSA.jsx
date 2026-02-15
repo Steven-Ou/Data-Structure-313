@@ -17,6 +17,10 @@ import {
   generateGraph, generateBSTData, generateHeapData, 
   generateSortData, generateStackData, generateHashData, generatePostfixData 
 } from "./utils/generators";
+import { 
+  GraphVisualizer, TreeVisualizer, ArrayVisualizer, 
+  StackVisualizer, PostfixVisualizer, RecurrenceVisualizer, HashVisualizer 
+} from "./components/visualizers/ArrayVisualizer";
 // --- DATA STRUCTURE CLASSES ---
 
 
