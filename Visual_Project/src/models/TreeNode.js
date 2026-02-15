@@ -1,4 +1,4 @@
-class TreeNode {
+export class TreeNode {
   constructor(val, color = "red") {
     this.val = val;
     this.left = null;
