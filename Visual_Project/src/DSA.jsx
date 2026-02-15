@@ -12,8 +12,9 @@ import {
   Search,
   Calculator,
 } from "lucide-react";
-
+// 1. Import the huge algorithms object
 import { algorithms } from "./data/algorithms";
+// 2. Import the generators
 import {
   generateGraph,
   generateBSTData,
@@ -23,6 +24,7 @@ import {
   generateHashData,
   generatePostfixData,
 } from "./utils/generators";
+// 3. Import the visualizers
 import {
   GraphVisualizer,
   TreeVisualizer,
@@ -32,6 +34,9 @@ import {
   RecurrenceVisualizer,
   HashVisualizer,
 } from "./components/visualizers/ArrayVisualizer";
+// 4. Import the helpers
+import { analyzeCode } from "./utils/helpers";
+
 // --- DATA STRUCTURE CLASSES ---
 
 // --- HELPER FUNCTIONS ---
