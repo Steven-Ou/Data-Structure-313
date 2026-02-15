@@ -195,7 +195,7 @@ export const ArrayVisualizer = ({ data }) => {
   );
 };
 
-const StackVisualizer = ({ data }) => {
+export const StackVisualizer = ({ data }) => {
   if (!data || !data.result) return null;
   return (
     <div className="flex flex-col-reverse items-center gap-1 h-48 w-full p-4 border rounded bg-slate-50 overflow-y-auto">
@@ -214,7 +214,7 @@ const StackVisualizer = ({ data }) => {
   );
 };
 
-const PostfixVisualizer = ({ data }) => (
+export const PostfixVisualizer = ({ data }) => (
   <div className="flex flex-col items-center justify-center h-full p-4">
     <div className="text-2xl font-mono bg-slate-100 p-4 rounded mb-2 tracking-widest">
       {data ? data.expr : "Loading..."}
@@ -225,7 +225,7 @@ const PostfixVisualizer = ({ data }) => (
   </div>
 );
 
-const RecurrenceVisualizer = () => (
+export const RecurrenceVisualizer = () => (
   <div className="flex flex-col items-center justify-center h-full text-center p-4">
     <div className="text-4xl font-serif italic mb-4 text-slate-700">
       T(n) = ...
@@ -234,7 +234,7 @@ const RecurrenceVisualizer = () => (
   </div>
 );
 
-const HashVisualizer = ({ data }) => {
+export const HashVisualizer = ({ data }) => {
   if (!data || !data.table)
     return <div className="text-slate-400 p-8">No Hash Data</div>;
   return (
