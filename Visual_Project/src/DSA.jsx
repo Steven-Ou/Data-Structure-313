@@ -13,6 +13,10 @@ import {
   Calculator,
 } from "lucide-react";
 
+import { 
+  generateGraph, generateBSTData, generateHeapData, 
+  generateSortData, generateStackData, generateHashData, generatePostfixData 
+} from "./utils/generators";
 // --- DATA STRUCTURE CLASSES ---
 
 
